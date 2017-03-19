@@ -35,8 +35,11 @@
                     <archive>
                         <manifest>
                             <mainClass>de.mk_bauer.heldensoftware.customentries.HeldenLauncher</mainClass>
-                            <!-- HeldenPluginClass: heldenbildPlugin.HeldenbildPlugin.class -->
                         </manifest>
+                        <manifestEntries>
+                            <!-- HeldenPluginClass: heldenbildPlugin.HeldenbildPlugin.class -->
+                            <HeldenPluginClass>de.mk_bauer.heldensoftware.customentries.CustomEntryLoaderPlugin.class</HeldenPluginClass>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
