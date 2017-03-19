@@ -11,5 +11,14 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Maven: de.helden_software:helden:5.5.2">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/heldensoftware/helden.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

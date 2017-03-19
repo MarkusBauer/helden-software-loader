@@ -43,4 +43,15 @@
         </plugins>
     </build>
 
+    <dependencies>
+        <dependency>
+            <groupId>de.helden_software</groupId>
+            <artifactId>helden</artifactId>
+            <version>5.5.2</version>
+            <scope>system</scope>
+            <!-- You can use a symlink to the installation directory, if you're on linux, and want life to be easy! -->
+            <systemPath>${project.basedir}/heldensoftware/helden.jar</systemPath>
+        </dependency>
+    </dependencies>
+
 </project>
