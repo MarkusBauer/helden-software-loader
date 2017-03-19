@@ -35,10 +35,12 @@
                     <archive>
                         <manifest>
                             <mainClass>de.mk_bauer.heldensoftware.customentries.HeldenLauncher</mainClass>
+                            <addClasspath>true</addClasspath>
                         </manifest>
                         <manifestEntries>
                             <!-- HeldenPluginClass: heldenbildPlugin.HeldenbildPlugin.class -->
                             <HeldenPluginClass>de.mk_bauer.heldensoftware.customentries.CustomEntryLoaderPlugin.class</HeldenPluginClass>
+                            <Class-Path>. helden.jar</Class-Path>
                         </manifestEntries>
                     </archive>
                 </configuration>
