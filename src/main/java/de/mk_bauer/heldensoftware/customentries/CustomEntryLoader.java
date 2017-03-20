@@ -131,10 +131,10 @@ public class CustomEntryLoader {
 
 	public static boolean loadFile(File f) throws ParseException {
 		if (!f.exists()) {
-			System.err.println("Keine Erweiterungen in "+f.getAbsolutePath());
+			System.err.println("[CustomEntryLoader] Keine Erweiterungen in "+f.getAbsolutePath());
 			return false;
 		}
-		System.err.println("Lade Erweiterungen von \""+f.getAbsolutePath()+"\"");
+		System.err.println("[CustomEntryLoader] Lade Erweiterungen von \""+f.getAbsolutePath()+"\"");
 		try (Reader r = new BufferedReader(new FileReader(f))){
 			new CustomEntryLoader().loadCustomEntries(r);
 		} catch (IOException e) {
