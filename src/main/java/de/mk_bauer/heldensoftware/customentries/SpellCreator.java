@@ -2,6 +2,7 @@ package de.mk_bauer.heldensoftware.customentries;
 
 import helden.framework.settings.Setting;
 import helden.framework.zauber.Zauber;
+import helden.framework.zauber.ZauberFabrik;
 import helden.framework.zauber.ZauberVerbreitung;
 
 import java.lang.reflect.*;
@@ -9,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static de.mk_bauer.heldensoftware.customentries.SpellCreator.Quellenangabe.leereQuelle;
 
@@ -139,6 +142,16 @@ public class SpellCreator {
 	}
 
 
+	/**
+	 * Erstellt und registriert einen neuen Zauber
+	 * @param name
+	 * @param kategorie Steigerungsspalte ("A" - "H")
+	 * @param merkmale Als String-Array: ["Anti", "Einfluss", "Dämonisch (Blakharaz)"]
+	 * @param probe
+	 * @param q Quellenangabe ("LCD: 123"), null ist erlaubt
+	 * @param mod Modifikationen der Probe ("", "+MR", "+Mod", ...), null ist erlaubt
+	 * @return
+	 */
 	public ZauberWrapper createSpell(String name, String kategorie, String[] merkmale, Probe probe, Quellenangabe q, String mod){
 		try {
 			if (q == null)
@@ -146,6 +159,7 @@ public class SpellCreator {
 			if (mod == null)
 				mod = "";
 			Object kat = alleKategorien.get(kategorie);
+			assert ZauberFabrik.getInstance().getZauberfertigkeit(name) == null;
 			Zauber newspell = newZauber.newInstance(name, kat, probe.getProbe(), getMerkmale(merkmale), q.getQuellenObj(), mod);
 			return new ZauberWrapper(name, newspell);
 		}catch(Exception e){
@@ -172,6 +186,17 @@ public class SpellCreator {
 			this.p3 = p3;
 		}
 
+		public Probe(String probe){
+			String[] p = probe.split("/");
+			assert p.length == 3;
+			for (String s: p) {
+				assert getInstance().alleEigenschaften.containsKey(p[0]);
+			}
+			this.p1 = p[0];
+			this.p2 = p[1];
+			this.p3 = p[2];
+		}
+
 		public Object getProbe() throws Exception {
 			return instance.talentprobeConstructor.newInstance(instance.alleEigenschaften.get(p1), instance.alleEigenschaften.get(p2), instance.alleEigenschaften.get(p3));
 		}
@@ -190,6 +215,17 @@ public class SpellCreator {
 			this.page = page;
 		}
 
+		public Quellenangabe(String quelle) {
+			int p = quelle.lastIndexOf(':');
+			if (p > 0){
+				this.book = quelle.substring(0, p);
+				this.page = Integer.parseInt(quelle.substring(p + 1));
+			}else{
+				this.book = quelle;
+				this.page = 0;
+			}
+		}
+
 		public Object getQuellenObj() throws Exception{
 			return getInstance().quellenObjConstructor.newInstance(book, page);
 		}
@@ -205,9 +241,20 @@ public class SpellCreator {
 			this.zauber = zauber;
 		}
 
+		/**
+		 * Verbreitung - notwendig zum Erlernen/Aktivieren
+		 * @param repr "Mag", "Hexe", "Dru(Elf)"
+		 * @param num
+		 */
 		public void addVerbreitung(String repr, int num) {
-			addVerbreitung(repr, repr, num);
+			Matcher m = reprPattern.matcher(repr);
+			if (m.matches()){
+				addVerbreitung(m.group(1), m.group(2), num);
+			}else {
+				addVerbreitung(repr, repr, num);
+			}
 		}
+		private static final Pattern reprPattern = Pattern.compile("^(\\w{3})\\s?\\((\\w{3})\\)$");
 
 		public void addVerbreitung(String repr, String bekanntIn, int num) {
 			Object reprObj = instance.alleRepresentationen.get(repr);
@@ -215,9 +262,7 @@ public class SpellCreator {
 			Object bekanntObj = instance.alleRepresentationen.get(bekanntIn);
 			assert bekanntObj != null;
 			try {
-				System.out.println(zauber.getVerbreitung());
 				zauber.getVerbreitung().add(instance.newZauberVerbreitung.newInstance(reprObj, bekanntObj, num));
-				System.out.println(zauber.getVerbreitung());
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -237,9 +282,13 @@ public class SpellCreator {
 		}
 
 		public void addToSetting(String settingName) {
-			if (settingName.equals("Aventurien")) settingName = "DSA4.1";
-			Setting setting = Setting.getByName(settingName);
-			setting.getIncluded().add("Z" + name);
+			if (settingName.equals("all") || settingName.equals("Alle")){
+				addToAllSettings();
+			} else {
+				if (settingName.equals("Aventurien")) settingName = "DSA4.1";
+				Setting setting = Setting.getByName(settingName);
+				setting.getIncluded().add("Z" + name);
+			}
 		}
 
 		public void addToAllSettings() {

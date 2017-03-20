@@ -19,6 +19,7 @@ public class HeldenLauncher {
 	}
 
 	public static void main(String[] args) {
+		CustomEntryLoader.loadExampleFile();
 		Helden.main(args);
 	}
 

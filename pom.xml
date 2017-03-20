@@ -39,7 +39,8 @@
                         </manifest>
                         <manifestEntries>
                             <!-- HeldenPluginClass: heldenbildPlugin.HeldenbildPlugin.class -->
-                            <HeldenPluginClass>de.mk_bauer.heldensoftware.customentries.CustomEntryLoaderPlugin.class</HeldenPluginClass>
+                            <HeldenPluginClass>de.mk_bauer.heldensoftware.customentries.CustomEntryLoaderPlugin.class
+                            </HeldenPluginClass>
                             <Class-Path>. helden.jar</Class-Path>
                         </manifestEntries>
                     </archive>
@@ -57,6 +58,14 @@
             <!-- You can use a symlink to the installation directory, if you're on linux, and want life to be easy! -->
             <systemPath>${project.basedir}/heldensoftware/helden.jar</systemPath>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
     </dependencies>
 
 </project>

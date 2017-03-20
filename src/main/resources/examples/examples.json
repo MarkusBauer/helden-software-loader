@@ -1,0 +1,35 @@
+{
+  "zauber": [
+    {
+      "name": "Inarcanitas", // Zaubername, darf noch nicht existieren
+      "kategorie": "F", // A-H
+      "merkmale": ["Anti", "Kraft", "Metamagie"], // Kurzfassung und Langfassung möglich
+      "probe": "MU/KL/KL", // Probe "XX/YY/ZZ", auch "**" möglich
+      "mod": "", // (optional) "+MR", "+Mod", ...
+      "quelle": "LCD:123", // (optional) Format muss "XXX:<seitenzahl>" sein
+
+      // Settings (optional)
+      // In welchem Regel-System kommt der Spruch vor?
+      // Die Auswahl eines / mehrerer Settings erlaubt es, den Spruch im Editor zu aktivieren
+      // Mögliche Werte: "Alle", "DSA4.1"/"Aventurien", "Myranor", "Tharun", ...
+      "settings": ["Aventurien"],
+
+      // Verbreitungen (optional)
+      // In welcher Repräsentation existiert der Spruch, wie häufig (0-7)?
+      // Setting + Verbreitung erlaubt es, den Spruch regulär zu aktivieren
+      "verbreitung": {
+        "Mag": 7,
+        "Elf": 4,
+        "Hex(Mag)": 2  // Hexen können den Spruch in gildenmagischer Repräsentation lernen
+      },
+
+      // Spezialisierungen (optional)
+      // Mögliche Zauberspezialisierungen (spontane Modifikationen, Varianten, ...)
+      "spezialisierungen": [
+        "Reichweite",
+        "Zauberdauer",
+        "Variante X"
+      ]
+    }
+  ]
+}
