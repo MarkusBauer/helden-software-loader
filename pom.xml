@@ -48,6 +48,32 @@
             </plugin>
 
             <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<outputFile>${project.build.directory}/CustomEntryLoader.jar</outputFile>
+							<!-- external jars -->
+							<artifactSet>
+								<excludes>
+									<exclude>helden</exclude>
+									<exclude>junit</exclude>
+									<exclude>hamcrest</exclude>
+								</excludes>
+							</artifactSet>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+            <!-- Add comment support to the JSON library's lexer -->
+            <plugin>
                 <groupId>de.jflex</groupId>
                 <artifactId>jflex-maven-plugin</artifactId>
                 <version>1.6.1</version>
