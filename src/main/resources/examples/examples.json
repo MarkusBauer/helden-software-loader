@@ -1,11 +1,12 @@
 {
   "zauber": [
+    // === Inarcanitas - ein neuer Zauber aus unserer Runde ===
     {
       "name": "Inarcanitas", // Zaubername, darf noch nicht existieren
       "kategorie": "F", // A-H
       "merkmale": ["Anti", "Kraft", "Metamagie"], // Kurzfassung und Langfassung möglich
       "probe": "MU/KL/KL", // Probe "XX/YY/ZZ", auch "**" möglich
-      "mod": "", // (optional) "+MR", "+Mod", ...
+      "mod": "+Mod", // (optional) "+MR", "+Mod", ...
       "quelle": "LCD:123", // (optional) Format muss "XXX:<seitenzahl>" sein
 
       // Settings (optional)
@@ -30,6 +31,28 @@
         "Zauberdauer",
         "Variante X"
       ]
+    },
+
+    // === Kurzfassung - Bannbaladin aus der Zauberwerkstatt ===
+    {
+      "name": "Bannbaladin (erhöhte Reichweite)",
+      "kategorie": "B",
+      "merkmale": ["Einfluss"],
+      "probe": "IN/CH/CH",
+      "mod": "+MR",
+      "settings": ["Aventurien"],
+      "verbreitung": { "Mag": 2 },
+      "spezialisierungen": ["Reichweite", "Wirkungsdauer", "Zauberdauer", "Zielobjekt"]
+    },
+
+    // === Nur für Meisterpersonen ===
+    {
+      "name": "Armageddon Weltenbrand",
+      "kategorie": "G",
+      "merkmale": ["Elementar (Feuer)", "Umwelt"],
+      "probe": "MU/KL/KO",
+      "settings": ["Aventurien"]
+      // Keine Verbreitung - nur per Editor wählbar
     }
   ]
 }
