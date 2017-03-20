@@ -1,14 +1,16 @@
 package de.mk_bauer.heldensoftware.customentries;
 
+import helden.comm.CommUtilities;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
+
 import de.mk_bauer.heldensoftware.customentries.SpellCreator.*;
+
+import javax.swing.*;
 
 import static org.json.simple.JSONValue.parse;
 
@@ -26,7 +28,7 @@ public class CustomEntryLoader {
 		}
 	}
 
-	public void loadZauber(JSONObject zauber){
+	protected void loadZauber(JSONObject zauber){
 		// Read parameters
 		String name = (String) zauber.get("name");
 		String kategorie = (String) zauber.get("kategorie");
@@ -90,6 +92,55 @@ public class CustomEntryLoader {
 		} catch (IOException | ParseException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+
+	/**
+	 * Load first file from:
+	 * - helden.jar directory
+	 * - helden.zip.hld directory
+	 */
+	public static void loadFiles(){
+		try {
+			// Config files next to helden.jar
+			File jarpath = (new CommUtilities()).getJarPath();
+			if (loadFiles(jarpath)) return;
+			if (jarpath.getName().toLowerCase().endsWith(".jar")){
+				if (loadFiles(jarpath.getParentFile())) return;
+			}
+
+			// Config files next to helden.zip.hld
+			File heldenPath = new File(new File(System.getProperty("user.home")), "helden");
+			if (!loadFiles(heldenPath)) return;
+
+		} catch (Throwable e){
+			// Show message box and exit
+			e.printStackTrace();
+			String msg = e.getMessage();
+			while ((e instanceof RuntimeException) && e.getCause() != null) e = e.getCause();
+			JOptionPane.showMessageDialog(null, msg, e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+	}
+
+	public static boolean loadFiles(File folder) throws ParseException {
+		return
+				loadFile(new File(folder, "customentries.json")) |
+				loadFile(new File(folder, "erweiterungen.json"));
+	}
+
+	public static boolean loadFile(File f) throws ParseException {
+		if (!f.exists()) {
+			System.err.println("Keine Erweiterungen in "+f.getAbsolutePath());
+			return false;
+		}
+		System.err.println("Lade Erweiterungen von \""+f.getAbsolutePath()+"\"");
+		try (Reader r = new BufferedReader(new FileReader(f))){
+			new CustomEntryLoader().loadCustomEntries(r);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return true;
 	}
 
 }

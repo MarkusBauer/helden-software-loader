@@ -21,16 +21,7 @@ public class HeldenLauncher {
 	}
 
 	public static void main(String[] args) {
-		try {
-			CustomEntryLoader.loadExampleFile();
-		} catch (Throwable e){
-			// Show message box and exit
-			e.printStackTrace();
-			String msg = e.getMessage();
-			while ((e instanceof RuntimeException) && e.getCause() != null) e = e.getCause();
-			JOptionPane.showMessageDialog(null, msg, e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
-			return;
-		}
+		CustomEntryLoader.loadFiles();
 		// Launch Helden-Software
 		Helden.main(args);
 	}

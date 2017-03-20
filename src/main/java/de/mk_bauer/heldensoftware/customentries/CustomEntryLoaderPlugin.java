@@ -11,6 +11,7 @@ public class CustomEntryLoaderPlugin implements HeldenPlugin {
 
 	static {
 		System.err.println("STATIC CODE EXEC");
+		CustomEntryLoader.loadFiles();
 	}
 
 	public CustomEntryLoaderPlugin(){
