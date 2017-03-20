@@ -135,7 +135,7 @@ public class SpellCreator {
 		Object result = Array.newInstance(merkmalType, merkmale.length);
 		for (int i = 0; i < merkmale.length; i++){
 			Object mkml = alleMerkmale.get(merkmale[i]);
-			assert mkml != null;
+			if (mkml == null) throw new IllegalArgumentException("Unbekanntes Merkmal: "+merkmale[i]);
 			Array.set(result, i, mkml);
 		}
 		return result;
@@ -159,7 +159,8 @@ public class SpellCreator {
 			if (mod == null)
 				mod = "";
 			Object kat = alleKategorien.get(kategorie);
-			assert ZauberFabrik.getInstance().getZauberfertigkeit(name) == null;
+			if (isSpellKnown(name))
+				throw new IllegalArgumentException("Zauber \""+name+"\" ist bereits bekannt!");
 			Zauber newspell = newZauber.newInstance(name, kat, probe.getProbe(), getMerkmale(merkmale), q.getQuellenObj(), mod);
 			return new ZauberWrapper(name, newspell);
 		}catch(Exception e){
@@ -167,6 +168,13 @@ public class SpellCreator {
 		}
 	}
 
+	private boolean isSpellKnown(String name){
+		try {
+			return ZauberFabrik.getInstance().getZauberfertigkeit(name) != null;
+		} catch (RuntimeException e){
+			return false;
+		}
+	}
 
 
 
@@ -198,7 +206,13 @@ public class SpellCreator {
 		}
 
 		public Object getProbe() throws Exception {
-			return instance.talentprobeConstructor.newInstance(instance.alleEigenschaften.get(p1), instance.alleEigenschaften.get(p2), instance.alleEigenschaften.get(p3));
+			Object o1 = instance.alleEigenschaften.get(p1);
+			if (o1 == null) throw new IllegalArgumentException("Unbekannte Eigenschaft: "+p1);
+			Object o2 = instance.alleEigenschaften.get(p2);
+			if (o2 == null) throw new IllegalArgumentException("Unbekannte Eigenschaft: "+p2);
+			Object o3 = instance.alleEigenschaften.get(p3);
+			if (o3 == null) throw new IllegalArgumentException("Unbekannte Eigenschaft: "+p3);
+			return instance.talentprobeConstructor.newInstance(o1, o2, o3);
 		}
 
 	}
@@ -258,9 +272,9 @@ public class SpellCreator {
 
 		public void addVerbreitung(String repr, String bekanntIn, int num) {
 			Object reprObj = instance.alleRepresentationen.get(repr);
-			assert reprObj != null;
+			if (reprObj == null) throw new IllegalArgumentException("Unbekannte Repräsentation: "+repr);
 			Object bekanntObj = instance.alleRepresentationen.get(bekanntIn);
-			assert bekanntObj != null;
+			if (bekanntObj == null) throw new IllegalArgumentException("Unbekannte Repräsentation: "+bekanntIn);
 			try {
 				zauber.getVerbreitung().add(instance.newZauberVerbreitung.newInstance(reprObj, bekanntObj, num));
 			} catch (Exception e) {
