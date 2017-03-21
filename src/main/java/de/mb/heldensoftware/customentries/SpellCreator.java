@@ -27,25 +27,59 @@ public class SpellCreator {
 	}
 
 
-	// Methods of Zauber
+	// Methods of Zauber: String => Method
 	Map<String, Method> methods = new HashMap<>();
-	Method getTalentprobe;
+
+	// Container für 3 Eigenschaften
 	Class talentprobeType;
+
+	// new Talentprobe: (Eigenschaft, Eigenschaft, Eigenschaft) -> Talentprobe
 	Constructor talentprobeConstructor;
+
+	// Zauber.getTalentprobe: () -> Talentprobe
+	Method getTalentprobe;
+
+	// Eigenschaft ("MU", "KL", ...)
 	Class eigenschaftType;
+	// Name => Eigenschaft
 	Map<String, Object> alleEigenschaften = new HashMap<>();
+
+	// Kategorie: "A", "B", ..., "H"
+	Class kategorieType;
+
+	// Zauber.getKategorie: boolean -> Kategorie (Parameter wird ignoriert?)
 	Method getKategorie;
+	// Spalte => Kategorie
 	Map<String, Object> alleKategorien = new HashMap<>();
+
+	// Merkmal ("Antimagie", ...)
 	Class merkmalType;
+	// Name => Merkmal (auch Kurzfassungen funktionieren)
 	Map<String, Object> alleMerkmale = new HashMap<>();
+
+	// QuellenObj := (String, int), z.B. ("LCD", 123)
 	Class quellenObjType;
+
+	// new QuellenObj: (String, int) -> QuellenObj
 	Constructor quellenObjConstructor;
+
+	// Repräsentation ("Mag", "Hexe", ...)
 	Class representationType;
+	// Name => Repräsentation
 	Map<String, Object> alleRepresentationen = new HashMap<>();
+
+	// new Zauber: (String name, Kategorie spalte, Merkmal[] merkmale, Probe probe, QuellenObj quellenangabe, String mod) -> Zauber
 	Constructor<Zauber> newZauber = null;
+
+	// new ZauberVerbreitung: (Repräsentation bekanntBei, Repräsentation bekanntIn, int verbreitung) -> ZauberVerbreitung
 	Constructor<ZauberVerbreitung> newZauberVerbreitung;
+
+	// Zauber.setSpezialisierungen: (ArrayList<String> spezialisierungen) -> void
 	Method zauberSetSpezialisierungen;
 
+	/**
+	 * Resolves all reflection references to helden-software
+	 */
 	private SpellCreator(){
 		try {
 			for (Method m : Zauber.class.getMethods()) {
@@ -65,7 +99,7 @@ public class SpellCreator {
 
 			// Steigerungsspalten
 			getKategorie = Zauber.class.getMethod("getKategorie", boolean.class);
-			Class kategorieType = getKategorie.getReturnType();
+			kategorieType = getKategorie.getReturnType();
 			for (Field f: kategorieType.getDeclaredFields()){
 				if (f.getType().equals(kategorieType)) {
 					Object kat = f.get(null);
@@ -130,6 +164,11 @@ public class SpellCreator {
 		}
 	}
 
+	/**
+	 * Converts an array of Strings to an array of the corresponding "Merkmal" instances
+	 * @param merkmale
+	 * @return
+	 */
 	private Object getMerkmale(String[] merkmale){
 		Object result = Array.newInstance(merkmalType, merkmale.length);
 		for (int i = 0; i < merkmale.length; i++){
@@ -167,6 +206,12 @@ public class SpellCreator {
 		}
 	}
 
+	/**
+	 *
+	 * @param name
+	 * @return <code>true</code> falls ein Zauber mit dem Namen <code>name</code> bekannt ist
+	 * @see helden.framework.zauber.ZauberFabrik
+	 */
 	private boolean isSpellKnown(String name){
 		try {
 			return ZauberFabrik.getInstance().getZauberfertigkeit(name) != null;
@@ -176,13 +221,12 @@ public class SpellCreator {
 	}
 
 
-
-
-
-
+	/**
+	 * Eine Probe aus drei Eigenschaften. Bsp: "(MU/KL/KO)"
+	 */
 	public static class Probe{
 
-		private String p1, p2, p3;
+		public final String p1, p2, p3;
 
 		public Probe(String p1, String p2, String p3){
 			assert getInstance().alleEigenschaften.containsKey(p1);
@@ -194,6 +238,8 @@ public class SpellCreator {
 		}
 
 		public Probe(String probe){
+			if (probe.startsWith("(") && probe.endsWith(")"))
+				probe = probe.substring(1, probe.length()-1);
 			String[] p = probe.split("/");
 			assert p.length == 3;
 			for (String s: p) {
@@ -217,9 +263,12 @@ public class SpellCreator {
 	}
 
 
+	/**
+	 * Eine Quellenangabe, bestehend aus Buchkürzel und Seitenzahl ("LCD:123")
+	 */
 	public static class Quellenangabe{
-		private String book;
-		private int page;
+		public final String book;
+		public final int page;
 
 		public static final Quellenangabe leereQuelle = new Quellenangabe("", 0);
 
@@ -269,6 +318,13 @@ public class SpellCreator {
 		}
 		private static final Pattern reprPattern = Pattern.compile("^(\\w{3})\\s?\\((\\w{3})\\)$");
 
+		/**
+		 * (Dru, Elf, 3) => Dru(Elf) 3
+		 * @param repr
+		 * @param bekanntIn
+		 * @param num
+		 * @see helden.framework.zauber.ZauberVerbreitung
+		 */
 		public void addVerbreitung(String repr, String bekanntIn, int num) {
 			Object reprObj = instance.alleRepresentationen.get(repr);
 			if (reprObj == null) throw new IllegalArgumentException("Unbekannte Repräsentation: "+repr);
@@ -294,6 +350,11 @@ public class SpellCreator {
 			}
 		}
 
+		/**
+		 * "Aventurien", "DSA4.1", "Myranor", "Tharun", "Alle", ...
+		 * @param settingName
+		 * @see helden.framework.settings.Setting
+		 */
 		public void addToSetting(String settingName) {
 			if (settingName.equals("all") || settingName.equals("Alle")){
 				addToAllSettings();
