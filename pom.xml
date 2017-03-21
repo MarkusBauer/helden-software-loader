@@ -48,29 +48,37 @@
             </plugin>
 
             <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.3</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<outputFile>${project.build.directory}/CustomEntryLoader.jar</outputFile>
-							<!-- external jars -->
-							<artifactSet>
-								<excludes>
-									<exclude>helden</exclude>
-									<exclude>junit</exclude>
-									<exclude>hamcrest</exclude>
-								</excludes>
-							</artifactSet>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>${project.build.directory}/CustomEntryLoader.jar</outputFile>
+                            <!-- external jars -->
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>helden</exclude>
+                                    <exclude>junit</exclude>
+                                    <exclude>org.hamcrest:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>com.googlecode.json-simple:json-simple</artifact>
+                                    <excludes>
+                                        <exclude>org/json/simple/parser/Yylex.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <!-- Add comment support to the JSON library's lexer -->
             <plugin>
