@@ -194,8 +194,9 @@ Die komplette Beispiel-Datei gibt's hier: [examples.json](src/main/resources/exa
 ```
 
 
-Intern - Wie funktionierts?
----------------------------
+Entwickler
+----------
+### Wie funktioniert's?
 Die Helden-Software nutzt (aus urheberrechtlichen Gründen) *Obfuscation-Techniken*, 
  um ihren Quellcode geheim zu halten. Dieses Plugin verwendet daher Java's 
  *Reflection-API*, um mit den internen, unkenntlich gemachten Klassen der 
@@ -203,3 +204,12 @@ Die Helden-Software nutzt (aus urheberrechtlichen Gründen) *Obfuscation-Technik
   
 Wer seine Java-Kenntnisse vertiefen möchte - die Magie steckt in der Klasse 
  [SpellCreator](src/main/java/de/mk_bauer/heldensoftware/customentries/SpellCreator.java).
+
+### Plugin compilieren
+Das Plugin nutzt [Maven](https://maven.apache.org/) für seinen Build-Prozess. 
+ Gängige Entwicklungsumgebungen erkennen Maven-Projekte reibungslos. 
+ Mit dem Befehl `mvn package` wird die Jar erzeugt. 
+
+Bevor das Projekt compiliert werden kann, muss ein Ordner `heldensoftware` 
+ im Hauptverzeichnis angelegt werden, und die `helden.jar` hineinkopiert werden. 
+ Alternativ funktioniert auch ein Linux-Symlink ins Installationsverzeichnis (namens `heldensoftware`). 
