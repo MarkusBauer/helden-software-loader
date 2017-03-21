@@ -1,4 +1,4 @@
-package de.mk_bauer.heldensoftware.customentries;
+package de.mb.heldensoftware.customentries;
 
 import helden.comm.CommUtilities;
 import org.json.simple.JSONArray;
@@ -7,13 +7,11 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
-import java.util.Arrays;
 
-import de.mk_bauer.heldensoftware.customentries.SpellCreator.*;
+import de.mb.heldensoftware.customentries.SpellCreator.*;
 
 import javax.swing.*;
 
-import static org.json.simple.JSONValue.parse;
 
 /**
  * Created by Markus on 20.03.2017.

@@ -1,4 +1,4 @@
-package de.mk_bauer.heldensoftware.customentries;
+package de.mb.heldensoftware.customentries;
 
 import helden.framework.settings.Setting;
 import helden.framework.zauber.Zauber;
@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static de.mk_bauer.heldensoftware.customentries.SpellCreator.Quellenangabe.leereQuelle;
 
 /**
  * Created by Markus on 19.03.2017.

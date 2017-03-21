@@ -1,6 +1,7 @@
-package de.mk_bauer.heldensoftware.customentries;
+package de.mb.heldensoftware.customentries;
 
-import de.mk_bauer.heldensoftware.customentries.SpellCreator.*;
+import de.mb.heldensoftware.customentries.CustomEntryLoader;
+import de.mb.heldensoftware.customentries.SpellCreator.*;
 import helden.Helden;
 
 import javax.swing.*;

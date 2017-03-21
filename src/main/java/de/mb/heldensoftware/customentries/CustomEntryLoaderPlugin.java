@@ -1,5 +1,6 @@
-package de.mk_bauer.heldensoftware.customentries;
+package de.mb.heldensoftware.customentries;
 
+import de.mb.heldensoftware.customentries.CustomEntryLoader;
 import helden.plugin.HeldenPlugin;
 
 import javax.swing.*;
