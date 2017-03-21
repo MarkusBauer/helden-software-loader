@@ -7,6 +7,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
+import java.util.Arrays;
 
 import de.mk_bauer.heldensoftware.customentries.SpellCreator.*;
 
@@ -116,17 +117,18 @@ public class CustomEntryLoader {
 		} catch (Throwable e){
 			// Show message box and exit
 			e.printStackTrace();
-			String msg = e.getMessage();
+			String msg = e.getMessage() + "\n" + e.toString();
 			while ((e instanceof RuntimeException) && e.getCause() != null) e = e.getCause();
 			JOptionPane.showMessageDialog(null, msg, e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
-			return;
+			System.exit(-1);
 		}
 	}
 
 	public static boolean loadFiles(File folder) throws ParseException {
 		return
 				loadFile(new File(folder, "customentries.json")) |
-				loadFile(new File(folder, "erweiterungen.json"));
+				loadFile(new File(folder, "erweiterungen.json")) |
+				loadFile(new File(folder, "erweiterungen.json.txt")); // I know my dear Windows users...
 	}
 
 	public static boolean loadFile(File f) throws ParseException {
@@ -135,11 +137,26 @@ public class CustomEntryLoader {
 			return false;
 		}
 		System.err.println("[CustomEntryLoader] Lade Erweiterungen von \""+f.getAbsolutePath()+"\"");
-		try (Reader r = new BufferedReader(new FileReader(f))){
-			new CustomEntryLoader().loadCustomEntries(r);
+		try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(f))){
+			// Remove BOM - I know my Windows users
+			byte[] buffer = new byte[3];
+			input.mark(4);
+			input.read(buffer);
+			if (! (buffer[0] == (byte) 0xEF && buffer[1] == (byte) 0xBB && buffer[2] == (byte) 0xBF)) {
+				input.reset();
+			}
+			// Read file as UTF-8
+			try (Reader r = new InputStreamReader(input, "UTF-8")) {
+				new CustomEntryLoader().loadCustomEntries(r);
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		/*try (BufferedReader r = new BufferedReader(new FileReader(f))){
+			new CustomEntryLoader().loadCustomEntries(r);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}*/
 		return true;
 	}
 
