@@ -213,3 +213,10 @@ Das Plugin nutzt [Maven](https://maven.apache.org/) für seinen Build-Prozess.
 Bevor das Projekt compiliert werden kann, muss ein Ordner `heldensoftware` 
  im Hauptverzeichnis angelegt werden, und die `helden.jar` hineinkopiert werden. 
  Alternativ funktioniert auch ein Linux-Symlink ins Installationsverzeichnis (namens `heldensoftware`). 
+ 
+ 
+ Kontakt
+ -------
+ - "Rothen" bei [dsaforum.de](http://dsaforum.de/memberlist.php?mode=viewprofile&u=12050)
+ - Per Mail: markus-7y5wrhdz (AT) mk-bauer.de
+ 
