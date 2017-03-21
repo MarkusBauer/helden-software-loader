@@ -5,20 +5,19 @@ Dieses Plugin ist in der Lage, eigene Zauber zur DSA 4.1 Helden-Software
 von [www.helden-software.de](http://www.helden-software.de) hinzuzufügen.
 Neue Zauber sind wahlweise per Editor oder zur regulären Aktivierung verfügbar.
 
-![](screenshot1.png)
-
 Nach der Installation können eigene Zauber in eine Konfigurationsdatei eingetragen
 werden, und stehen dann in allen Helden zur Verfügung. Diese Konfigurationsdatei
 könnt ihr auch an andere Spieler versenden, denen eure Zauber dann ebenfalls 
 zur Verfügung stehen. 
- 
+
  
  
 Warnung
 -------
 *Bitte lest diesen Abschnitt genau, wenn ihr eure Helden nicht verlieren wollt!*
 
-Die Helden-Software weigert sich Helden zu laden, die nicht bekannte Zauber eingetragen haben. Daraus folgen einige Punkte, die man beachten sollte. 
+Die Helden-Software weigert sich Helden zu laden, die nicht bekannte Zauber eingetragen haben. 
+Daraus folgen einige Punkte, die man beachten sollte. 
 
 **Helden mit eigenen Zaubern können nur mit Plugin geladen werden.**
 Wenn ihr die Helden-Software ohne Plugin startet, fehlen entsprechende Helden. 
@@ -34,8 +33,10 @@ dann muss dieser das Plugin installiert haben, und alle eigenen Zauber konfiguri
 Sonst sind die betreffenden Helden weg. Endgültig. Es gibt drei mögliche Gründe, 
 warum dieser Fehler auftreten kann: 
  - Plugin wurde nicht richtig installiert oder geladen. Lest die Installations-Anleitung nochmal. 
- - Ein Zauber wurde aus der Konfiguration entfernt (oder umbenannt). Ein Spruch den Helden aktiviert haben darf nicht entfernt oder umbenannt werden.
- - Die Helden-Software hat sich gerade aktualisiert und neugestartet. Ein weiterer Neustart (natürlich ohne zu speichern) löst das Problem. 
+ - Ein Zauber wurde aus der Konfiguration entfernt (oder umbenannt). Ein Spruch den Helden 
+   aktiviert haben darf nicht entfernt oder umbenannt werden.
+ - Die Helden-Software hat sich gerade aktualisiert und neugestartet. Ein weiterer Neustart 
+   (natürlich ohne zu speichern) löst das Problem. 
 
 
 **Macht Backups!**
@@ -84,27 +85,24 @@ Konfigurationsdatei (`erweiterungen.json`) geschrieben.
 Diese Datei kommt ins gleiche Verzeichnis wie eure `helden.zip.hld` - also 
 `C:\Benutzer\XXX\helden\erweiterungen.json` unter Windows bzw. `~/helden/erweiterungen.json` unter Linux. 
 
-### JSON-Dateien
+--- JSON-Dateien ---
 Json-Dateien können mit einem beliebigen Texteditor angelegt oder bearbeitet werden
- (bspw. dem "Editor" von Windows). Die Datei sollte mit der Codierung "UTF-8" 
- gespeichert werden, sonst sind Umlaute später kaputt. Ein ordentlicher Editor 
- wie bspw. "Sublime Text" oder "Notepad++" kann das Leben einfacher machen, ist 
- aber nicht zwingend notwendig.
+(bspw. dem "Editor" von Windows). Die Datei sollte mit der Codierung "UTF-8" 
+gespeichert werden, sonst sind Umlaute später kaputt. Ein ordentlicher Editor 
+wie bspw. "Sublime Text" oder "Notepad++" kann das Leben einfacher machen, ist 
+aber nicht zwingend notwendig.
 
-### Grundstruktur
+--- Grundstruktur ---
 Eine leere `erweiterungen.json` ohne neue Zauber sieht so aus: 
-```
 {
     "zauber": [
         // Hier kommen eure neuen Zauber hin 
     ]
 }
-```
 Die `//` sind Kommentarzeichen - alles was dahinter steht gehört nicht zum 
  eigentlichen Inhalt der Datei (und wird nicht mit eingelesen). 
  
 Ein einfacher Zauber sieht so aus: 
-```
 {
     "zauber": [
         {
@@ -116,11 +114,9 @@ Ein einfacher Zauber sieht so aus:
         }
     ]
 }
-```
 
-### Zauber konfigurieren
+--- Zauber konfigurieren ---
 Der folgende Zauber verwendet alle möglichen Optionen:
-```
 {
     "zauber": [
         // === Inarcanitas - ein neuer Zauber aus unserer Runde ===
@@ -157,7 +153,6 @@ Der folgende Zauber verwendet alle möglichen Optionen:
         }
     ]
 }
-```
 Zur Sichtbarkeit eines Zaubers gilt:
 - Ist ein Setting gesetzt, kann der Zauber per Editor hinzugefügt werden
 - Ist ein Setting und eine Verbreitung gesetzt, kann der Zauber (in diesen 
@@ -166,60 +161,11 @@ Zur Sichtbarkeit eines Zaubers gilt:
   (aber weiter gesteigert werden, wenn er schon aktiviert ist).
 
 
-### Weitere Beispiele
-Die komplette Beispiel-Datei gibt's hier: [examples.json](src/main/resources/examples/examples.json)
-```
-{
-    "zauber": [
-        // === Kurzfassung - Bannbaladin aus der Zauberwerkstatt ===
-        {
-            "name": "Bannbaladin (erhöhte Reichweite)",
-            "kategorie": "B",
-            "merkmale": ["Einfluss"],
-            "probe": "IN/CH/CH",
-            "mod": "+MR",
-            "settings": ["Aventurien"],
-            "verbreitung": { "Mag": 2 },
-            "spezialisierungen": ["Reichweite", "Wirkungsdauer", "Zauberdauer", "Zielobjekt"]
-        },
-
-        // === Nur für Meisterpersonen ===
-        {
-            "name": "Armageddon Weltenbrand",
-            "kategorie": "G",
-            "merkmale": ["Elementar (Feuer)", "Umwelt"],
-            "probe": "MU/KL/KO",
-            "settings": ["Aventurien"]
-            // Keine Verbreitung - nur per Editor wählbar
-        }
-    ]
-}
-```
+--- Weitere Beispiele ---
+Diesem Archiv liegt eine exemplarische "examples.json" bei.
 
 
 
-Entwickler
-----------
-### Wie funktioniert's?
-Die Helden-Software nutzt (aus urheberrechtlichen Gründen) *Obfuscation-Techniken*, 
- um ihren Quellcode geheim zu halten. Dieses Plugin verwendet daher Java's 
- *Reflection-API*, um mit den internen, unkenntlich gemachten Klassen der 
- Helden-Software zu interagieren.
-  
-Wer seine Java-Kenntnisse vertiefen möchte - die Magie steckt in der Klasse 
- [SpellCreator](src/main/java/de/mk_bauer/heldensoftware/customentries/SpellCreator.java).
-
-### Plugin compilieren
-Das Plugin nutzt [Maven](https://maven.apache.org/) für seinen Build-Prozess. 
- Gängige Entwicklungsumgebungen erkennen Maven-Projekte reibungslos. 
- Mit dem Befehl `mvn package` wird die Jar erzeugt. 
-
-Bevor das Projekt compiliert werden kann, muss ein Ordner `heldensoftware` 
- im Hauptverzeichnis angelegt werden, und die `helden.jar` hineinkopiert werden. 
- Alternativ funktioniert auch ein Linux-Symlink ins Installationsverzeichnis (namens `heldensoftware`). 
- 
- 
- 
 Kontakt
 -------
  - "Rothen" bei [dsaforum.de](http://dsaforum.de/memberlist.php?mode=viewprofile&u=12050)
