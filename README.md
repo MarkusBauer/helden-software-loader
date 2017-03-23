@@ -207,7 +207,7 @@ Die Helden-Software nutzt (aus urheberrechtlichen Gründen) *Obfuscation-Technik
  Helden-Software zu interagieren.
   
 Wer seine Java-Kenntnisse vertiefen möchte - die Magie steckt in der Klasse 
- [SpellCreator](src/main/java/de/mk_bauer/heldensoftware/customentries/SpellCreator.java).
+ [SpellCreator](src/main/java/de/mb/heldensoftware/customentries/SpellCreator.java).
 
 ### Plugin compilieren
 Das Plugin nutzt [Maven](https://maven.apache.org/) für seinen Build-Prozess. 
