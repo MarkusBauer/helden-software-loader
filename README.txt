@@ -56,7 +56,7 @@ Aber da ihr ja alle Backups habt, sollte euch das nicht betreffen...
 Installation
 ------------
 Dieses Plugin kann *nicht* wie herkömmliche Helden-Software-Plugins installiert 
-werden, da die offizielle Plugin-Schnittstelle nicht solche Eingriffe gemacht ist.
+werden, da die offizielle Plugin-Schnittstelle nicht für solche Eingriffe gemacht ist.
 
 Stattdessen muss dieses Plugin (die `CustomEntryLoader.jar`) die Datei sein, 
 über die Ihr die Helden-Software startet. 
@@ -64,11 +64,12 @@ Stattdessen muss dieses Plugin (die `CustomEntryLoader.jar`) die Datei sein,
 - Zuerst sucht Ihr den Ordner, in den die Helden-Software installiert ist. 
   Das ist der Ordner, in dem eine Datei namens `helden.jar` liegt. 
 - Kopiert die `CustomEntryLoader.jar` in diesen Ordner
-- Ändert eure Verknüpfungen ab (bspw. die im Startmenü, Rechtsklick -> Eigenschaften). 
-  Ersetzt jedes Auftreten von `helden.jar` durch `CustomEntryLoader.jar`. 
-    
-  Alternativ: Legt eine neue Verknüpfung zur `CustomEntryLoader.jar` an, und
+- Legt eine neue Verknüpfung zur `CustomEntryLoader.jar` an, und
   benutzt ausschließlich diese.
+
+  Alternativ: Ändert eure Verknüpfungen ab (bspw. die im Startmenü, Rechtsklick -> Eigenschaften).
+  Ersetzt jedes Auftreten von `helden.jar` durch `CustomEntryLoader.jar`.
+
 
 Solltet ihr die Helden-Software versehentlich über eine alte Verknüpfung starten
 (ohne dass das Plugin geladen wird), werdet ihr mit einer großen Warnung begrüßt, 
