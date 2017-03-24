@@ -17,12 +17,12 @@ import java.util.regex.Pattern;
 /**
  * Created by Markus on 19.03.2017.
  */
-public class SpellCreator {
+public class EntryCreator {
 
-	private static SpellCreator instance;
+	private static EntryCreator instance;
 
-	public static SpellCreator getInstance(){
-		if (instance == null) instance = new SpellCreator();
+	public static EntryCreator getInstance(){
+		if (instance == null) instance = new EntryCreator();
 		return instance;
 	}
 
@@ -80,7 +80,7 @@ public class SpellCreator {
 	/**
 	 * Resolves all reflection references to helden-software
 	 */
-	private SpellCreator(){
+	private EntryCreator(){
 		try {
 			for (Method m : Zauber.class.getMethods()) {
 				methods.put(m.getName(), m);
@@ -128,6 +128,9 @@ public class SpellCreator {
 			assert newZauber != null;
 			zauberSetSpezialisierungen = methods.get("setSpezialisierungen");
 			newZauberVerbreitung = (Constructor<ZauberVerbreitung>) ZauberVerbreitung.class.getConstructors()[0];
+
+			// Talent
+
 		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
@@ -139,7 +142,7 @@ public class SpellCreator {
 	 * @param map
 	 * @param type
 	 */
-	private void createStringMap(Map<String, Object> map, Class type) throws Exception {
+	protected void createStringMap(Map<String, Object> map, Class type) throws Exception {
 		ArrayList<Method> stringMethods = new ArrayList<>();
 		for (Method m : type.getDeclaredMethods()) {
 			if (m.getReturnType().equals(String.class) && m.getParameterTypes().length == 0) {
