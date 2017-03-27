@@ -26,6 +26,8 @@ public class NewTalentDialog extends JDialog {
 	private JLabel lblBehinderungInt;
 	private JLabel lblSprachFamilie;
 	private JLabel lblSprachKomplex;
+	private JPanel paneFields;
+	private JLabel lblTalentname;
 
 	public NewTalentDialog() {
 		setContentPane(contentPane);
@@ -79,7 +81,10 @@ public class NewTalentDialog extends JDialog {
 				onTalentArtChanged();
 			}
 		});
-		contentPane.setLayout(new GridLayout());
+
+		// Force initial size to fit all components
+		int col1Width = lblSprachKomplex.getPreferredSize().width + 5;
+		lblTalentname.setPreferredSize(new Dimension(col1Width, lblTalentname.getPreferredSize().height));
 	}
 
 	private void initModels() throws IllegalAccessException, InvocationTargetException {
