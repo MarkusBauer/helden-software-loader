@@ -94,7 +94,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="416ea" class="javax.swing.JLabel">
+          <component id="416ea" class="javax.swing.JLabel" binding="lblProbe">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -146,9 +146,11 @@
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <actionCommand value="TalentArtChanged"/>
+            </properties>
           </component>
-          <component id="a60a4" class="javax.swing.JLabel">
+          <component id="a60a4" class="javax.swing.JLabel" binding="lblSprachFamilie">
             <constraints>
               <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -162,7 +164,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="c8058" class="javax.swing.JLabel">
+          <component id="c8058" class="javax.swing.JLabel" binding="lblSprachKomplex">
             <constraints>
               <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -176,7 +178,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="b0ef7" class="javax.swing.JLabel">
+          <component id="b0ef7" class="javax.swing.JLabel" binding="lblBehinderungStr">
             <constraints>
               <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -198,7 +200,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="637a8" class="javax.swing.JLabel">
+          <component id="637a8" class="javax.swing.JLabel" binding="lblBehinderungInt">
             <constraints>
               <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -206,7 +208,7 @@
               <text value="Behinderung"/>
             </properties>
           </component>
-          <component id="98e88" class="javax.swing.JCheckBox" binding="paradeMöglichCheckBox" default-binding="true">
+          <component id="98e88" class="javax.swing.JCheckBox" binding="paradeMoeglichCheckBox">
             <constraints>
               <grid row="9" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>

@@ -1,8 +1,7 @@
 package de.mb.heldensoftware.customentries;
 
-import de.mb.heldensoftware.customentries.EntryCreator;
-
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.InvocationTargetException;
 
@@ -21,7 +20,12 @@ public class NewTalentDialog extends JDialog {
 	private JSpinner spinnerSprachKomplex;
 	private JTextField textBehinderung;
 	private JSpinner spinnerBehinderung;
-	private JCheckBox paradeMöglichCheckBox;
+	private JCheckBox paradeMoeglichCheckBox;
+	private JLabel lblProbe;
+	private JLabel lblBehinderungStr;
+	private JLabel lblBehinderungInt;
+	private JLabel lblSprachFamilie;
+	private JLabel lblSprachKomplex;
 
 	public NewTalentDialog() {
 		setContentPane(contentPane);
@@ -55,11 +59,27 @@ public class NewTalentDialog extends JDialog {
 			}
 		}, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
+		initComponents();
+
 		try {
 			initModels();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+
+		onTalentArtChanged();
+	}
+
+	private void initComponents(){
+		spinnerSprachKomplex.setModel(new SpinnerNumberModel(18, 1, 99, 1));
+		spinnerBehinderung.setModel(new SpinnerNumberModel(2, 0, 99, 1));
+		comboArt.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onTalentArtChanged();
+			}
+		});
+		contentPane.setLayout(new GridLayout());
 	}
 
 	private void initModels() throws IllegalAccessException, InvocationTargetException {
@@ -85,6 +105,51 @@ public class NewTalentDialog extends JDialog {
 		}
 	}
 
+	private void onTalentArtChanged(){
+		// Get information about talent
+		String art = comboArt.getSelectedItem().toString();
+		boolean isKampf = art.equals("Kampf") || art.equals("Nahkampf") || art.equals("Fernkampf");
+		boolean isKoerper = art.equals("Körperlich");
+		boolean isSprache = art.equals("Sprachen");
+		boolean isSpracheSchrift = isSprache || art.equals("Schriften");
+
+		// Probe
+		comboProbe1.setEnabled(!isKampf && !isSpracheSchrift);
+		comboProbe2.setEnabled(!isKampf && !isSpracheSchrift);
+		comboProbe3.setEnabled(!isKampf && !isSpracheSchrift);
+		lblProbe.setEnabled(!isKampf && !isSpracheSchrift);
+		if (isKampf){
+			comboProbe1.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("GE"));
+			comboProbe2.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get(art.equals("Fernkampf") ? "FF" : "GE"));
+			comboProbe3.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("KK"));
+		}else if (isSprache){
+			comboProbe1.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("KL"));
+			comboProbe2.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("IN"));
+			comboProbe3.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("CH"));
+		}else if (isSpracheSchrift){
+			comboProbe1.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("KL"));
+			comboProbe2.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("KL"));
+			comboProbe3.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("FF"));
+		}
+
+		// Sprachen
+		lblSprachFamilie.setVisible(isSprache);
+		comboSprachFamilie.setVisible(isSprache);
+		lblSprachKomplex.setVisible(isSpracheSchrift);
+		spinnerSprachKomplex.setVisible(isSpracheSchrift);
+
+		// Behinderung
+		lblBehinderungStr.setVisible(isKoerper);
+		textBehinderung.setVisible(isKoerper);
+		lblBehinderungInt.setVisible(isKampf);
+		spinnerBehinderung.setVisible(isKampf);
+
+		// Parade
+		paradeMoeglichCheckBox.setVisible(isKampf);
+	}
+
+
+
 	private void onOK() {
 		// add your code here
 		dispose();
@@ -101,5 +166,4 @@ public class NewTalentDialog extends JDialog {
 		dialog.setVisible(true);
 		System.exit(0);
 	}
-
 }
