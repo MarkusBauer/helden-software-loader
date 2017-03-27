@@ -1,15 +1,14 @@
 package de.mb.heldensoftware.customentries;
 
+import helden.framework.held.persistenz.ModsDatenParser;
 import helden.framework.settings.Setting;
 import helden.framework.zauber.Zauber;
 import helden.framework.zauber.ZauberFabrik;
 import helden.framework.zauber.ZauberVerbreitung;
 
+import java.io.File;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,6 +76,14 @@ public class EntryCreator {
 	// Zauber.setSpezialisierungen: (ArrayList<String> spezialisierungen) -> void
 	Method zauberSetSpezialisierungen;
 
+	// Talente
+	Class TalentType;
+
+	// TalentArt (Natur, ...)
+	Class TalentArtType;
+	// TalentArt.isPrimitive: () -> boolean
+	Method talentArtIsPrimitive;
+
 	/**
 	 * Resolves all reflection references to helden-software
 	 */
@@ -130,6 +137,17 @@ public class EntryCreator {
 			newZauberVerbreitung = (Constructor<ZauberVerbreitung>) ZauberVerbreitung.class.getConstructors()[0];
 
 			// Talent
+			Method einlesenTalent = ModsDatenParser.class.getMethod("einlesenTalent", File.class);
+			TalentType = einlesenTalent.getReturnType();
+
+			// TalentArt
+			TalentArtType = TalentType.getConstructors()[0].getParameterTypes()[1];
+			for (Method m: TalentArtType.getDeclaredMethods()){
+				if (m.getReturnType().equals(Boolean.TYPE) && m.getParameterTypes().length == 0){
+					if (talentArtIsPrimitive != null) throw new RuntimeException();
+					talentArtIsPrimitive = m;
+				}
+			}
 
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -165,6 +183,17 @@ public class EntryCreator {
 				}
 			}
 		}
+	}
+
+	protected List<Object> getAllStaticInstances(Class type) throws IllegalAccessException {
+		ArrayList<Object> result = new ArrayList<>();
+		for (Field f : type.getDeclaredFields()) {
+			if (f.getType().equals(type)) {
+				Object instance = f.get(null);
+				result.add(instance);
+			}
+		}
+		return result;
 	}
 
 	/**
