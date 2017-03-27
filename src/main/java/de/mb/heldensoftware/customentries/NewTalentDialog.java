@@ -79,6 +79,10 @@ public class NewTalentDialog extends JDialog {
 			boolean b = ((Boolean) ec.talentArtIsPrimitive.invoke(o)).booleanValue();
 			if (b) comboArt.addItem(o);
 		}
+		// Sprachfamilien
+		for (String s: ec.getAllStringConstants(ec.SprachFamilieType)){
+			comboSprachFamilie.addItem(s);
+		}
 	}
 
 	private void onOK() {

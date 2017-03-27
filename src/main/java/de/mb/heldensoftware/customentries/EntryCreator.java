@@ -1,5 +1,8 @@
 package de.mb.heldensoftware.customentries;
 
+import com.openpojo.reflection.PojoClass;
+import com.openpojo.reflection.impl.PojoClassFactory;
+import helden.framework.EigeneErweiterungenMoeglich;
 import helden.framework.held.persistenz.ModsDatenParser;
 import helden.framework.settings.Setting;
 import helden.framework.zauber.Zauber;
@@ -78,11 +81,21 @@ public class EntryCreator {
 
 	// Talente
 	Class TalentType;
+	Class SprachTalentType;
+	Class KampfTalentType;
+	Class RunenFertigkeitType;
 
 	// TalentArt (Natur, ...)
 	Class TalentArtType;
 	// TalentArt.isPrimitive: () -> boolean
 	Method talentArtIsPrimitive;
+
+	Class SprachFamilieType;
+
+	// Eigene Talente
+	Class EigenesTalentType;
+	Class EigenesSprachTalentType;
+	Class EigenesKampfTalentType;
 
 	/**
 	 * Resolves all reflection references to helden-software
@@ -149,6 +162,50 @@ public class EntryCreator {
 				}
 			}
 
+			// Talent subclasses
+			List<PojoClass> classes = PojoClassFactory.enumerateClassesByExtendingType(TalentType.getPackage().getName(), TalentType, null);
+			for (PojoClass pojoClass: classes){
+				Class c = pojoClass.getClazz();
+				if (!EigeneErweiterungenMoeglich.class.isAssignableFrom(c)){
+					// Basisklasse
+					List<Object> instances = getAllStaticInstances(c);
+					if (instances.size() > 100){
+						// Sprachen / Schriften
+						SprachTalentType = c;
+						SprachFamilieType = c.getDeclaredClasses()[0];
+					}else if (instances.size() > 28){
+						// Kampftalent
+						KampfTalentType = c;
+					}else if (instances.size() > 14){
+						RunenFertigkeitType = c;
+					}
+				}
+			}
+
+			// Talent-Unterklassen - Eigene Erweiterungen Möglich
+			for (PojoClass pojoClass: classes) {
+				Class c = pojoClass.getClazz();
+				if (EigeneErweiterungenMoeglich.class.isAssignableFrom(c)) {
+					if (SprachTalentType.isAssignableFrom(c)){
+						EigenesSprachTalentType = c;
+					}else if (KampfTalentType.isAssignableFrom(c)){
+						EigenesKampfTalentType = c;
+					}else if (c.getSuperclass().equals(TalentType)){
+						EigenesTalentType = c;
+					}
+				}
+			}
+
+			// Alle belegt?
+			if (SprachTalentType == null) throw new RuntimeException("SprachTalentType not found");
+			if (SprachFamilieType == null) throw new RuntimeException("SprachFamilieType not found");
+			if (KampfTalentType == null) throw new RuntimeException("KampfTalentType not found");
+			if (RunenFertigkeitType == null) throw new RuntimeException("RunenFertigkeitType not found");
+			if (EigenesTalentType == null) throw new RuntimeException("EigenesTalentType not found");
+			if (EigenesSprachTalentType == null) throw new RuntimeException("EigenesSprachTalentType not found");
+			if (EigenesKampfTalentType == null) throw new RuntimeException("EigenesKampfTalentType not found");
+
+
 		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
@@ -161,11 +218,26 @@ public class EntryCreator {
 	 * @param type
 	 */
 	protected void createStringMap(Map<String, Object> map, Class type) throws Exception {
+		createStringMap(map, type, type);
+	}
+
+	/**
+	 * Takes all static instances of this class, runs all "String _()" methods of stringBasisType on them, and fills a dictionary
+	 * @param map
+	 * @param type
+	 * @param stringBasisType
+	 */
+	protected void createStringMap(Map<String, Object> map, Class type, Class stringBasisType) throws Exception {
 		ArrayList<Method> stringMethods = new ArrayList<>();
-		for (Method m : type.getDeclaredMethods()) {
+		boolean foundToString = false;
+		for (Method m : stringBasisType.getDeclaredMethods()) {
 			if (m.getReturnType().equals(String.class) && m.getParameterTypes().length == 0) {
 				stringMethods.add(m);
+				if (m.getName().equals("toString")) foundToString = true;
 			}
+		}
+		if (!foundToString){
+			stringMethods.add(type.getMethod("toString"));
 		}
 
 		for (Field f : type.getDeclaredFields()) {
@@ -173,7 +245,8 @@ public class EntryCreator {
 				Object instance = f.get(null);
 				for (Method m : stringMethods) {
 					try {
-						map.put((String) m.invoke(instance), instance);
+						String s = (String) m.invoke(instance);
+						if (!s.isEmpty()) map.put(s, instance);
 					}catch(InvocationTargetException e){
 						if (e.getCause() instanceof IllegalArgumentException){
 						}else{
@@ -190,6 +263,17 @@ public class EntryCreator {
 		for (Field f : type.getDeclaredFields()) {
 			if (f.getType().equals(type)) {
 				Object instance = f.get(null);
+				result.add(instance);
+			}
+		}
+		return result;
+	}
+
+	protected List<String> getAllStringConstants(Class type) throws IllegalAccessException {
+		ArrayList<String> result = new ArrayList<>();
+		for (Field f : type.getDeclaredFields()) {
+			if (f.getType().equals(String.class) && Modifier.isStatic(f.getModifiers())) {
+				String instance = (String) f.get(null);
 				result.add(instance);
 			}
 		}
