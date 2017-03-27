@@ -39,8 +39,8 @@
                         </manifest>
                         <manifestEntries>
                             <!-- HeldenPluginClass: heldenbildPlugin.HeldenbildPlugin.class -->
-                            <HeldenPluginClass>de.mb.heldensoftware.customentries.CustomEntryLoaderPlugin.class
-                            </HeldenPluginClass>
+                            <HeldenDatenPluginClass>de.mb.heldensoftware.customentries.CustomEntryLoaderPlugin.class
+                            </HeldenDatenPluginClass>
                             <Class-Path>. helden.jar</Class-Path>
                         </manifestEntries>
                     </archive>

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static javafx.scene.input.KeyCode.Y;
+
 /**
  * Created by markus on 24.03.17.
  */
@@ -93,6 +95,28 @@ public class Test {
 		talentFactoryInternalListRef.add(talent);
 		talentFactoryInternalMapRef.put(id, talent);
 		Setting.getByName("DSA4.1").getIncluded().add("T"+talent.toString());
+	}
+
+
+
+	public static void modHeld(Object held) throws Exception {
+		System.out.println(held.getClass().getName());
+		System.out.println(held);
+		HashMap<String, Method> heldMethods = new HashMap<>();
+		for (Method m: held.getClass().getMethods()){
+			heldMethods.put(m.getName(), m);
+		}
+
+		Method einlesenTalent = ModsDatenParser.class.getMethod("einlesenTalent", File.class);
+		Class TalentType = einlesenTalent.getReturnType();
+
+		Object talent = einlesenTalent.invoke(ModsDatenParser.getInstance(), new File("C:/Users/Markus/Desktop/Sheydanjida.xml"));
+		System.out.println("Talent: "+talent);
+
+		//Method possibleAdd = heldMethods.get("Ó00000");
+		// o00000 (O, int)
+		Method heldAddTalent = held.getClass().getMethod("o00000", TalentType.getSuperclass(), Integer.TYPE);
+		Object result = heldAddTalent.invoke(held, talent, 0);
 	}
 
 }
