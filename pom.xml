@@ -168,6 +168,13 @@
             <version>7.0.3</version>
         </dependency>
 
+        <!-- Already included by forms_rt - that's why I use this old version -->
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>3.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

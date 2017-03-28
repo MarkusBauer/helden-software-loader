@@ -19,6 +19,10 @@ public class HeldenLauncher {
 	}
 
 	public static void main(String[] args) {
+		// Register the plugin component
+		PluginSideloader.addPlugin(CustomEntryLoaderPlugin.class);
+		PluginSideloader.registerSideloader();
+		// Load the non-plugin component
 		CustomEntryLoader.loadFiles();
 		// Launch Helden-Software
 		Helden.main(args);
