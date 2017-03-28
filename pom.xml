@@ -6,7 +6,7 @@
 
     <groupId>de.mb.heldensoftware</groupId>
     <artifactId>customentries</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -39,9 +39,9 @@
                         </manifest>
                         <manifestEntries>
                             <!-- HeldenPluginClass: heldenbildPlugin.HeldenbildPlugin.class -->
-                            <HeldenPluginClass>de.mb.heldensoftware.customentries.CustomEntryLoaderPlugin.class
-                            </HeldenPluginClass>
-                            <Class-Path>. helden.jar</Class-Path>
+                            <HeldenDatenPluginClass>de.mb.heldensoftware.customentries.CustomEntryLoaderPlugin.class
+                            </HeldenDatenPluginClass>
+                            <Class-Path>. helden.jar helden5.jar</Class-Path>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -65,6 +65,7 @@
                                     <exclude>helden</exclude>
                                     <exclude>junit</exclude>
                                     <exclude>org.hamcrest:*</exclude>
+                                    <exclude>com.jgoodies:*</exclude>
                                 </excludes>
                             </artifactSet>
                             <filters>
@@ -113,6 +114,26 @@
 					</execution>
 				</executions>
 			</plugin>
+
+            <!-- Building the form using IDEA -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>ideauidesigner-maven-plugin</artifactId>
+                <version>1.0-beta-1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>javac2</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <configuration>
+                    <fork>true</fork>
+                    <debug>true</debug>
+                    <failOnError>true</failOnError>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -131,6 +152,27 @@
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.openpojo/openpojo -->
+        <dependency>
+            <groupId>com.openpojo</groupId>
+            <artifactId>openpojo</artifactId>
+            <version>0.8.4</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.intellij/forms_rt -->
+        <dependency>
+            <groupId>com.intellij</groupId>
+            <artifactId>forms_rt</artifactId>
+            <version>7.0.3</version>
+        </dependency>
+
+        <!-- Already included by forms_rt - that's why I use this old version -->
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>3.0</version>
         </dependency>
 
     </dependencies>

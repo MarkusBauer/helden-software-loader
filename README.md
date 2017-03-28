@@ -1,16 +1,19 @@
 Custom Entry Plugin für die Helden-Software
 ===========================================
 
-Dieses Plugin ist in der Lage, eigene Zauber zur DSA 4.1 Helden-Software 
+Dieses Plugin ist in der Lage, eigene Zauber, Talente und Sprachen zur DSA 4.1 Helden-Software 
 von [www.helden-software.de](http://www.helden-software.de) hinzuzufügen.
-Neue Zauber sind wahlweise per Editor oder zur regulären Aktivierung verfügbar.
+Neue Zauber sind wahlweise per Editor oder zur regulären Aktivierung verfügbar, 
+neue Talente werden über das "Erweiterungen"-Menü zu einzelnen Helden hinzugefügt.
 
 ![](screenshot1.png)
 
 Nach der Installation können eigene Zauber in eine Konfigurationsdatei eingetragen
 werden, und stehen dann in allen Helden zur Verfügung. Diese Konfigurationsdatei
 könnt ihr auch an andere Spieler versenden, denen eure Zauber dann ebenfalls 
-zur Verfügung stehen. 
+zur Verfügung stehen.
+ 
+Eigene Talente benötigen keine Konfiguration. 
  
  
  
@@ -23,12 +26,13 @@ Die Helden-Software weigert sich Helden zu laden, die nicht bekannte Zauber eing
 **Helden mit eigenen Zaubern können nur mit Plugin geladen werden.**
 Wenn ihr die Helden-Software ohne Plugin startet, fehlen entsprechende Helden. 
 Wenn ihr das Plugin nicht mehr nutzen wollt, müsst ihr alle eigenen Zauber
-vorher per Editor aus euren Helden entfernen.
+vorher per Editor aus euren Helden entfernen. Für Talente gilt dies nicht.
  
 **Helden können nur geladen werden, wenn alle eigenen Zauber dem Plugin bekannt sind.**
 Bevor ihr also einen Zauber aus der Konfiguration löscht, muss der Zauber aus allen
 Helden entfernt werden. Wenn ihr euren Helden exportiert und eurem Spielleiter schickt,
 dann muss dieser das Plugin installiert haben, und alle eigenen Zauber konfiguriert haben.
+Talente werden im Held gespeichert, und funktionieren trotzdem.
 
 **Wenn die Helden-Software meldet, dass manche eurer Helden nicht geladen werden konnten - Software schließen und nicht speichern!**
 Sonst sind die betreffenden Helden weg. Endgültig. Es gibt drei mögliche Gründe, 
@@ -61,7 +65,7 @@ Stattdessen muss dieses Plugin (die `CustomEntryLoader.jar`) die Datei sein,
 über die Ihr die Helden-Software startet. 
 
 - Zuerst sucht Ihr den Ordner, in den die Helden-Software installiert ist. 
-  Das ist der Ordner, in dem eine Datei namens `helden.jar` liegt. 
+  Das ist der Ordner, in dem eine Datei namens `helden.jar` (oder `helden5.jar`) liegt. 
 - Kopiert die `CustomEntryLoader.jar` in diesen Ordner
 - Legt eine neue Verknüpfung zur `CustomEntryLoader.jar` an, und
   benutzt ausschließlich diese.
@@ -79,10 +83,12 @@ Speichern, und den Generator mit Plugin starten.
 
 Konfiguration
 -------------
-Neue Zauber werden nicht in der Helden-Software selber erstellt, sondern in eine
+Neue **Zauber** werden nicht in der Helden-Software selber erstellt, sondern in eine
 Konfigurationsdatei (`erweiterungen.json`) geschrieben. 
 Diese Datei kommt ins gleiche Verzeichnis wie eure `helden.zip.hld` - also 
-`C:\Benutzer\XXX\helden\erweiterungen.json` unter Windows bzw. `~/helden/erweiterungen.json` unter Linux. 
+`C:\Benutzer\XXX\helden\erweiterungen.json` unter Windows bzw. `~/helden/erweiterungen.json` unter Linux.
+ 
+Neue **Talente** benötigen keine Konfiguration, und können im "Erweiterungen"-Menü erstellt werden.
 
 ### JSON-Dateien
 Json-Dateien können mit einem beliebigen Texteditor angelegt oder bearbeitet werden
@@ -207,7 +213,7 @@ Die Helden-Software nutzt (aus urheberrechtlichen Gründen) *Obfuscation-Technik
  Helden-Software zu interagieren.
   
 Wer seine Java-Kenntnisse vertiefen möchte - die Magie steckt in der Klasse 
- [SpellCreator](src/main/java/de/mb/heldensoftware/customentries/SpellCreator.java).
+ [EntryCreator](src/main/java/de/mb/heldensoftware/customentries/EntryCreator.java).
 
 ### Plugin compilieren
 Das Plugin nutzt [Maven](https://maven.apache.org/) für seinen Build-Prozess. 
@@ -217,6 +223,17 @@ Das Plugin nutzt [Maven](https://maven.apache.org/) für seinen Build-Prozess.
 Bevor das Projekt compiliert werden kann, muss ein Ordner `heldensoftware` 
  im Hauptverzeichnis angelegt werden, und die `helden.jar` hineinkopiert werden. 
  Alternativ funktioniert auch ein Linux-Symlink ins Installationsverzeichnis (namens `heldensoftware`). 
+ 
+ 
+ 
+Externe Komponenten
+-------------------
+Dieses Plugin basiert auf verschiedenen anderen Projekten:
+
+- json-simple by *Yidong Fang*, [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+- [OpenPojo](https://github.com/oshoukry/openpojo), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+- IntelliJ Forms_rt by [Jetbrains](http://www.jetbrains.com/), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+- [ASM Commons](http://asm.ow2.org/), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
  
  
  

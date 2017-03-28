@@ -1,15 +1,18 @@
 package de.mb.heldensoftware.customentries;
 
+import com.openpojo.reflection.PojoClass;
+import com.openpojo.reflection.impl.PojoClassFactory;
+import helden.framework.EigeneErweiterungenMoeglich;
+import helden.framework.held.persistenz.ModsDatenParser;
 import helden.framework.settings.Setting;
 import helden.framework.zauber.Zauber;
 import helden.framework.zauber.ZauberFabrik;
 import helden.framework.zauber.ZauberVerbreitung;
+import org.w3c.dom.*;
 
+import java.io.File;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,12 +20,12 @@ import java.util.regex.Pattern;
 /**
  * Created by Markus on 19.03.2017.
  */
-public class SpellCreator {
+public class EntryCreator {
 
-	private static SpellCreator instance;
+	private static EntryCreator instance;
 
-	public static SpellCreator getInstance(){
-		if (instance == null) instance = new SpellCreator();
+	public static EntryCreator getInstance(){
+		if (instance == null) instance = new EntryCreator();
 		return instance;
 	}
 
@@ -77,10 +80,38 @@ public class SpellCreator {
 	// Zauber.setSpezialisierungen: (ArrayList<String> spezialisierungen) -> void
 	Method zauberSetSpezialisierungen;
 
+	// Talente
+	Class TalentType;
+	Class SprachTalentType;
+	Class KampfTalentType;
+	Class RunenFertigkeitType;
+
+	// TalentArt (Natur, ...)
+	Class TalentArtType;
+	// TalentArt.isPrimitive: () -> boolean
+	Method talentArtIsPrimitive;
+	// Name => Art
+	Map<String, Object> alleTalentArten = new HashMap<>();
+
+	Class SprachFamilieType;
+
+	// Eigene Talente
+	Class EigenesTalentType;
+	Class EigenesSprachTalentType;
+	Class EigenesKampfTalentType;
+
+	// Eigene Talente - Konstruktoren
+	// newEigenesTalent: (String name, R art, boolean basistalent, L probe, Node xmlnode, String behinderung, String beschreibung, String urheber, String kontakt) -> EigenesTalent
+	Constructor newEigenesTalent;
+
+	// Held
+	Class HeldType;
+	Method heldAddTalent;
+
 	/**
 	 * Resolves all reflection references to helden-software
 	 */
-	private SpellCreator(){
+	private EntryCreator(){
 		try {
 			for (Method m : Zauber.class.getMethods()) {
 				methods.put(m.getName(), m);
@@ -128,9 +159,87 @@ public class SpellCreator {
 			assert newZauber != null;
 			zauberSetSpezialisierungen = methods.get("setSpezialisierungen");
 			newZauberVerbreitung = (Constructor<ZauberVerbreitung>) ZauberVerbreitung.class.getConstructors()[0];
+
+			// Talent
+			Method einlesenTalent = ModsDatenParser.class.getMethod("einlesenTalent", File.class);
+			TalentType = einlesenTalent.getReturnType();
+
+			// TalentArt
+			TalentArtType = TalentType.getConstructors()[0].getParameterTypes()[1];
+			for (Method m: TalentArtType.getDeclaredMethods()){
+				if (m.getReturnType().equals(Boolean.TYPE) && m.getParameterTypes().length == 0){
+					if (talentArtIsPrimitive != null) throw new RuntimeException();
+					talentArtIsPrimitive = m;
+				}
+			}
+			createStringMap(alleTalentArten, TalentArtType);
+
+			// Talent subclasses
+			// init Pojo Library hotfix
+			ClassLoader tcl = Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(EntryCreator.class.getClassLoader());
+			List<PojoClass> classes = PojoClassFactory.enumerateClassesByExtendingType(TalentType.getPackage().getName(), TalentType, null);
+			Thread.currentThread().setContextClassLoader(tcl);
+			for (PojoClass pojoClass: classes){
+				Class c = pojoClass.getClazz();
+				if (!EigeneErweiterungenMoeglich.class.isAssignableFrom(c)){
+					// Basisklasse
+					List<Object> instances = getAllStaticInstances(c);
+					if (instances.size() > 100){
+						// Sprachen / Schriften
+						SprachTalentType = c;
+						SprachFamilieType = c.getDeclaredClasses()[0];
+					}else if (instances.size() > 28){
+						// Kampftalent
+						KampfTalentType = c;
+					}else if (instances.size() > 14){
+						RunenFertigkeitType = c;
+					}
+				}
+			}
+
+			// Talent-Unterklassen - Eigene Erweiterungen Möglich
+			for (PojoClass pojoClass: classes) {
+				Class c = pojoClass.getClazz();
+				if (EigeneErweiterungenMoeglich.class.isAssignableFrom(c)) {
+					if (SprachTalentType.isAssignableFrom(c)){
+						EigenesSprachTalentType = c;
+					}else if (KampfTalentType.isAssignableFrom(c)){
+						EigenesKampfTalentType = c;
+					}else if (c.getSuperclass().equals(TalentType)){
+						EigenesTalentType = c;
+					}
+				}
+			}
+
+			// Alle belegt?
+			if (SprachTalentType == null) throw new RuntimeException("SprachTalentType not found");
+			if (SprachFamilieType == null) throw new RuntimeException("SprachFamilieType not found");
+			if (KampfTalentType == null) throw new RuntimeException("KampfTalentType not found");
+			if (RunenFertigkeitType == null) throw new RuntimeException("RunenFertigkeitType not found");
+			if (EigenesTalentType == null) throw new RuntimeException("EigenesTalentType not found");
+			if (EigenesSprachTalentType == null) throw new RuntimeException("EigenesSprachTalentType not found");
+			if (EigenesKampfTalentType == null) throw new RuntimeException("EigenesKampfTalentType not found");
+
+			for (Constructor c: EigenesTalentType.getConstructors()){
+				if (c.getParameterTypes().length == 9) newEigenesTalent = c;
+			}
+
+
 		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void initHeldTypes(Object held){
+		HeldType = held.getClass();
+		for (Method m: HeldType.getMethods()){
+			Class[] params = m.getParameterTypes();
+			if (params.length == 2 && m.getReturnType().equals(Void.TYPE) && params[0].equals(TalentType.getSuperclass()) && params[1].equals(Integer.TYPE)){
+				heldAddTalent = m;
+			}
+		}
+		if (heldAddTalent == null) throw new RuntimeException("heldAddTalent not found");
 	}
 
 
@@ -139,12 +248,27 @@ public class SpellCreator {
 	 * @param map
 	 * @param type
 	 */
-	private void createStringMap(Map<String, Object> map, Class type) throws Exception {
+	protected void createStringMap(Map<String, Object> map, Class type) throws Exception {
+		createStringMap(map, type, type);
+	}
+
+	/**
+	 * Takes all static instances of this class, runs all "String _()" methods of stringBasisType on them, and fills a dictionary
+	 * @param map
+	 * @param type
+	 * @param stringBasisType
+	 */
+	protected void createStringMap(Map<String, Object> map, Class type, Class stringBasisType) throws Exception {
 		ArrayList<Method> stringMethods = new ArrayList<>();
-		for (Method m : type.getDeclaredMethods()) {
+		boolean foundToString = false;
+		for (Method m : stringBasisType.getDeclaredMethods()) {
 			if (m.getReturnType().equals(String.class) && m.getParameterTypes().length == 0) {
 				stringMethods.add(m);
+				if (m.getName().equals("toString")) foundToString = true;
 			}
+		}
+		if (!foundToString){
+			stringMethods.add(type.getMethod("toString"));
 		}
 
 		for (Field f : type.getDeclaredFields()) {
@@ -152,7 +276,8 @@ public class SpellCreator {
 				Object instance = f.get(null);
 				for (Method m : stringMethods) {
 					try {
-						map.put((String) m.invoke(instance), instance);
+						String s = (String) m.invoke(instance);
+						if (!s.isEmpty()) map.put(s, instance);
 					}catch(InvocationTargetException e){
 						if (e.getCause() instanceof IllegalArgumentException){
 						}else{
@@ -162,6 +287,28 @@ public class SpellCreator {
 				}
 			}
 		}
+	}
+
+	protected List<Object> getAllStaticInstances(Class type) throws IllegalAccessException {
+		ArrayList<Object> result = new ArrayList<>();
+		for (Field f : type.getDeclaredFields()) {
+			if (f.getType().equals(type)) {
+				Object instance = f.get(null);
+				result.add(instance);
+			}
+		}
+		return result;
+	}
+
+	protected List<String> getAllStringConstants(Class type) throws IllegalAccessException {
+		ArrayList<String> result = new ArrayList<>();
+		for (Field f : type.getDeclaredFields()) {
+			if (f.getType().equals(String.class) && Modifier.isStatic(f.getModifiers())) {
+				String instance = (String) f.get(null);
+				result.add(instance);
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -217,6 +364,16 @@ public class SpellCreator {
 			return ZauberFabrik.getInstance().getZauberfertigkeit(name) != null;
 		} catch (RuntimeException e){
 			return false;
+		}
+	}
+
+
+	public void addTalentToHeld(Object held, Object talent, int value){
+		if (HeldType == null) initHeldTypes(held);
+		try {
+			heldAddTalent.invoke(held, talent, value);
+		}catch(Exception e){
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -1,10 +1,7 @@
 package de.mb.heldensoftware.customentries;
 
-import de.mb.heldensoftware.customentries.CustomEntryLoader;
-import de.mb.heldensoftware.customentries.SpellCreator.*;
+import de.mb.heldensoftware.customentries.EntryCreator.*;
 import helden.Helden;
-
-import javax.swing.*;
 
 /**
  * Created by Markus on 19.03.2017.
@@ -12,7 +9,7 @@ import javax.swing.*;
 public class HeldenLauncher {
 
 	public static void addExampleSpell(){
-		SpellCreator sc = SpellCreator.getInstance();
+		EntryCreator sc = EntryCreator.getInstance();
 		ZauberWrapper z = sc.createSpell("Inarcanitas", "F", new String[]{"Anti", "Krft", "Meta"}, new Probe("MU", "KL", "KL"), Quellenangabe.leereQuelle, "");
 		z.addVerbreitung("Mag", 7);
 		z.addVerbreitung("Elf", 5);
@@ -22,6 +19,10 @@ public class HeldenLauncher {
 	}
 
 	public static void main(String[] args) {
+		// Register the plugin component
+		PluginSideloader.addPlugin(CustomEntryLoaderPlugin.class);
+		PluginSideloader.registerSideloader();
+		// Load the non-plugin component
 		CustomEntryLoader.loadFiles();
 		// Launch Helden-Software
 		Helden.main(args);

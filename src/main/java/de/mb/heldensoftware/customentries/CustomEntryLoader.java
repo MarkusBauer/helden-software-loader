@@ -8,7 +8,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.*;
 
-import de.mb.heldensoftware.customentries.SpellCreator.*;
+import de.mb.heldensoftware.customentries.EntryCreator.*;
 
 import javax.swing.*;
 
@@ -43,7 +43,7 @@ public class CustomEntryLoader {
 		if (o != null) mod = (String) o;
 
 		// Create spell
-		ZauberWrapper zw = SpellCreator.getInstance().createSpell(name, kategorie, merkmale, probe, quelle, mod);
+		ZauberWrapper zw = EntryCreator.getInstance().createSpell(name, kategorie, merkmale, probe, quelle, mod);
 
 		// Settings
 		Object settings = zauber.get("settings");
@@ -94,12 +94,16 @@ public class CustomEntryLoader {
 	}
 
 
+	private static boolean filesLoaded = false;
+
 	/**
 	 * Load first file from:
 	 * - helden.jar directory
 	 * - helden.zip.hld directory
 	 */
 	public static void loadFiles(){
+		if (filesLoaded) return;
+		filesLoaded = true;
 		try {
 			// Config files next to helden.jar
 			File jarpath = (new CommUtilities()).getJarPath();
