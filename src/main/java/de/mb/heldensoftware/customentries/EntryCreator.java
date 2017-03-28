@@ -8,6 +8,7 @@ import helden.framework.settings.Setting;
 import helden.framework.zauber.Zauber;
 import helden.framework.zauber.ZauberFabrik;
 import helden.framework.zauber.ZauberVerbreitung;
+import org.w3c.dom.*;
 
 import java.io.File;
 import java.lang.reflect.*;
@@ -89,6 +90,8 @@ public class EntryCreator {
 	Class TalentArtType;
 	// TalentArt.isPrimitive: () -> boolean
 	Method talentArtIsPrimitive;
+	// Name => Art
+	Map<String, Object> alleTalentArten = new HashMap<>();
 
 	Class SprachFamilieType;
 
@@ -96,6 +99,10 @@ public class EntryCreator {
 	Class EigenesTalentType;
 	Class EigenesSprachTalentType;
 	Class EigenesKampfTalentType;
+
+	// Eigene Talente - Konstruktoren
+	// newEigenesTalent: (String name, R art, boolean basistalent, L probe, Node xmlnode, String behinderung, String beschreibung, String urheber, String kontakt) -> EigenesTalent
+	Constructor newEigenesTalent;
 
 	/**
 	 * Resolves all reflection references to helden-software
@@ -161,6 +168,7 @@ public class EntryCreator {
 					talentArtIsPrimitive = m;
 				}
 			}
+			createStringMap(alleTalentArten, TalentArtType);
 
 			// Talent subclasses
 			List<PojoClass> classes = PojoClassFactory.enumerateClassesByExtendingType(TalentType.getPackage().getName(), TalentType, null);
@@ -204,6 +212,10 @@ public class EntryCreator {
 			if (EigenesTalentType == null) throw new RuntimeException("EigenesTalentType not found");
 			if (EigenesSprachTalentType == null) throw new RuntimeException("EigenesSprachTalentType not found");
 			if (EigenesKampfTalentType == null) throw new RuntimeException("EigenesKampfTalentType not found");
+
+			for (Constructor c: EigenesTalentType.getConstructors()){
+				if (c.getParameterTypes().length == 9) newEigenesTalent = c;
+			}
 
 
 		}catch(Exception e){
@@ -335,6 +347,19 @@ public class EntryCreator {
 			return false;
 		}
 	}
+
+
+	/*public Object createEigenesTalent(String name, Object art, Object probe, String behinderung, String beschreibung, String urheber, String kontakt){
+		try {
+			if (art instanceof String) art = alleTalentArten.get(art);
+			if (probe instanceof String) probe = new Probe((String) probe);
+			if (probe instanceof Probe) probe = ((Probe) probe).getProbe();
+
+
+		} catch (Exception e){
+			throw new RuntimeException(e);
+		}
+	}*/
 
 
 	/**

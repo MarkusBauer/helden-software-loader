@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static javafx.scene.input.KeyCode.Y;
-
 /**
  * Created by markus on 24.03.17.
  */

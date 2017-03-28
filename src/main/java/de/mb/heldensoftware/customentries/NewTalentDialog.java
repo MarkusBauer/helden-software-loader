@@ -1,5 +1,7 @@
 package de.mb.heldensoftware.customentries;
 
+import org.w3c.dom.Element;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -20,7 +22,7 @@ public class NewTalentDialog extends JDialog {
 	private JSpinner spinnerSprachKomplex;
 	private JTextField textBehinderung;
 	private JSpinner spinnerBehinderung;
-	private JCheckBox paradeMoeglichCheckBox;
+	private JCheckBox checkParadeMoeglich;
 	private JLabel lblProbe;
 	private JLabel lblBehinderungStr;
 	private JLabel lblBehinderungInt;
@@ -28,8 +30,10 @@ public class NewTalentDialog extends JDialog {
 	private JLabel lblSprachKomplex;
 	private JPanel paneFields;
 	private JLabel lblTalentname;
+	private JSpinner spinnerStartwert;
 
 	public NewTalentDialog() {
+		setTitle("Neues Talent hinzufügen");
 		setContentPane(contentPane);
 		setModal(true);
 		getRootPane().setDefaultButton(buttonOK);
@@ -75,6 +79,7 @@ public class NewTalentDialog extends JDialog {
 	private void initComponents(){
 		spinnerSprachKomplex.setModel(new SpinnerNumberModel(18, 1, 99, 1));
 		spinnerBehinderung.setModel(new SpinnerNumberModel(2, 0, 99, 1));
+		spinnerStartwert.setModel(new SpinnerNumberModel(0, -10, 99, 1));
 		comboArt.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -150,14 +155,65 @@ public class NewTalentDialog extends JDialog {
 		spinnerBehinderung.setVisible(isKampf);
 
 		// Parade
-		paradeMoeglichCheckBox.setVisible(isKampf);
+		checkParadeMoeglich.setVisible(isKampf);
 	}
 
 
 
 	private void onOK() {
-		// add your code here
+		// Cleanup
+		try {
+			sanitizeInput();
+		}catch(IllegalArgumentException e){
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Fehler", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// Sicher?
+		if (JOptionPane.showConfirmDialog(this, "Möchten sie dieses Talent wirklich hinzufügen? Diese Aktion kann nicht rückgängig gemacht werden.", "Talent hinzufügen", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
+			return;
+
+		try {
+			System.out.println(createTalentInstance());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+
 		dispose();
+	}
+
+	private void sanitizeInput(){
+		if (textTalentName.getText().isEmpty()) throw new IllegalArgumentException("Bitte einen Talentnamen eingeben!");
+		if (textTalentAbkuerzung.getText().isEmpty()) textTalentAbkuerzung.setText(textTalentName.getText());
+	}
+
+	private Object createTalentInstance() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+		// Get information about talent
+		String art = comboArt.getSelectedItem().toString();
+		boolean isKampf = art.equals("Kampf") || art.equals("Nahkampf") || art.equals("Fernkampf");
+		boolean isKoerper = art.equals("Körperlich");
+		boolean isSprache = art.equals("Sprachen");
+		boolean isSpracheSchrift = isSprache || art.equals("Schriften");
+
+		XmlEntryCreator xmlec = XmlEntryCreator.getInstance();
+		Element xmlnode = xmlec.createBasicTalentNode(textTalentName.getText(), comboArt.getSelectedItem().toString(),
+				textTalentAbkuerzung.getText(), comboKategorie.getSelectedItem().toString(),
+				comboProbe1.getSelectedItem(), comboProbe2.getSelectedItem(), comboProbe3.getSelectedItem(),
+				"", "CustomEntryLoader Plugin", "");
+
+		if (isKampf){
+			xmlec.setTalentBehinderung(xmlnode, (Integer) spinnerBehinderung.getValue());
+			xmlec.setTalentParade(xmlnode, checkParadeMoeglich.isSelected());
+		}else if (isSpracheSchrift){
+			xmlec.setTalentKomplexitaet(xmlnode, (Integer) spinnerSprachKomplex.getValue());
+			if (isSprache) {
+				xmlec.setTalentSprachfamilie(xmlnode, comboSprachFamilie.getSelectedItem().toString());
+			}
+		}else if (isKoerper){
+			xmlec.setTalentBehinderung(xmlnode, textBehinderung.getText());
+		}
+		return xmlec.talentNodeToObject(xmlnode);
 	}
 
 	private void onCancel() {
