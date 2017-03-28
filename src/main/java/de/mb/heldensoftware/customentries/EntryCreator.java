@@ -175,7 +175,11 @@ public class EntryCreator {
 			createStringMap(alleTalentArten, TalentArtType);
 
 			// Talent subclasses
+			// init Pojo Library hotfix
+			ClassLoader tcl = Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(EntryCreator.class.getClassLoader());
 			List<PojoClass> classes = PojoClassFactory.enumerateClassesByExtendingType(TalentType.getPackage().getName(), TalentType, null);
+			Thread.currentThread().setContextClassLoader(tcl);
 			for (PojoClass pojoClass: classes){
 				Class c = pojoClass.getClazz();
 				if (!EigeneErweiterungenMoeglich.class.isAssignableFrom(c)){
