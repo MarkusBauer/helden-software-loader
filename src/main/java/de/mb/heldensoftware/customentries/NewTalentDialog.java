@@ -33,6 +33,7 @@ public class NewTalentDialog extends JDialog {
 	private JLabel lblTalentname;
 	private JSpinner spinnerStartwert;
 	private JLabel lblKategorie;
+	private JLabel lblTalentAbkuerzung;
 
 	public NewTalentDialog(){
 		this(null);
@@ -117,7 +118,7 @@ public class NewTalentDialog extends JDialog {
 		// Arten
 		for (Object o: ec.getAllStaticInstances(ec.TalentArtType)){
 			boolean b = ((Boolean) ec.talentArtIsPrimitive.invoke(o)).booleanValue();
-			if ((b && !o.toString().equals("Kampf")) || o.toString().equals("Nahkampf") || o.toString().equals("Fernkampf")) comboArt.addItem(o);
+			if (b && !o.toString().equals("Kampf")) comboArt.addItem(o); // "Kampf" is not importable, "Nahkampf"/"Fernkampf" is broken
 		}
 		// Sprachfamilien
 		for (String s: ec.getAllStringConstants(ec.SprachFamilieType)){
@@ -151,6 +152,10 @@ public class NewTalentDialog extends JDialog {
 			comboProbe2.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("KL"));
 			comboProbe3.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("FF"));
 		}
+
+		// Abkürzung
+		lblTalentAbkuerzung.setVisible(isKampf);
+		textTalentAbkuerzung.setVisible(isKampf);
 
 		// Steigerung
 		comboKategorie.setEnabled(isKampf || isSpracheSchrift);

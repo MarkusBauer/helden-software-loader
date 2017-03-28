@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -87,9 +88,14 @@ public class XmlEntryCreator {
 		n.appendChild(n2);
 	}
 
-	public Object talentNodeToObject(Node talent){
+	public Object talentNodeToObject(Element talent){
 		try {
-			return ModsDatenParser.class.getMethod("einlesenTalent", Node.class).invoke(ModsDatenParser.getInstance(), talent);
+			Method einlesenTalent = ModsDatenParser.class.getMethod("einlesenTalent", Node.class);
+			Object talent1 = einlesenTalent.invoke(ModsDatenParser.getInstance(), talent);
+			String id = (String) talent1.getClass().getMethod("getID").invoke(talent1);
+			System.out.println("ID = "+id);
+			talent.setAttribute("id", id);
+			return einlesenTalent.invoke(ModsDatenParser.getInstance(), talent);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -78,7 +78,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="6beaf" class="javax.swing.JLabel">
+          <component id="6beaf" class="javax.swing.JLabel" binding="lblTalentAbkuerzung">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -224,7 +224,7 @@
               <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Eigene Talente können kosten keine AP, und können nach Aktivierung nicht mehr geändert werden."/>
+              <text value="Eigene Talente kosten keine AP, und können nach Aktivierung nicht mehr geändert werden."/>
             </properties>
           </component>
           <component id="676a4" class="javax.swing.JLabel">
