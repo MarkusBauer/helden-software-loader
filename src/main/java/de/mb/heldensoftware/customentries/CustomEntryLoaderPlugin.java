@@ -18,6 +18,7 @@ public class CustomEntryLoaderPlugin implements HeldenDatenPlugin {
 
 	public CustomEntryLoaderPlugin(){
 		System.err.println("CUSTOM LOADER loaded");
+		EntryCreator.getInstance();
 	}
 
 	@Override

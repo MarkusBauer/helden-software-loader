@@ -15,6 +15,13 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: com.openpojo:openpojo:0.8.4" level="project" />
+    <orderEntry type="library" name="Maven: com.intellij:forms_rt:7.0.3" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-commons:3.0" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-tree:3.0" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm:3.0" level="project" />
+    <orderEntry type="library" name="Maven: com.jgoodies:forms:1.1-preview" level="project" />
+    <orderEntry type="library" name="Maven: jdom:jdom:1.0" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: de.helden_software:helden:5.5.2">
         <CLASSES>
