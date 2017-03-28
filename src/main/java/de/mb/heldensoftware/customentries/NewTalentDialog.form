@@ -184,6 +184,7 @@
             </constraints>
             <properties>
               <text value="Behinderung"/>
+              <toolTipText value="Beispielsweise &quot;BE&quot;, &quot;BEx2&quot;, &quot;BE-2&quot;, ..."/>
             </properties>
           </component>
           <component id="851ff" class="javax.swing.JTextField" binding="textBehinderung">
@@ -192,7 +193,9 @@
                 <preferred-size width="150" height="-1"/>
               </grid>
             </constraints>
-            <properties/>
+            <properties>
+              <toolTipText value="Beispielsweise &quot;BE&quot;, &quot;BEx2&quot;, &quot;BE-2&quot;, ..."/>
+            </properties>
           </component>
           <component id="2c247" class="javax.swing.JSpinner" binding="spinnerBehinderung">
             <constraints>

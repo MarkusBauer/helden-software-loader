@@ -17,7 +17,6 @@ public class CustomEntryLoaderPlugin implements HeldenDatenPlugin {
 	private static final String    VERSION    = "1.0";
 
 	public CustomEntryLoaderPlugin(){
-		System.err.println("CUSTOM LOADER loaded");
 		EntryCreator.getInstance();
 	}
 
@@ -38,12 +37,12 @@ public class CustomEntryLoaderPlugin implements HeldenDatenPlugin {
 
 	@Override
 	public String getMenuName() {
-		return "CustomEntryLoader";
+		return "Eigenes Talent hinzufügen...";
 	}
 
 	@Override
 	public String getToolTipText() {
-		return "TestToolTip";
+		return "Ein neues, inoffizielles Talent erstellen und dem aktuellen Helden hinzufügen";
 	}
 
 	@Override

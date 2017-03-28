@@ -34,8 +34,13 @@ public class NewTalentDialog extends JDialog {
 	private JSpinner spinnerStartwert;
 	private JLabel lblKategorie;
 
+	public NewTalentDialog(){
+		this(null);
+	}
+
 	public NewTalentDialog(JFrame frame) {
 		super(frame, "Neues Talent hinzufügen");
+		if (frame != null) setLocationRelativeTo(frame);
 		setContentPane(contentPane);
 		setModal(true);
 		getRootPane().setDefaultButton(buttonOK);
@@ -199,7 +204,21 @@ public class NewTalentDialog extends JDialog {
 
 	private void sanitizeInput(){
 		if (textTalentName.getText().isEmpty()) throw new IllegalArgumentException("Bitte einen Talentnamen eingeben!");
-		if (textTalentAbkuerzung.getText().isEmpty()) textTalentAbkuerzung.setText(textTalentName.getText());
+		if (textTalentAbkuerzung.getText().isEmpty()){
+			String name = textTalentName.getText();
+			if (name.startsWith("Sprachen kennen")) name = name.substring(16);
+			if (name.startsWith("Lesen/Schreiben")) name = name.substring(16);
+			textTalentAbkuerzung.setText(name);
+		}
+		if (comboArt.getSelectedItem().toString().equals("Sprachen")){
+			if (!textTalentName.getText().startsWith("Sprachen kennen"))
+				textTalentName.setText("Sprachen kennen " + textTalentName.getText());
+		}
+		if (comboArt.getSelectedItem().toString().equals("Schriften")){
+			if (!textTalentName.getText().startsWith("Lesen/Schreiben"))
+				textTalentName.setText("Lesen/Schreiben " + textTalentName.getText());
+		}
+		textBehinderung.setText(textBehinderung.getText().replace(" ", ""));
 	}
 
 	private Object createTalentInstance() throws IllegalAccessException, InvocationTargetException, InstantiationException {
