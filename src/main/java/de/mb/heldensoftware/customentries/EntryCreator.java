@@ -104,6 +104,10 @@ public class EntryCreator {
 	// newEigenesTalent: (String name, R art, boolean basistalent, L probe, Node xmlnode, String behinderung, String beschreibung, String urheber, String kontakt) -> EigenesTalent
 	Constructor newEigenesTalent;
 
+	// Held
+	Class HeldType;
+	Method heldAddTalent;
+
 	/**
 	 * Resolves all reflection references to helden-software
 	 */
@@ -221,6 +225,17 @@ public class EntryCreator {
 		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void initHeldTypes(Object held){
+		HeldType = held.getClass();
+		for (Method m: HeldType.getMethods()){
+			Class[] params = m.getParameterTypes();
+			if (params.length == 2 && m.getReturnType().equals(Void.TYPE) && params[0].equals(TalentType.getSuperclass()) && params[1].equals(Integer.TYPE)){
+				heldAddTalent = m;
+			}
+		}
+		if (heldAddTalent == null) throw new RuntimeException("heldAddTalent not found");
 	}
 
 
@@ -349,17 +364,14 @@ public class EntryCreator {
 	}
 
 
-	/*public Object createEigenesTalent(String name, Object art, Object probe, String behinderung, String beschreibung, String urheber, String kontakt){
+	public void addTalentToHeld(Object held, Object talent, int value){
+		if (HeldType == null) initHeldTypes(held);
 		try {
-			if (art instanceof String) art = alleTalentArten.get(art);
-			if (probe instanceof String) probe = new Probe((String) probe);
-			if (probe instanceof Probe) probe = ((Probe) probe).getProbe();
-
-
-		} catch (Exception e){
+			heldAddTalent.invoke(held, talent, value);
+		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
-	}*/
+	}
 
 
 	/**

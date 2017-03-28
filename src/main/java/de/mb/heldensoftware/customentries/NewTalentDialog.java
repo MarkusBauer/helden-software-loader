@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.Callable;
 
 public class NewTalentDialog extends JDialog {
 	private JPanel contentPane;
@@ -31,9 +32,10 @@ public class NewTalentDialog extends JDialog {
 	private JPanel paneFields;
 	private JLabel lblTalentname;
 	private JSpinner spinnerStartwert;
+	private JLabel lblKategorie;
 
-	public NewTalentDialog() {
-		setTitle("Neues Talent hinzufügen");
+	public NewTalentDialog(JFrame frame) {
+		super(frame, "Neues Talent hinzufügen");
 		setContentPane(contentPane);
 		setModal(true);
 		getRootPane().setDefaultButton(buttonOK);
@@ -90,12 +92,15 @@ public class NewTalentDialog extends JDialog {
 		// Force initial size to fit all components
 		int col1Width = lblSprachKomplex.getPreferredSize().width + 5;
 		lblTalentname.setPreferredSize(new Dimension(col1Width, lblTalentname.getPreferredSize().height));
+		Dimension d = contentPane.getPreferredSize();
+		contentPane.setPreferredSize(new Dimension(d.width, d.height));
 	}
 
 	private void initModels() throws IllegalAccessException, InvocationTargetException {
 		EntryCreator ec = EntryCreator.getInstance();
 		// Probe / Eigenschaft
-		for (Object o: ec.getAllStaticInstances(ec.eigenschaftType)){
+		for (String s: new String[]{"MU", "KL", "IN", "CH", "FF", "GE", "KO", "KK", "**"}){
+			Object o = ec.alleEigenschaften.get(s);
 			comboProbe1.addItem(o);
 			comboProbe2.addItem(o);
 			comboProbe3.addItem(o);
@@ -107,7 +112,7 @@ public class NewTalentDialog extends JDialog {
 		// Arten
 		for (Object o: ec.getAllStaticInstances(ec.TalentArtType)){
 			boolean b = ((Boolean) ec.talentArtIsPrimitive.invoke(o)).booleanValue();
-			if (b) comboArt.addItem(o);
+			if ((b && !o.toString().equals("Kampf")) || o.toString().equals("Nahkampf") || o.toString().equals("Fernkampf")) comboArt.addItem(o);
 		}
 		// Sprachfamilien
 		for (String s: ec.getAllStringConstants(ec.SprachFamilieType)){
@@ -142,6 +147,13 @@ public class NewTalentDialog extends JDialog {
 			comboProbe3.setSelectedItem(EntryCreator.getInstance().alleEigenschaften.get("FF"));
 		}
 
+		// Steigerung
+		comboKategorie.setEnabled(isKampf || isSpracheSchrift);
+		lblKategorie.setEnabled(isKampf || isSpracheSchrift);
+		if (!isKampf && !isSpracheSchrift){
+			comboKategorie.setSelectedItem(EntryCreator.getInstance().alleKategorien.get(isKoerper ? "D" : "B"));
+		}
+
 		// Sprachen
 		lblSprachFamilie.setVisible(isSprache);
 		comboSprachFamilie.setVisible(isSprache);
@@ -174,7 +186,9 @@ public class NewTalentDialog extends JDialog {
 			return;
 
 		try {
-			System.out.println(createTalentInstance());
+			Object talent = createTalentInstance();
+			System.out.println(talent);
+			if (newTalentCallback != null) newTalentCallback.talentCreated(talent, (Integer) spinnerStartwert.getValue());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -216,13 +230,31 @@ public class NewTalentDialog extends JDialog {
 		return xmlec.talentNodeToObject(xmlnode);
 	}
 
+
 	private void onCancel() {
 		// add your code here if necessary
 		dispose();
 	}
 
+
+	public static interface TalentCallback {
+		public void talentCreated(Object talent, int value);
+	}
+
+
+	private TalentCallback newTalentCallback = null;
+
+	public TalentCallback getNewTalentCallback() {
+		return newTalentCallback;
+	}
+
+	public void setNewTalentCallback(TalentCallback newTalentCallback) {
+		this.newTalentCallback = newTalentCallback;
+	}
+
+
 	public static void main(String[] args) {
-		NewTalentDialog dialog = new NewTalentDialog();
+		NewTalentDialog dialog = new NewTalentDialog(null);
 		dialog.pack();
 		dialog.setVisible(true);
 		System.exit(0);

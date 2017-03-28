@@ -57,14 +57,17 @@ public class CustomEntryLoaderPlugin implements HeldenDatenPlugin {
 
 	@Override
 	public void doWork(JFrame jFrame, PluginHeld2[] pluginHeld2s, DatenPluginHeldenWerkzeug datenPluginHeldenWerkzeug) {
-		Object held = datenPluginHeldenWerkzeug.getSelectesHeld().getHeldObject();
+		final Object held = datenPluginHeldenWerkzeug.getSelectesHeld().getHeldObject();
 
-		try {
-			Test.modHeld(held);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		NewTalentDialog dialog = new NewTalentDialog(jFrame);
+		dialog.setNewTalentCallback(new NewTalentDialog.TalentCallback() {
+			@Override
+			public void talentCreated(Object talent, int value) {
+				EntryCreator.getInstance().addTalentToHeld(held, talent, value);
+			}
+		});
+		dialog.pack();
+		dialog.setVisible(true);
 	}
 
 	@Override
