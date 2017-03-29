@@ -22,6 +22,8 @@ public class HeldenLauncher {
 		// Register the plugin component
 		PluginSideloader.addPlugin(CustomEntryLoaderPlugin.class);
 		PluginSideloader.registerSideloader();
+		// Patch bugs
+		ModsDatenParserBugPatcher.patchModsDatenParser();
 		// Load the non-plugin component
 		CustomEntryLoader.loadFiles();
 		// Launch Helden-Software

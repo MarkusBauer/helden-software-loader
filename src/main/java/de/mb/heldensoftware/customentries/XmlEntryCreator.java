@@ -93,7 +93,6 @@ public class XmlEntryCreator {
 			Method einlesenTalent = ModsDatenParser.class.getMethod("einlesenTalent", Node.class);
 			Object talent1 = einlesenTalent.invoke(ModsDatenParser.getInstance(), talent);
 			String id = (String) talent1.getClass().getMethod("getID").invoke(talent1);
-			System.out.println("ID = "+id);
 			talent.setAttribute("id", id);
 			return einlesenTalent.invoke(ModsDatenParser.getInstance(), talent);
 		} catch (Exception e) {
