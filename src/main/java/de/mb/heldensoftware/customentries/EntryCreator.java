@@ -8,7 +8,6 @@ import helden.framework.settings.Setting;
 import helden.framework.zauber.Zauber;
 import helden.framework.zauber.ZauberFabrik;
 import helden.framework.zauber.ZauberVerbreitung;
-import org.w3c.dom.*;
 
 import java.io.File;
 import java.lang.reflect.*;
@@ -103,6 +102,13 @@ public class EntryCreator {
 	// Eigene Talente - Konstruktoren
 	// newEigenesTalent: (String name, R art, boolean basistalent, L probe, Node xmlnode, String behinderung, String beschreibung, String urheber, String kontakt) -> EigenesTalent
 	Constructor newEigenesTalent;
+
+	// TalentFactory (singleton)
+	Class TalentFactoryType;
+	Object talentFactoryInst;
+	Field talentFactoryMapField;
+	// Internal map: Talent.toString() -> Talent
+	HashMap<String, Object> talentFactoryMap;
 
 	// Held
 	Class HeldType;
@@ -225,6 +231,32 @@ public class EntryCreator {
 				if (c.getParameterTypes().length == 9) newEigenesTalent = c;
 			}
 
+			// TalentFactory
+			// final class with many private fields (ArrayList, HashMap), but no public fields
+			for (PojoClass pojoClass: PojoClassFactory.getPojoClasses(TalentType.getPackage().getName())){
+				Class c = pojoClass.getClazz();
+				if (Modifier.isFinal(c.getModifiers()) && c.getFields().length <= 2 && c.getDeclaredFields().length >= 7){
+					TalentFactoryType = c;
+					break;
+				}
+			}
+			for (Method m: TalentFactoryType.getMethods()){
+				if (Modifier.isStatic(m.getModifiers()) && m.getReturnType().equals(TalentFactoryType)){
+					talentFactoryInst = m.invoke(null);
+					break;
+				}
+			}
+			// EntryCreator gets initialized before any calls to TalentFactory can happen
+			// That means we exploit that the target map is null after initialization
+			for (Field f: TalentFactoryType.getDeclaredFields()){
+				if (f.getType().equals(HashMap.class)){
+					f.setAccessible(true);
+					if (f.get(talentFactoryInst) == null){
+						talentFactoryMapField = f;
+						break;
+					}
+				}
+			}
 
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -375,6 +407,19 @@ public class EntryCreator {
 		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Der Editor braucht Talente in einer speziellen Map, deren Key der Name ist...
+	 * @param talent
+	 * @throws IllegalAccessException
+	 */
+	public void registerTalentForEditor(Object talent) throws IllegalAccessException {
+		if (talentFactoryMap == null) {
+			talentFactoryMap = (HashMap<String, Object>) talentFactoryMapField.get(talentFactoryInst);
+			if (talentFactoryMap == null) throw new RuntimeException("Map is null, TODO");
+		}
+		talentFactoryMap.put(talent.toString(), talent);
 	}
 
 
