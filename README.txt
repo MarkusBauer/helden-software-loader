@@ -42,6 +42,7 @@ warum dieser Fehler auftreten kann:
  - Die Helden-Software hat sich gerade aktualisiert und neugestartet. Ein weiterer Neustart 
    (natürlich ohne zu speichern) löst das Problem. 
 
+**Talente mit gleichem Namen sollten gleich sein.** Sonst weigert sich der Editor später, das Talent zu bearbeiten.
 
 **Macht Backups!**
 Sollte eigentlich selbstverständlich sein, ist es aber leider nicht. 
