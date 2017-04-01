@@ -75,11 +75,13 @@ public class InstrumentationEngine {
 		private final String wrapperResultType; // can be null
 		private final String classname;
 		private final String method;
+		private final String thisReferenceType;
 
 		public MethodResultAModifier(String classname, String method, String resultType) {
 			this.wrapperResultType = resultType;
 			this.classname = classname;
 			this.method = method;
+			this.thisReferenceType = null;
 		}
 
 		public MethodResultAModifier(String classname, String method) {
@@ -87,11 +89,26 @@ public class InstrumentationEngine {
 		}
 
 		public MethodResultAModifier(Class c, String method, String resultType) {
-			this(c.getName().replace('.', '/'), method, resultType);
+			this.classname = c.getName().replace('.', '/');
+			this.method = method;
+			this.wrapperResultType = resultType;
+			this.thisReferenceType = null;
 		}
 
 		public MethodResultAModifier(Class c, String method) {
 			this(c, method, null);
+		}
+
+		public MethodResultAModifier(Method m){
+			this.classname = m.getDeclaringClass().getName().replace('.', '/');
+			this.method = m.getName();
+			this.wrapperResultType = "L"+m.getReturnType().getName().replace('.', '/');
+			Class[] params = m.getParameterTypes();
+			if (params.length == 2){
+				this.thisReferenceType = "L"+params[1].getName().replace('.', '/');
+			}else{
+				this.thisReferenceType = null;
+			}
 		}
 
 		private String extractResultType(String desc){
@@ -106,12 +123,15 @@ public class InstrumentationEngine {
 		public MethodVisitor getMethodVisitor(MethodVisitor parent, int access, String name, String desc, String signature, String[] exceptions) {
 			final String originalResultType = extractResultType(desc);
 			final String methodResultType = wrapperResultType != null ? wrapperResultType : originalResultType;
+			final String callbackType = "("+methodResultType+";"+(thisReferenceType == null ? "" : thisReferenceType+";")+")"+methodResultType+";";
 			return new MethodAdapter(parent) {
 				@Override
 				public void visitInsn(int opcode) {
 					// Before "return X", add call to hook
 					if (opcode == Opcodes.ARETURN) {
-						super.visitMethodInsn(Opcodes.INVOKESTATIC, classname, method, "("+methodResultType+";)"+methodResultType+";");
+						if (thisReferenceType != null)
+							super.visitIntInsn(Opcodes.ALOAD, 0);
+						super.visitMethodInsn(Opcodes.INVOKESTATIC, classname, method, callbackType);
 						// if return types do not match, we add a cast (just to be sure)
 						if (!originalResultType.equals(methodResultType)) {
 							super.visitTypeInsn(Opcodes.CHECKCAST, originalResultType.substring(1));
