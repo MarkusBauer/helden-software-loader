@@ -78,7 +78,7 @@ public class NewTalentDialog extends JDialog {
 		try {
 			initModels();
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			ErrorHandler.handleException(e);
 		}
 
 		onTalentArtChanged();
@@ -200,7 +200,7 @@ public class NewTalentDialog extends JDialog {
 			System.out.println(talent);
 			if (newTalentCallback != null) newTalentCallback.talentCreated(talent, (Integer) spinnerStartwert.getValue());
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			ErrorHandler.handleException(e);
 		}
 
 

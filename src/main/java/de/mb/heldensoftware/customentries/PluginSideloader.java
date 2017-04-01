@@ -24,7 +24,7 @@ public class PluginSideloader {
 		try {
 			patchHeldenPluginFactory();
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			ErrorHandler.handleException(e);
 		}
 	}
 

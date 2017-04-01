@@ -13,7 +13,7 @@ public class ErrorHandler {
 	 * This method never returns.
 	 * @param t
 	 */
-	public static void handleException(Throwable t){
+	public static RuntimeException handleException(Throwable t){
 		if (t instanceof RuntimeException) throw (RuntimeException) t;
 		throw new RuntimeException(t);
 	}

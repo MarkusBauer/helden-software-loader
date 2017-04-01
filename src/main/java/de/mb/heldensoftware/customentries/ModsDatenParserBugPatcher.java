@@ -17,7 +17,7 @@ public class ModsDatenParserBugPatcher {
 					new InstrumentationEngine.MethodResultAModifier(ModsDatenParserBugPatcher.class, "afterEinlesenTalent", "Ljava/lang/Object"));
 			inst.patchClass();
 		}catch (Exception e){
-			throw new RuntimeException(e);
+			ErrorHandler.handleException(e);
 		}
 	}
 
@@ -46,7 +46,7 @@ public class ModsDatenParserBugPatcher {
 			EntryCreator.getInstance().registerTalentForEditor(talent);
 			return talent;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw ErrorHandler.handleException(e);
 		}
 	}
 

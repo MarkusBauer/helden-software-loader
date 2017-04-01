@@ -261,7 +261,7 @@ public class EntryCreator {
 			if (talentFactoryMapField == null) throw new RuntimeException("talentFactoryMapField not found");
 
 		}catch(Exception e){
-			throw new RuntimeException(e);
+			ErrorHandler.handleException(e);
 		}
 	}
 
@@ -383,7 +383,7 @@ public class EntryCreator {
 			Zauber newspell = newZauber.newInstance(name, kat, probe.getProbe(), getMerkmale(merkmale), q.getQuellenObj(), mod);
 			return new ZauberWrapper(name, newspell);
 		}catch(Exception e){
-			throw new RuntimeException(e);
+			throw ErrorHandler.handleException(e);
 		}
 	}
 
@@ -407,7 +407,7 @@ public class EntryCreator {
 		try {
 			heldAddTalent.invoke(held, talent, value);
 		}catch(Exception e){
-			throw new RuntimeException(e);
+			ErrorHandler.handleException(e);
 		}
 	}
 

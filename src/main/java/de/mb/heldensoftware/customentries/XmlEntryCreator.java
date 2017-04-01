@@ -96,7 +96,7 @@ public class XmlEntryCreator {
 			talent.setAttribute("id", id);
 			return einlesenTalent.invoke(ModsDatenParser.getInstance(), talent);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw ErrorHandler.handleException(e);
 		}
 	}
 
