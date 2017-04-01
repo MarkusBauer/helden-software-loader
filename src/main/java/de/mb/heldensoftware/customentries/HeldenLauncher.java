@@ -25,6 +25,8 @@ public class HeldenLauncher {
 		// Patch bugs
 		ErrorHandler.patchHeldenErrorHandler();
 		ModsDatenParserBugPatcher.patchModsDatenParser();
+		// Resolve reflection references (after patches are deployed, before HeldenSoftware initializes anything)
+		EntryCreator.getInstance();
 		// Load the non-plugin component
 		CustomEntryLoader.loadFiles();
 		// Launch Helden-Software

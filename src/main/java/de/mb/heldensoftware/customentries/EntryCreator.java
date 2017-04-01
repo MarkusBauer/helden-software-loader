@@ -257,6 +257,8 @@ public class EntryCreator {
 					}
 				}
 			}
+			if (talentFactoryInst == null) throw new RuntimeException("talentFactoryInst not found");
+			if (talentFactoryMapField == null) throw new RuntimeException("talentFactoryMapField not found");
 
 		}catch(Exception e){
 			throw new RuntimeException(e);
