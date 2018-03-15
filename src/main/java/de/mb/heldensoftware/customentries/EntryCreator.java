@@ -447,7 +447,7 @@ public class EntryCreator {
 			String[] p = probe.split("/");
 			assert p.length == 3;
 			for (String s: p) {
-				assert getInstance().alleEigenschaften.containsKey(p[0]);
+				assert getInstance().alleEigenschaften.containsKey(s);
 			}
 			this.p1 = p[0];
 			this.p2 = p[1];
