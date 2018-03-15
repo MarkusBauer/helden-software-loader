@@ -12,6 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <helden.version>5.5.2</helden.version>
     </properties>
 
 
@@ -39,9 +40,8 @@
                         </manifest>
                         <manifestEntries>
                             <!-- HeldenPluginClass: heldenbildPlugin.HeldenbildPlugin.class -->
-                            <HeldenDatenPluginClass>de.mb.heldensoftware.customentries.CustomEntryLoaderPlugin.class
-                            </HeldenDatenPluginClass>
-                            <Class-Path>. helden.jar helden5.jar</Class-Path>
+                            <HeldenDatenPluginClass>de.mb.heldensoftware.customentries.CustomEntryLoaderPlugin.class</HeldenDatenPluginClass>
+                            <Class-Path>. helden.jar helden5.jar helden-${helden.version}.jar</Class-Path>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -134,6 +134,26 @@
                     <failOnError>true</failOnError>
                 </configuration>
             </plugin>
+
+            <!-- Copy helden.jar to target directory to make development easier -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <includeScope>system</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -141,7 +161,7 @@
         <dependency>
             <groupId>de.helden_software</groupId>
             <artifactId>helden</artifactId>
-            <version>5.5.2</version>
+            <version>${helden.version}</version>
             <scope>system</scope>
             <!-- You can use a symlink to the installation directory, if you're on linux, and want life to be easy! -->
             <systemPath>${project.basedir}/heldensoftware/helden.jar</systemPath>
