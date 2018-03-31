@@ -38,37 +38,37 @@ public class CsvConverter {
                 .withHeader(columns)
                 .withSkipHeaderRecord();
 
-        // TODO MVR close reader/parser
-        final FileReader fileReader = new FileReader(p.toFile());
-        final CSVParser parser = new CSVParser(fileReader, csvFormat);
-        final Map<String, Integer> headerMap = parser.getHeaderMap();
+        try (final FileReader fileReader = new FileReader(p.toFile());
+             final CSVParser parser = new CSVParser(fileReader, csvFormat)
+            ) {
+            final Map<String, Integer> headerMap = parser.getHeaderMap();
 
-        // Verify Existence of columns
-        for (String headerName : columns) {
-            if (!headerMap.containsKey(headerName)) {
-                throw new IllegalStateException("Es wurde keine Spalte mit der Bezeichnung '" + headerName + "' gefunden.");
+            // Verify Existence of columns
+            for (String headerName : columns) {
+                if (!headerMap.containsKey(headerName)) {
+                    throw new IllegalStateException("Es wurde keine Spalte mit der Bezeichnung '" + headerName + "' gefunden.");
+                }
             }
+
+            // Now try to convert
+            final List<CSVRecord> records = parser.getRecords();
+            final JSONArray spells = new JSONArray();
+            for (CSVRecord eachRecord : records) {
+                final JSONObject spell = new JSONObject();
+                spell.put("name", "A " + eachRecord.get(Columns.Name));
+                spell.put("kategorie", eachRecord.get(Columns.Kategorie));
+                spell.put("merkmale", parseList(eachRecord.get(Columns.Merkmale), ","));
+                spell.put("probe", eachRecord.get(Columns.Probe));
+                spell.put("mod", eachRecord.get(Columns.MODS_MR));
+                spell.put("settings", parseList(eachRecord.get(Columns.Settings), ","));
+                spell.put("verbreitung", parseVerbreitung(eachRecord.get(Columns.Verbreitung), ","));
+                spells.add(spell);
+            }
+
+            final JSONObject root = new JSONObject();
+            root.put("zauber", spells);
+            return new ByteArrayInputStream(root.toJSONString().getBytes());
         }
-
-        // Now try to convert
-        final List<CSVRecord> records = parser.getRecords();
-        final JSONArray spells = new JSONArray();
-        for (CSVRecord eachRecord : records) {
-            final JSONObject spell = new JSONObject();
-            spell.put("name", "A " + eachRecord.get(Columns.Name));
-            spell.put("kategorie", eachRecord.get(Columns.Kategorie));
-            spell.put("merkmale", parseList(eachRecord.get(Columns.Merkmale), ","));
-            spell.put("probe", eachRecord.get(Columns.Probe));
-            spell.put("mod", eachRecord.get(Columns.MODS_MR));
-            spell.put("settings", parseList(eachRecord.get(Columns.Settings), ","));
-            spell.put("verbreitung", parseVerbreitung(eachRecord.get(Columns.Verbreitung), ","));
-            spells.add(spell);
-        }
-
-        final JSONObject root = new JSONObject();
-        root.put("zauber", spells);
-        return new ByteArrayInputStream(root.toJSONString().getBytes());
-
     }
 
     private static List<String> parseList(String input, String delimiter) {
