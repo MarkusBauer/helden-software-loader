@@ -1,16 +1,26 @@
 package de.mb.heldensoftware.customentries;
 
+import de.mb.heldensoftware.customentries.EntryCreator.Probe;
+import de.mb.heldensoftware.customentries.EntryCreator.Quellenangabe;
+import de.mb.heldensoftware.customentries.EntryCreator.ZauberWrapper;
 import helden.comm.CommUtilities;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.*;
-
-import de.mb.heldensoftware.customentries.EntryCreator.*;
-
 import javax.swing.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -18,7 +28,7 @@ import javax.swing.*;
  */
 public class CustomEntryLoader {
 
-	public void loadCustomEntries(Reader in) throws IOException, ParseException {
+	protected void loadCustomEntries(Reader in) throws IOException, ParseException {
 		JSONParser parser = new JSONParser();
 		JSONObject customEntries = (JSONObject) parser.parse(in);
 		JSONArray zauber = (JSONArray) customEntries.get("zauber");
@@ -85,15 +95,6 @@ public class CustomEntryLoader {
 
 
 
-	public static void loadExampleFile(){
-		try (Reader r = new InputStreamReader(CustomEntryLoader.class.getResourceAsStream("/examples/examples.json"))){
-			new CustomEntryLoader().loadCustomEntries(r);
-		} catch (IOException | ParseException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-
 	private static boolean filesLoaded = false;
 
 	/**
@@ -101,20 +102,18 @@ public class CustomEntryLoader {
 	 * - helden.jar directory
 	 * - helden.zip.hld directory
 	 */
-	public static void loadFiles(){
+	public static void loadFiles() {
 		if (filesLoaded) return;
 		filesLoaded = true;
+
 		try {
-			// Config files next to helden.jar
-			File jarpath = (new CommUtilities()).getJarPath();
-			if (loadFiles(jarpath)) return;
-			if (jarpath.getName().toLowerCase().endsWith(".jar")){
-				if (loadFiles(jarpath.getParentFile())) return;
+			final List<CustomEntryHandler> customEntryHandler = new ArrayList<>();
+			customEntryHandler.add(new JsonFileProvider());
+			customEntryHandler.add(new CsvJsonProvider());
+			for (CustomEntryHandler each : customEntryHandler) {
+				each.loadCustomEntries();
 			}
 
-			// Config files next to helden.zip.hld
-			File heldenPath = new File(new File(System.getProperty("user.home")), "helden");
-			if (!loadFiles(heldenPath)) return;
 
 		} catch (Throwable e){
 			// Show message box and exit
@@ -124,42 +123,83 @@ public class CustomEntryLoader {
 			JOptionPane.showMessageDialog(null, msg, e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
 			System.exit(-1);
 		}
+
 	}
 
-	public static boolean loadFiles(File folder) throws ParseException {
-		return
-				loadFile(new File(folder, "customentries.json")) |
-				loadFile(new File(folder, "erweiterungen.json")) |
-				loadFile(new File(folder, "erweiterungen.json.txt")); // I know my dear Windows users...
+	public interface CustomEntryHandler {
+
+		boolean loadCustomEntries() throws ParseException;
 	}
 
-	public static boolean loadFile(File f) throws ParseException {
-		if (!f.exists()) {
-			System.err.println("[CustomEntryLoader] Keine Erweiterungen in "+f.getAbsolutePath());
-			return false;
-		}
-		System.err.println("[CustomEntryLoader] Lade Erweiterungen von \""+f.getAbsolutePath()+"\"");
-		try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(f))){
-			// Remove BOM - I know my Windows users
-			byte[] buffer = new byte[3];
-			input.mark(4);
-			input.read(buffer);
-			if (! (buffer[0] == (byte) 0xEF && buffer[1] == (byte) 0xBB && buffer[2] == (byte) 0xBF)) {
-				input.reset();
+	private static class CsvJsonProvider implements CustomEntryHandler {
+
+		@Override
+		public boolean loadCustomEntries() throws ParseException {
+			Path p = Paths.get(System.getProperty("user.home"), "helden", "erweiterungen.csv");
+			if (!Files.exists(p)) {
+				System.err.println("[CustomEntryLoader] Keine Erweiterungen in " + p.toAbsolutePath());
+				return false;
 			}
-			// Read file as UTF-8
-			try (Reader r = new InputStreamReader(input, "UTF-8")) {
+			System.err.println("[CustomEntryLoader] Lade Erweiterungen von \"" + p.toAbsolutePath() + "\"");
+			try (Reader r = new InputStreamReader(new CsvConverter().convertToJson(p), "UTF-8")) {
 				new CustomEntryLoader().loadCustomEntries(r);
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
 			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			return true;
 		}
-		/*try (BufferedReader r = new BufferedReader(new FileReader(f))){
-			new CustomEntryLoader().loadCustomEntries(r);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}*/
-		return true;
+	}
+
+	private static class JsonFileProvider implements CustomEntryHandler {
+
+		@Override
+		public boolean loadCustomEntries() throws ParseException {
+			// Config files next to helden.jar
+			File jarpath = (new CommUtilities()).getJarPath();
+			if (loadFiles(jarpath)) {
+				return true;
+			}
+			if (jarpath.getName().toLowerCase().endsWith(".jar")) {
+				if (loadFiles(jarpath.getParentFile())) {
+					return true;
+				}
+			}
+
+			// Config files next to helden.zip.hld
+			File heldenPath = new File(new File(System.getProperty("user.home")), "helden");
+			return loadFiles(heldenPath);
+		}
+
+		private boolean loadFiles(File folder) throws ParseException {
+			return
+					loadFile(new File(folder, "customentries.json")) |
+							loadFile(new File(folder, "erweiterungen.json")) |
+							loadFile(new File(folder, "erweiterungen.json.txt")); // I know my dear Windows users...
+		}
+
+		private boolean loadFile(File f) throws ParseException {
+			if (!f.exists()) {
+				System.err.println("[CustomEntryLoader] Keine Erweiterungen in "+f.getAbsolutePath());
+				return false;
+			}
+			System.err.println("[CustomEntryLoader] Lade Erweiterungen von \""+f.getAbsolutePath()+"\"");
+			try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(f))){
+				// Remove BOM - I know my Windows users
+				byte[] buffer = new byte[3];
+				input.mark(4);
+				input.read(buffer);
+				if (! (buffer[0] == (byte) 0xEF && buffer[1] == (byte) 0xBB && buffer[2] == (byte) 0xBF)) {
+					input.reset();
+				}
+				// Read file as UTF-8
+				try (Reader r = new InputStreamReader(input, "UTF-8")) {
+					new CustomEntryLoader().loadCustomEntries(r);
+				}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return true;
+		}
 	}
 
 }
