@@ -6,11 +6,11 @@ import org.apache.commons.csv.CSVRecord;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class CsvConverter {
 
 	public interface Columns {
-		String Name = "name";
+		String Name = "Name";
 		String Kategorie = "Kategorie";
 		String Merkmale = "Merkmale";
 		String Probe = "Probe";
@@ -27,19 +27,22 @@ public class CsvConverter {
 		String Settings = "Settings";
 	}
 
+	@SuppressWarnings("unchecked")
 	public InputStream convertToJson(Path p) throws IOException {
+		byte[] content = Files.readAllBytes(p);
+
 		final String[] columns = new String[]{
 				Columns.Name, Columns.Kategorie,
 				Columns.Merkmale, Columns.Probe,
 				Columns.MODS_MR, Columns.Verbreitung,
 				Columns.Settings
 		};
-		final CSVFormat csvFormat = CSVFormat.DEFAULT
+		final CSVFormat csvFormat = detectFormat(content)
 				.withHeader(columns)
 				.withSkipHeaderRecord();
 
-		try (final FileReader fileReader = new FileReader(p.toFile());
-			 final CSVParser parser = new CSVParser(fileReader, csvFormat)
+		try (final Reader reader = new StringReader(new String(content, StandardCharsets.UTF_8)); //TODO encoding
+			 final CSVParser parser = new CSVParser(reader, csvFormat)
 		) {
 			final Map<String, Integer> headerMap = parser.getHeaderMap();
 
@@ -55,7 +58,7 @@ public class CsvConverter {
 			final JSONArray spells = new JSONArray();
 			for (CSVRecord eachRecord : records) {
 				final JSONObject spell = new JSONObject();
-				spell.put("name", "A " + eachRecord.get(Columns.Name));
+				spell.put("name", eachRecord.get(Columns.Name));
 				spell.put("kategorie", eachRecord.get(Columns.Kategorie));
 				spell.put("merkmale", parseList(eachRecord.get(Columns.Merkmale), ","));
 				spell.put("probe", eachRecord.get(Columns.Probe));
@@ -115,5 +118,23 @@ public class CsvConverter {
 			}
 		}
 		return verbreitungObj;
+	}
+
+	private static CSVFormat detectFormat(byte[] content) {
+		CSVFormat format = CSVFormat.DEFAULT;
+		// detect separator: , or ;
+		long count_comma = 0;
+		long count_semicolon = 0;
+		for (byte b : content) {
+			if (b == ',') count_comma++;
+			else if (b == ';') count_semicolon++;
+			else if (b == '\n') break;
+		}
+		if (count_semicolon > count_comma)
+			format = format.withDelimiter(';');
+
+		//TODO detect encoding + BOM
+
+		return format;
 	}
 }
