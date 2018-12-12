@@ -111,7 +111,15 @@ public class CustomEntryLoader {
 			customEntryHandler.add(new JsonFileProvider());
 			customEntryHandler.add(new CsvJsonProvider());
 			for (CustomEntryHandler handler : customEntryHandler) {
-				handler.loadCustomEntries();
+				// Config files next to helden.jar
+				File jarpath = new CommUtilities().getJarPath();
+				if (handler.loadCustomEntries(jarpath)) continue;
+				if (jarpath.getName().toLowerCase().endsWith(".jar")) {
+					if (handler.loadCustomEntries(jarpath.getParentFile())) continue;
+				}
+				// Config files next to helden.zip.hld
+				File heldenPath = new File(new File(System.getProperty("user.home")), "helden");
+				handler.loadCustomEntries(heldenPath);
 			}
 
 
@@ -127,16 +135,18 @@ public class CustomEntryLoader {
 	}
 
 	public interface CustomEntryHandler {
-		boolean loadCustomEntries() throws ParseException;
+		boolean loadCustomEntries(File folder) throws ParseException;
 	}
 
 	private static class CsvJsonProvider implements CustomEntryHandler {
 
 		@Override
-		public boolean loadCustomEntries() throws ParseException {
-			for (Path p: new Path[]{
-					new File(new CommUtilities().getJarPath(), "erweiterungen.csv").toPath(),
-					Paths.get(System.getProperty("user.home"), "helden", "erweiterungen.csv")
+		public boolean loadCustomEntries(File folder) throws ParseException {
+			boolean result = false;
+			for (Path p : new Path[]{
+					new File(folder, "erweiterungen.csv").toPath(),
+					new File(folder, "erweiterungen-libreoffice.csv").toPath(),
+					new File(folder, "erweiterungen-excel.csv").toPath()
 			}) {
 				if (!Files.exists(p)) {
 					System.err.println("[CustomEntryLoader] Keine Erweiterungen in " + p.toAbsolutePath());
@@ -148,33 +158,16 @@ public class CustomEntryLoader {
 				} catch (IOException ex) {
 					throw new RuntimeException(ex);
 				}
-				return true;
+				result = true;
 			}
-			return false;
+			return result;
 		}
 	}
 
 	private static class JsonFileProvider implements CustomEntryHandler {
 
 		@Override
-		public boolean loadCustomEntries() throws ParseException {
-			// Config files next to helden.jar
-			File jarpath = new CommUtilities().getJarPath();
-			if (loadFiles(jarpath)) {
-				return true;
-			}
-			if (jarpath.getName().toLowerCase().endsWith(".jar")) {
-				if (loadFiles(jarpath.getParentFile())) {
-					return true;
-				}
-			}
-
-			// Config files next to helden.zip.hld
-			File heldenPath = new File(new File(System.getProperty("user.home")), "helden");
-			return loadFiles(heldenPath);
-		}
-
-		private boolean loadFiles(File folder) throws ParseException {
+		public boolean loadCustomEntries(File folder) throws ParseException {
 			return loadFile(new File(folder, "customentries.json")) |
 					loadFile(new File(folder, "erweiterungen.json")) |
 					loadFile(new File(folder, "erweiterungen.json.txt")); // I know my dear Windows users...
