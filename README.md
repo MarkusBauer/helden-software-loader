@@ -204,6 +204,22 @@ Die komplette Beispiel-Datei gibt's hier: [examples.json](src/main/resources/exa
 ```
 
 
+### CSV
+
+Da viele Tabellenkalkulationen den Export nach CSV ermöglichen und dies für viele Anwender dies einfacher zu handhaben ist, besteht die Option neue Zauber auch über eine `erweiterungen.csv`-Datei zu importieren.
+Die Konfiguration ist wie bei json zu handhaben:
+Die `erweiterungen.csv` Datei, kommt ins gleiche Verzeichnis wie eure `helden.zip.hld`, als `C:\Benutzer\XXX\helden\erweiterungen.csv` unter Windows bzw. `~/helden/erweiterungen.csv` unter Linux.
+
+Die folgende Tabelle veranschaulicht das Format:
+
+```
+Name,Kategorie,Merkmale,Probe,Mods/MR,Verbreitung,Settings
+Mein Zauber,D,Antimagie,MU/KL/CH,,Mag3,Aventurien
+
+```
+
+Beispieldateien liegen dem Plugin bei (für Excel und Libreoffice). 
+
 
 Entwickler
 ----------
@@ -236,6 +252,7 @@ Dieses Plugin basiert auf verschiedenen anderen Projekten:
 - [OpenPojo](https://github.com/oshoukry/openpojo), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 - IntelliJ Forms_rt by [Jetbrains](http://www.jetbrains.com/), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 - [ASM Commons](http://asm.ow2.org/), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+- [Apache CSV](https://commons.apache.org/proper/commons-csv/), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0) 
  
  
  

@@ -13,6 +13,12 @@
             <source>src/main/resources/examples/examples.json</source>
         </file>
         <file>
+            <source>src/main/resources/examples/erweiterungen-excel.csv</source>
+        </file>
+        <file>
+            <source>src/main/resources/examples/erweiterungen-libreoffice.csv</source>
+        </file>
+        <file>
             <source>README.txt</source>
         </file>
     </files>

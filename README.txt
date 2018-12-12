@@ -173,6 +173,19 @@ Zur Sichtbarkeit eines Zaubers gilt:
 Diesem Archiv liegt eine exemplarische "examples.json" bei.
 
 
+--- CSV ---
+Da viele Tabellenkalkulationen den Export nach CSV ermöglichen und dies für viele Anwender dies einfacher zu handhaben ist,
+besteht die Option neue Zauber auch über eine "erweiterungen.csv"-Datei zu importieren.
+Die Konfiguration ist wie bei json zu handhaben:
+Die "erweiterungen.csv" Datei, kommt ins gleiche Verzeichnis wie eure "helden.zip.hld", als "C:\Benutzer\XXX\helden\erweiterungen.csv" unter Windows
+bzw. "~/helden/erweiterungen.csv" unter Linux.
+Die folgende Tabelle veranschaulicht das Format:
+
+Name,Kategorie,Merkmale,Probe,Mods/MR,Verbreitung,Settings
+Mein Zauber,D,Antimagie,MU/KL/CH,,Mag3,Aventurien
+
+
+
 
 Externe Komponenten
 -------------------
