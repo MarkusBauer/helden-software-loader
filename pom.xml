@@ -12,7 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <helden.version>5.5.2</helden.version>
+        <helden.version>5.5.3</helden.version>
     </properties>
 
 
@@ -40,8 +40,7 @@
                         </manifest>
                         <manifestEntries>
                             <!-- HeldenPluginClass: heldenbildPlugin.HeldenbildPlugin.class -->
-                            <HeldenDatenPluginClass>de.mb.heldensoftware.customentries.CustomEntryLoaderPlugin.class
-                            </HeldenDatenPluginClass>
+                            <HeldenDatenPluginClass>de.mb.heldensoftware.customentries.CustomEntryLoaderPlugin.class</HeldenDatenPluginClass>
                             <Class-Path>. helden.jar helden5.jar helden-${helden.version}.jar</Class-Path>
                         </manifestEntries>
                     </archive>

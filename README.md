@@ -240,7 +240,7 @@ Das Plugin nutzt [Maven](https://maven.apache.org/) für seinen Build-Prozess.
 Bevor das Projekt compiliert werden kann, muss ein Ordner `heldensoftware` 
  im Hauptverzeichnis angelegt werden, und die `helden.jar` hineinkopiert werden. 
  Alternativ funktioniert auch ein Linux-Symlink ins Installationsverzeichnis (namens `heldensoftware`):
- `ln -s <pfad zu helden.jar> heldensoftware`
+ `ln -s <pfad zu ordner mit helden.jar> heldensoftware`
  
  
  
