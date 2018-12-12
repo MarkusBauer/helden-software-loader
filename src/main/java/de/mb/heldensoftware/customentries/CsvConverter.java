@@ -5,9 +5,13 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mozilla.intl.chardet.nsDetector;
+import org.mozilla.intl.chardet.nsICharsetDetectionObserver;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,11 +41,10 @@ public class CsvConverter {
 				Columns.MODS_MR, Columns.Verbreitung,
 				Columns.Settings
 		};
-		final CSVFormat csvFormat = detectFormat(content)
-				.withHeader(columns)
-				.withSkipHeaderRecord();
+		CSVFormat csvFormat = detectFormat(content).withHeader(columns).withSkipHeaderRecord();
+		Charset charset = detectEncoding(content);
 
-		try (final Reader reader = new StringReader(new String(content, StandardCharsets.UTF_8)); //TODO encoding
+		try (final Reader reader = new StringReader(new String(content, charset));
 			 final CSVParser parser = new CSVParser(reader, csvFormat)
 		) {
 			final Map<String, Integer> headerMap = parser.getHeaderMap();
@@ -125,16 +128,46 @@ public class CsvConverter {
 		// detect separator: , or ;
 		long count_comma = 0;
 		long count_semicolon = 0;
+		long count_tab = 0;
 		for (byte b : content) {
 			if (b == ',') count_comma++;
 			else if (b == ';') count_semicolon++;
+			else if (b == '\t') count_tab++;
 			else if (b == '\n') break;
 		}
-		if (count_semicolon > count_comma)
+		if (count_tab > count_semicolon && count_tab > count_comma)
+			format = format.withDelimiter('\t');
+		else if (count_semicolon > count_comma)
 			format = format.withDelimiter(';');
 
 		//TODO detect encoding + BOM
 
 		return format;
+	}
+
+	/**
+	 * Automatic charset detection, based on jchardet. Typical charsets are windows-1252 and UTF-8.
+	 *
+	 * @param content File content to perform detection on
+	 * @return A charset, with UTF-8 being default.
+	 */
+	private static Charset detectEncoding(byte[] content) {
+		// What an ugly library interface. Directly from hell...
+		final Charset result[] = new Charset[]{StandardCharsets.UTF_8};
+		nsDetector detector = new nsDetector();
+		detector.Init(new nsICharsetDetectionObserver() {
+			@Override
+			public void Notify(String s) {
+				result[0] = Charset.forName(s);
+			}
+		});
+		try {
+			detector.DoIt(content, content.length, false);
+			detector.DataEnd();
+			detector.Done();
+		} catch (UnsupportedCharsetException e) {
+			System.err.println(e.getMessage());
+		}
+		return result[0];
 	}
 }

@@ -60,7 +60,15 @@ public class CustomEntryLoaderTest {
 
 	@Test
 	public void testExampleCsvExcel() throws URISyntaxException, IOException, ParseException {
-		Path p = Paths.get(getClass().getResource("/examples/erweiterungen-excel2010.csv").toURI());
+		Path p = Paths.get(getClass().getResource("/examples/erweiterungen-excel-2.csv").toURI());
+		try (InputStreamReader r = new InputStreamReader(new CsvConverter().convertToJson(p))) {
+			testImportedZauber(r);
+		}
+	}
+
+	@Test
+	public void testExampleCsvExcelStrange() throws URISyntaxException, IOException, ParseException {
+		Path p = Paths.get(getClass().getResource("/examples/erweiterungen-excel-strange.csv").toURI());
 		try (InputStreamReader r = new InputStreamReader(new CsvConverter().convertToJson(p))) {
 			testImportedZauber(r);
 		}
