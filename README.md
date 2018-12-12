@@ -218,6 +218,8 @@ Mein Zauber,D,Antimagie,MU/KL/CH,,Mag3,Aventurien
 
 ```
 
+Beispieldateien liegen dem Plugin bei (für Excel und Libreoffice). 
+
 
 Entwickler
 ----------
