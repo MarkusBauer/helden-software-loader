@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Markus on 19.03.2017.
  */
+@SuppressWarnings("WeakerAccess")
 public class EntryCreator {
 
 	private static EntryCreator instance;
@@ -67,8 +68,13 @@ public class EntryCreator {
 
 	// Repräsentation ("Mag", "Hexe", ...)
 	Class representationType;
+	Constructor<?> newRepresentation;
 	// Name => Repräsentation
 	Map<String, Object> alleRepresentationen = new HashMap<>();
+
+	// Sonderfertigkeit
+	Class sonderfertigkeitType;
+	Constructor<?> newSonderfertigkeit;
 
 	// new Zauber: (String name, Kategorie spalte, Merkmal[] merkmale, Probe probe, QuellenObj quellenangabe, String mod) -> Zauber
 	Constructor<Zauber> newZauber = null;
@@ -114,6 +120,8 @@ public class EntryCreator {
 	Class HeldType;
 	Method heldAddTalent;
 
+	private int numRepresentations = 0; // number of representations already created
+
 	/**
 	 * Resolves all reflection references to helden-software
 	 */
@@ -156,7 +164,21 @@ public class EntryCreator {
 
 			// Repräsentation
 			representationType = Zauber.class.getMethod("getRepraesentationen").getReturnType().getComponentType();
+			newRepresentation = representationType.getConstructors()[0];
+			newRepresentation.setAccessible(true);
 			createStringMap(alleRepresentationen, representationType);
+
+			// Sonderfertigkeit (from Repräsentation)
+			for (Method m: representationType.getMethods()) {
+				if (Modifier.isStatic(m.getModifiers())) continue;
+				if (m.getReturnType().equals(String.class)) continue;
+				sonderfertigkeitType = m.getReturnType();
+				break;
+			}
+			for (Constructor<?> c: sonderfertigkeitType.getConstructors()) {
+				if (c.getParameterTypes().length == 1) newSonderfertigkeit = c;
+			}
+			assert newSonderfertigkeit != null;
 
 			// Zauber
 			for (Constructor<?> c : Zauber.class.getConstructors()) {
@@ -226,6 +248,7 @@ public class EntryCreator {
 			if (EigenesTalentType == null) throw new RuntimeException("EigenesTalentType not found");
 			if (EigenesSprachTalentType == null) throw new RuntimeException("EigenesSprachTalentType not found");
 			if (EigenesKampfTalentType == null) throw new RuntimeException("EigenesKampfTalentType not found");
+			if (sonderfertigkeitType == null) throw new RuntimeException("sonderfertigkeitType not found");
 
 			for (Constructor c: EigenesTalentType.getConstructors()){
 				if (c.getParameterTypes().length == 9) newEigenesTalent = c;
@@ -398,6 +421,25 @@ public class EntryCreator {
 			return ZauberFabrik.getInstance().getZauberfertigkeit(name) != null;
 		} catch (RuntimeException e){
 			return false;
+		}
+	}
+
+	public Object createSonderfertigkeit(String name) {
+		try {
+			return newSonderfertigkeit.newInstance(name);
+		} catch (Exception e) {
+			ErrorHandler.handleException(e);
+			return null;
+		}
+	}
+
+	public void createRepresentation(String name, String shortname, boolean hasRitualkenntnis) {
+		try {
+			Object sf1 = createSonderfertigkeit("Repräsentation: "+name);
+			Object sf2 = hasRitualkenntnis ? createSonderfertigkeit("Ritualkenntnis: "+name) : null;
+			Object repr = newRepresentation.newInstance("z"+(numRepresentations++), name, shortname, sf1, sf2);
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			ErrorHandler.handleException(e);
 		}
 	}
 

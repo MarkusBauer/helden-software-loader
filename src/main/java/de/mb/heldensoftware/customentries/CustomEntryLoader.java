@@ -32,9 +32,19 @@ public class CustomEntryLoader {
 	protected void loadCustomEntries(Reader in) throws IOException, ParseException {
 		JSONParser parser = new JSONParser();
 		JSONObject customEntries = (JSONObject) parser.parse(in);
-		JSONArray zauber = (JSONArray) customEntries.get("zauber");
-		for (Object o : zauber) {
-			loadZauber((JSONObject) o);
+		if (customEntries.containsKey("zauber")) {
+			JSONArray zauber = (JSONArray) customEntries.get("zauber");
+			for (Object o : zauber) {
+				loadZauber((JSONObject) o);
+			}
+		}
+
+		if (customEntries.containsKey("sonderfertigkeiten")) {
+			//TODO so einfach ist das nicht :/
+			JSONArray sf = (JSONArray) customEntries.get("sonderfertigkeiten");
+			for (Object o : sf) {
+				EntryCreator.getInstance().createSonderfertigkeit((String) o);
+			}
 		}
 	}
 
