@@ -43,9 +43,11 @@ public class CustomEntryLoader {
 			//TODO so einfach ist das nicht :/
 			JSONArray sf = (JSONArray) customEntries.get("sonderfertigkeiten");
 			for (Object o : sf) {
-				EntryCreator.getInstance().createSonderfertigkeit((String) o);
+				loadSF((JSONObject) o);
 			}
 		}
+
+		EntryCreator.getInstance().createRepresentation("Testisch", "Tes", true);
 	}
 
 	protected void loadZauber(JSONObject zauber) {
@@ -93,6 +95,11 @@ public class CustomEntryLoader {
 		if (objSpezis != null) {
 			zw.setSpezialisierungen(toStringArray((JSONArray) objSpezis));
 		}
+	}
+
+	protected void loadSF(JSONObject sf) {
+		String name = (String) sf.get("name");
+		EntryCreator.getInstance().createSonderfertigkeit(name);
 	}
 
 

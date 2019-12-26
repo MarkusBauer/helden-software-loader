@@ -164,7 +164,7 @@ public class EntryCreator {
 
 			// Repräsentation
 			representationType = Zauber.class.getMethod("getRepraesentationen").getReturnType().getComponentType();
-			newRepresentation = representationType.getConstructors()[0];
+			newRepresentation = representationType.getDeclaredConstructors()[0];
 			newRepresentation.setAccessible(true);
 			createStringMap(alleRepresentationen, representationType);
 
@@ -426,7 +426,11 @@ public class EntryCreator {
 
 	public Object createSonderfertigkeit(String name) {
 		try {
-			return newSonderfertigkeit.newInstance(name);
+			Object sf = newSonderfertigkeit.newInstance(name);
+			for (Setting setting : Setting.getHauptSettings()) {
+				setting.getIncluded().add("S"+name);
+			}
+			return sf;
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 			return null;
@@ -435,10 +439,25 @@ public class EntryCreator {
 
 	public void createRepresentation(String name, String shortname, boolean hasRitualkenntnis) {
 		try {
-			Object sf1 = createSonderfertigkeit("Repräsentation: "+name);
+			// SF 5 = Repr
+			Class SF2 = Class.forName("helden.framework.D.P");
+			Constructor<?> SF2c = SF2.getDeclaredConstructor(String.class, int.class, int.class);
+			SF2c.setAccessible(true);
+			Object sf1_real = SF2c.newInstance("Repräsentation: "+name, 2000, 5);
+
+			Class SFList = Class.forName("helden.framework.D.OoOo");
+			//TODO find method returning hashmap, add P instance
+
+			Object sf1 =
+					createSonderfertigkeit("Repräsentation: "+name);
 			Object sf2 = hasRitualkenntnis ? createSonderfertigkeit("Ritualkenntnis: "+name) : null;
 			Object repr = newRepresentation.newInstance("z"+(numRepresentations++), name, shortname, sf1, sf2);
-		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			System.out.println("repr = "+repr.toString());
+
+			for (Setting setting : Setting.getHauptSettings()) {
+				setting.getIncluded().add("R"+name);
+			}
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException e) {
 			ErrorHandler.handleException(e);
 		}
 	}
