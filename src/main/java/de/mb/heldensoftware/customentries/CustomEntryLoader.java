@@ -41,7 +41,6 @@ public class CustomEntryLoader {
 		}
 
 		if (customEntries.containsKey("sonderfertigkeiten")) {
-			//TODO so einfach ist das nicht :/
 			JSONArray sf = (JSONArray) customEntries.get("sonderfertigkeiten");
 			for (Object o : sf) {
 				loadSF((JSONObject) o);
