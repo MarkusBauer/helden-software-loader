@@ -24,7 +24,7 @@ public class EntryCreator {
 
 	private static EntryCreator instance;
 
-	public static EntryCreator getInstance(){
+	public static EntryCreator getInstance() {
 		if (instance == null) instance = new EntryCreator();
 		return instance;
 	}
@@ -125,7 +125,7 @@ public class EntryCreator {
 	/**
 	 * Resolves all reflection references to helden-software
 	 */
-	private EntryCreator(){
+	private EntryCreator() {
 		try {
 			for (Method m : Zauber.class.getMethods()) {
 				methods.put(m.getName(), m);
@@ -135,7 +135,7 @@ public class EntryCreator {
 			getTalentprobe = Zauber.class.getMethod("getTalentprobe");
 			talentprobeType = getTalentprobe.getReturnType();
 			talentprobeConstructor = talentprobeType.getConstructors()[0];
-			for (Method m: talentprobeType.getDeclaredMethods()){
+			for (Method m : talentprobeType.getDeclaredMethods()) {
 				if (m.getParameterTypes().length == 1 && m.getParameterTypes()[0] == int.class)
 					eigenschaftType = m.getReturnType();
 			}
@@ -145,7 +145,7 @@ public class EntryCreator {
 			// Steigerungsspalten
 			getKategorie = Zauber.class.getMethod("getKategorie", boolean.class);
 			kategorieType = getKategorie.getReturnType();
-			for (Field f: kategorieType.getDeclaredFields()){
+			for (Field f : kategorieType.getDeclaredFields()) {
 				if (f.getType().equals(kategorieType)) {
 					Object kat = f.get(null);
 					alleKategorien.put(kat.toString(), kat);
@@ -169,13 +169,13 @@ public class EntryCreator {
 			createStringMap(alleRepresentationen, representationType);
 
 			// Sonderfertigkeit (from Repräsentation)
-			for (Method m: representationType.getMethods()) {
+			for (Method m : representationType.getMethods()) {
 				if (Modifier.isStatic(m.getModifiers())) continue;
 				if (m.getReturnType().equals(String.class)) continue;
 				sonderfertigkeitNameType = m.getReturnType();
 				break;
 			}
-			for (Constructor<?> c: sonderfertigkeitNameType.getConstructors()) {
+			for (Constructor<?> c : sonderfertigkeitNameType.getConstructors()) {
 				if (c.getParameterTypes().length == 1) newSonderfertigkeitName = c;
 			}
 			assert newSonderfertigkeitName != null;
@@ -194,8 +194,8 @@ public class EntryCreator {
 
 			// TalentArt
 			TalentArtType = TalentType.getConstructors()[0].getParameterTypes()[1];
-			for (Method m: TalentArtType.getDeclaredMethods()){
-				if (m.getReturnType().equals(Boolean.TYPE) && m.getParameterTypes().length == 0){
+			for (Method m : TalentArtType.getDeclaredMethods()) {
+				if (m.getReturnType().equals(Boolean.TYPE) && m.getParameterTypes().length == 0) {
 					if (talentArtIsPrimitive != null) throw new RuntimeException();
 					talentArtIsPrimitive = m;
 				}
@@ -208,33 +208,33 @@ public class EntryCreator {
 			Thread.currentThread().setContextClassLoader(EntryCreator.class.getClassLoader());
 			List<PojoClass> classes = PojoClassFactory.enumerateClassesByExtendingType(TalentType.getPackage().getName(), TalentType, null);
 			Thread.currentThread().setContextClassLoader(tcl);
-			for (PojoClass pojoClass: classes){
+			for (PojoClass pojoClass : classes) {
 				Class c = pojoClass.getClazz();
-				if (!EigeneErweiterungenMoeglich.class.isAssignableFrom(c)){
+				if (!EigeneErweiterungenMoeglich.class.isAssignableFrom(c)) {
 					// Basisklasse
 					List<Object> instances = getAllStaticInstances(c);
-					if (instances.size() > 100){
+					if (instances.size() > 100) {
 						// Sprachen / Schriften
 						SprachTalentType = c;
 						SprachFamilieType = c.getDeclaredClasses()[0];
-					}else if (instances.size() > 28){
+					} else if (instances.size() > 28) {
 						// Kampftalent
 						KampfTalentType = c;
-					}else if (instances.size() > 14){
+					} else if (instances.size() > 14) {
 						RunenFertigkeitType = c;
 					}
 				}
 			}
 
 			// Talent-Unterklassen - Eigene Erweiterungen Möglich
-			for (PojoClass pojoClass: classes) {
+			for (PojoClass pojoClass : classes) {
 				Class c = pojoClass.getClazz();
 				if (EigeneErweiterungenMoeglich.class.isAssignableFrom(c)) {
-					if (SprachTalentType.isAssignableFrom(c)){
+					if (SprachTalentType.isAssignableFrom(c)) {
 						EigenesSprachTalentType = c;
-					}else if (KampfTalentType.isAssignableFrom(c)){
+					} else if (KampfTalentType.isAssignableFrom(c)) {
 						EigenesKampfTalentType = c;
-					}else if (c.getSuperclass().equals(TalentType)){
+					} else if (c.getSuperclass().equals(TalentType)) {
 						EigenesTalentType = c;
 					}
 				}
@@ -250,31 +250,31 @@ public class EntryCreator {
 			if (EigenesKampfTalentType == null) throw new RuntimeException("EigenesKampfTalentType not found");
 			if (sonderfertigkeitNameType == null) throw new RuntimeException("sonderfertigkeitNameType not found");
 
-			for (Constructor c: EigenesTalentType.getConstructors()){
+			for (Constructor c : EigenesTalentType.getConstructors()) {
 				if (c.getParameterTypes().length == 9) newEigenesTalent = c;
 			}
 
 			// TalentFactory
 			// final class with many private fields (ArrayList, HashMap), but no public fields
-			for (PojoClass pojoClass: PojoClassFactory.getPojoClasses(TalentType.getPackage().getName())){
+			for (PojoClass pojoClass : PojoClassFactory.getPojoClasses(TalentType.getPackage().getName())) {
 				Class c = pojoClass.getClazz();
-				if (Modifier.isFinal(c.getModifiers()) && c.getFields().length <= 2 && c.getDeclaredFields().length >= 7){
+				if (Modifier.isFinal(c.getModifiers()) && c.getFields().length <= 2 && c.getDeclaredFields().length >= 7) {
 					TalentFactoryType = c;
 					break;
 				}
 			}
-			for (Method m: TalentFactoryType.getMethods()){
-				if (Modifier.isStatic(m.getModifiers()) && m.getReturnType().equals(TalentFactoryType)){
+			for (Method m : TalentFactoryType.getMethods()) {
+				if (Modifier.isStatic(m.getModifiers()) && m.getReturnType().equals(TalentFactoryType)) {
 					talentFactoryInst = m.invoke(null);
 					break;
 				}
 			}
 			// EntryCreator gets initialized before any calls to TalentFactory can happen
 			// That means we exploit that the target map is null after initialization
-			for (Field f: TalentFactoryType.getDeclaredFields()){
-				if (f.getType().equals(HashMap.class)){
+			for (Field f : TalentFactoryType.getDeclaredFields()) {
+				if (f.getType().equals(HashMap.class)) {
 					f.setAccessible(true);
-					if (f.get(talentFactoryInst) == null){
+					if (f.get(talentFactoryInst) == null) {
 						talentFactoryMapField = f;
 						break;
 					}
@@ -283,16 +283,16 @@ public class EntryCreator {
 			if (talentFactoryInst == null) throw new RuntimeException("talentFactoryInst not found");
 			if (talentFactoryMapField == null) throw new RuntimeException("talentFactoryMapField not found");
 
-		}catch(Exception e){
+		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 		}
 	}
 
-	private void initHeldTypes(Object held){
+	private void initHeldTypes(Object held) {
 		HeldType = held.getClass();
-		for (Method m: HeldType.getMethods()){
+		for (Method m : HeldType.getMethods()) {
 			Class[] params = m.getParameterTypes();
-			if (params.length == 2 && m.getReturnType().equals(Void.TYPE) && params[0].equals(TalentType.getSuperclass()) && params[1].equals(Integer.TYPE)){
+			if (params.length == 2 && m.getReturnType().equals(Void.TYPE) && params[0].equals(TalentType.getSuperclass()) && params[1].equals(Integer.TYPE)) {
 				heldAddTalent = m;
 			}
 		}
@@ -302,6 +302,7 @@ public class EntryCreator {
 
 	/**
 	 * Takes all static instances of this class, runs all "String _()" methods on them, and fills a dictionary
+	 *
 	 * @param map
 	 * @param type
 	 */
@@ -311,6 +312,7 @@ public class EntryCreator {
 
 	/**
 	 * Takes all static instances of this class, runs all "String _()" methods of stringBasisType on them, and fills a dictionary
+	 *
 	 * @param map
 	 * @param type
 	 * @param stringBasisType
@@ -324,7 +326,7 @@ public class EntryCreator {
 				if (m.getName().equals("toString")) foundToString = true;
 			}
 		}
-		if (!foundToString){
+		if (!foundToString) {
 			stringMethods.add(type.getMethod("toString"));
 		}
 
@@ -335,9 +337,9 @@ public class EntryCreator {
 					try {
 						String s = (String) m.invoke(instance);
 						if (!s.isEmpty()) map.put(s, instance);
-					}catch(InvocationTargetException e){
-						if (e.getCause() instanceof IllegalArgumentException){
-						}else{
+					} catch (InvocationTargetException e) {
+						if (e.getCause() instanceof IllegalArgumentException) {
+						} else {
 							throw e;
 						}
 					}
@@ -395,14 +397,15 @@ public class EntryCreator {
 
 	/**
 	 * Converts an array of Strings to an array of the corresponding "Merkmal" instances
+	 *
 	 * @param merkmale
 	 * @return
 	 */
-	private Object getMerkmale(String[] merkmale){
+	private Object getMerkmale(String[] merkmale) {
 		Object result = Array.newInstance(merkmalType, merkmale.length);
-		for (int i = 0; i < merkmale.length; i++){
+		for (int i = 0; i < merkmale.length; i++) {
 			Object mkml = alleMerkmale.get(merkmale[i]);
-			if (mkml == null) throw new IllegalArgumentException("Unbekanntes Merkmal: "+merkmale[i]);
+			if (mkml == null) throw new IllegalArgumentException("Unbekanntes Merkmal: " + merkmale[i]);
 			Array.set(result, i, mkml);
 		}
 		return result;
@@ -411,15 +414,16 @@ public class EntryCreator {
 
 	/**
 	 * Erstellt und registriert einen neuen Zauber
+	 *
 	 * @param name
 	 * @param kategorie Steigerungsspalte ("A" - "H")
-	 * @param merkmale Als String-Array: ["Anti", "Einfluss", "Dämonisch (Blakharaz)"]
+	 * @param merkmale  Als String-Array: ["Anti", "Einfluss", "Dämonisch (Blakharaz)"]
 	 * @param probe
-	 * @param q Quellenangabe ("LCD: 123"), null ist erlaubt
-	 * @param mod Modifikationen der Probe ("", "+MR", "+Mod", ...), null ist erlaubt
+	 * @param q         Quellenangabe ("LCD: 123"), null ist erlaubt
+	 * @param mod       Modifikationen der Probe ("", "+MR", "+Mod", ...), null ist erlaubt
 	 * @return
 	 */
-	public ZauberWrapper createSpell(String name, String kategorie, String[] merkmale, Probe probe, Quellenangabe q, String mod){
+	public ZauberWrapper createSpell(String name, String kategorie, String[] merkmale, Probe probe, Quellenangabe q, String mod) {
 		try {
 			if (q == null)
 				q = Quellenangabe.leereQuelle;
@@ -427,24 +431,23 @@ public class EntryCreator {
 				mod = "";
 			Object kat = alleKategorien.get(kategorie);
 			if (isSpellKnown(name))
-				throw new IllegalArgumentException("Zauber \""+name+"\" ist bereits bekannt!");
+				throw new IllegalArgumentException("Zauber \"" + name + "\" ist bereits bekannt!");
 			Zauber newspell = newZauber.newInstance(name, kat, probe.getProbe(), getMerkmale(merkmale), q.getQuellenObj(), mod);
 			return new ZauberWrapper(name, newspell);
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw ErrorHandler.handleException(e);
 		}
 	}
 
 	/**
-	 *
 	 * @param name
 	 * @return <code>true</code> falls ein Zauber mit dem Namen <code>name</code> bekannt ist
 	 * @see helden.framework.zauber.ZauberFabrik
 	 */
-	private boolean isSpellKnown(String name){
+	private boolean isSpellKnown(String name) {
 		try {
 			return ZauberFabrik.getInstance().getZauberfertigkeit(name) != null;
-		} catch (RuntimeException e){
+		} catch (RuntimeException e) {
 			return false;
 		}
 	}
@@ -488,7 +491,7 @@ public class EntryCreator {
 
 			Object sfname = newSonderfertigkeitName.newInstance(name);
 			for (Setting setting : Setting.getHauptSettings()) {
-				setting.getIncluded().add("S"+name);
+				setting.getIncluded().add("S" + name);
 			}
 			return sfname;
 		} catch (Exception e) {
@@ -499,13 +502,13 @@ public class EntryCreator {
 
 	public RepresentationWrapper createRepresentation(String name, String shortname, boolean hasRitualkenntnis) {
 		try {
-			Object sf1 = createSonderfertigkeit("Repräsentation: "+name, 2000, 5);
-			Object sf2 = hasRitualkenntnis ? createSonderfertigkeit("Ritualkenntnis: "+name, 250, 7) : null;
-			Object repr = newRepresentation.newInstance("z"+(numRepresentations++), name, shortname, sf1, sf2);
+			Object sf1 = createSonderfertigkeit("Repräsentation: " + name, 2000, 5);
+			Object sf2 = hasRitualkenntnis ? createSonderfertigkeit("Ritualkenntnis: " + name, 250, 7) : null;
+			Object repr = newRepresentation.newInstance("z" + (numRepresentations++), name, shortname, sf1, sf2);
 			alleRepresentationen.put(name, repr);
 
 			for (Setting setting : Setting.getHauptSettings()) {
-				setting.getIncluded().add("R"+name);
+				setting.getIncluded().add("R" + name);
 			}
 
 			return new RepresentationWrapper(name, repr);
@@ -516,17 +519,18 @@ public class EntryCreator {
 	}
 
 
-	public void addTalentToHeld(Object held, Object talent, int value){
+	public void addTalentToHeld(Object held, Object talent, int value) {
 		if (HeldType == null) initHeldTypes(held);
 		try {
 			heldAddTalent.invoke(held, talent, value);
-		}catch(Exception e){
+		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 		}
 	}
 
 	/**
 	 * Der Editor braucht Talente in einer speziellen Map, deren Key der Name ist...
+	 *
 	 * @param talent
 	 * @throws IllegalAccessException
 	 */
@@ -542,11 +546,11 @@ public class EntryCreator {
 	/**
 	 * Eine Probe aus drei Eigenschaften. Bsp: "(MU/KL/KO)"
 	 */
-	public static class Probe{
+	public static class Probe {
 
 		public final String p1, p2, p3;
 
-		public Probe(String p1, String p2, String p3){
+		public Probe(String p1, String p2, String p3) {
 			assert getInstance().alleEigenschaften.containsKey(p1);
 			assert instance.alleEigenschaften.containsKey(p2);
 			assert instance.alleEigenschaften.containsKey(p3);
@@ -555,12 +559,12 @@ public class EntryCreator {
 			this.p3 = p3;
 		}
 
-		public Probe(String probe){
+		public Probe(String probe) {
 			if (probe.startsWith("(") && probe.endsWith(")"))
-				probe = probe.substring(1, probe.length()-1);
+				probe = probe.substring(1, probe.length() - 1);
 			String[] p = probe.split("/");
 			assert p.length == 3;
-			for (String s: p) {
+			for (String s : p) {
 				assert getInstance().alleEigenschaften.containsKey(s);
 			}
 			this.p1 = p[0];
@@ -570,11 +574,11 @@ public class EntryCreator {
 
 		public Object getProbe() throws Exception {
 			Object o1 = instance.alleEigenschaften.get(p1);
-			if (o1 == null) throw new IllegalArgumentException("Unbekannte Eigenschaft: "+p1);
+			if (o1 == null) throw new IllegalArgumentException("Unbekannte Eigenschaft: " + p1);
 			Object o2 = instance.alleEigenschaften.get(p2);
-			if (o2 == null) throw new IllegalArgumentException("Unbekannte Eigenschaft: "+p2);
+			if (o2 == null) throw new IllegalArgumentException("Unbekannte Eigenschaft: " + p2);
 			Object o3 = instance.alleEigenschaften.get(p3);
-			if (o3 == null) throw new IllegalArgumentException("Unbekannte Eigenschaft: "+p3);
+			if (o3 == null) throw new IllegalArgumentException("Unbekannte Eigenschaft: " + p3);
 			return instance.talentprobeConstructor.newInstance(o1, o2, o3);
 		}
 
@@ -584,29 +588,29 @@ public class EntryCreator {
 	/**
 	 * Eine Quellenangabe, bestehend aus Buchkürzel und Seitenzahl ("LCD:123")
 	 */
-	public static class Quellenangabe{
+	public static class Quellenangabe {
 		public final String book;
 		public final int page;
 
 		public static final Quellenangabe leereQuelle = new Quellenangabe("", 0);
 
-		public Quellenangabe(String book, int page){
+		public Quellenangabe(String book, int page) {
 			this.book = book;
 			this.page = page;
 		}
 
 		public Quellenangabe(String quelle) {
 			int p = quelle.lastIndexOf(':');
-			if (p > 0){
+			if (p > 0) {
 				this.book = quelle.substring(0, p);
 				this.page = Integer.parseInt(quelle.substring(p + 1));
-			}else{
+			} else {
 				this.book = quelle;
 				this.page = 0;
 			}
 		}
 
-		public Object getQuellenObj() throws Exception{
+		public Object getQuellenObj() throws Exception {
 			return getInstance().quellenObjConstructor.newInstance(book, page);
 		}
 	}
@@ -623,21 +627,24 @@ public class EntryCreator {
 
 		/**
 		 * Verbreitung - notwendig zum Erlernen/Aktivieren
+		 *
 		 * @param repr "Mag", "Hexe", "Dru(Elf)"
 		 * @param num
 		 */
 		public void addVerbreitung(String repr, int num) {
 			Matcher m = reprPattern.matcher(repr);
-			if (m.matches()){
+			if (m.matches()) {
 				addVerbreitung(m.group(1), m.group(2), num);
-			}else {
+			} else {
 				addVerbreitung(repr, repr, num);
 			}
 		}
+
 		private static final Pattern reprPattern = Pattern.compile("^(\\w{3})\\s?\\((\\w{3})\\)$");
 
 		/**
 		 * (Dru, Elf, 3) => Dru(Elf) 3
+		 *
 		 * @param repr
 		 * @param bekanntIn
 		 * @param num
@@ -645,9 +652,9 @@ public class EntryCreator {
 		 */
 		public void addVerbreitung(String repr, String bekanntIn, int num) {
 			Object reprObj = instance.alleRepresentationen.get(repr);
-			if (reprObj == null) throw new IllegalArgumentException("Unbekannte Repräsentation: "+repr);
+			if (reprObj == null) throw new IllegalArgumentException("Unbekannte Repräsentation: " + repr);
 			Object bekanntObj = instance.alleRepresentationen.get(bekanntIn);
-			if (bekanntObj == null) throw new IllegalArgumentException("Unbekannte Repräsentation: "+bekanntIn);
+			if (bekanntObj == null) throw new IllegalArgumentException("Unbekannte Repräsentation: " + bekanntIn);
 			try {
 				zauber.getVerbreitung().add(instance.newZauberVerbreitung.newInstance(reprObj, bekanntObj, num));
 			} catch (Exception e) {
@@ -670,11 +677,12 @@ public class EntryCreator {
 
 		/**
 		 * "Aventurien", "DSA4.1", "Myranor", "Tharun", "Alle", ...
+		 *
 		 * @param settingName
 		 * @see helden.framework.settings.Setting
 		 */
 		public void addToSetting(String settingName) {
-			if (settingName.equals("all") || settingName.equals("Alle")){
+			if (settingName.equals("all") || settingName.equals("Alle")) {
 				addToAllSettings();
 			} else {
 				if (settingName.equals("Aventurien")) settingName = "DSA4.1";
