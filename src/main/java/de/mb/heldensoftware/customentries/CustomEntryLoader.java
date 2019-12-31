@@ -100,7 +100,54 @@ public class CustomEntryLoader {
 	protected void loadSF(JSONObject sf) {
 		String name = (String) sf.get("name");
 		Long kosten = (Long) sf.get("kosten");
-		EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), 0);
+		String cat = sf.containsKey("category") ? (String) sf.get("category") : "";
+		EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), getSFCategory(cat));
+	}
+
+	protected int getSFCategory(String cat) {
+		switch (cat) {
+			case "":
+			case "Allgemein":
+				return 0;
+			case "Geländekunde":
+				return 1;
+			case "Kampf: Nahkampf":
+			case "Nahkampf":
+				return 2;
+			case "Kampf: Fernkampf":
+			case "Fernkampf":
+				return 3;
+			case "Magisch":
+				return 4;
+			case "Magisch: Repräsentation":
+			case "Repräsentation":
+				return 5;
+			case "Magisch: Merkmalskenntnis":
+			case "Merkmalskenntnis":
+				return 6;
+			case "Magisch: Objektritual":
+			case "Objektritual":
+				return 7;
+			case "Elfenlied":
+				return 8;
+			case "Kampf: Manöver":
+			case "Manöver":
+				return 9;
+			case "Geweiht: Liturgie":
+			case "Liturgie":
+				return 10;
+			case "Geweiht":
+				return 11;
+			case "Magisch: Schamanenritual":
+			case "Schamanenritual":
+				return 12;
+			case "Magisch: Magische Lieder":
+			case "Magische Lieder":
+				return 13;
+			default:
+				System.err.println("[CustomEntryLoader] Unbekannte Kategorie: " + cat);
+				return 0;
+		}
 	}
 
 

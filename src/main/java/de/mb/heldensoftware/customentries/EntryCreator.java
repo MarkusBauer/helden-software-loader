@@ -73,8 +73,8 @@ public class EntryCreator {
 	Map<String, Object> alleRepresentationen = new HashMap<>();
 
 	// Sonderfertigkeit
-	Class sonderfertigkeitType;
-	Constructor<?> newSonderfertigkeit;
+	Class sonderfertigkeitNameType;
+	Constructor<?> newSonderfertigkeitName;
 
 	// new Zauber: (String name, Kategorie spalte, Merkmal[] merkmale, Probe probe, QuellenObj quellenangabe, String mod) -> Zauber
 	Constructor<Zauber> newZauber = null;
@@ -172,13 +172,13 @@ public class EntryCreator {
 			for (Method m: representationType.getMethods()) {
 				if (Modifier.isStatic(m.getModifiers())) continue;
 				if (m.getReturnType().equals(String.class)) continue;
-				sonderfertigkeitType = m.getReturnType();
+				sonderfertigkeitNameType = m.getReturnType();
 				break;
 			}
-			for (Constructor<?> c: sonderfertigkeitType.getConstructors()) {
-				if (c.getParameterTypes().length == 1) newSonderfertigkeit = c;
+			for (Constructor<?> c: sonderfertigkeitNameType.getConstructors()) {
+				if (c.getParameterTypes().length == 1) newSonderfertigkeitName = c;
 			}
-			assert newSonderfertigkeit != null;
+			assert newSonderfertigkeitName != null;
 
 			// Zauber
 			for (Constructor<?> c : Zauber.class.getConstructors()) {
@@ -248,7 +248,7 @@ public class EntryCreator {
 			if (EigenesTalentType == null) throw new RuntimeException("EigenesTalentType not found");
 			if (EigenesSprachTalentType == null) throw new RuntimeException("EigenesSprachTalentType not found");
 			if (EigenesKampfTalentType == null) throw new RuntimeException("EigenesKampfTalentType not found");
-			if (sonderfertigkeitType == null) throw new RuntimeException("sonderfertigkeitType not found");
+			if (sonderfertigkeitNameType == null) throw new RuntimeException("sonderfertigkeitNameType not found");
 
 			for (Constructor c: EigenesTalentType.getConstructors()){
 				if (c.getParameterTypes().length == 9) newEigenesTalent = c;
@@ -467,37 +467,30 @@ public class EntryCreator {
 		13: Magisch: Magische Lieder
 		 */
 		try {
-			System.err.println("Add SF: "+name);
-			Object sf = newSonderfertigkeit.newInstance(name);
-			for (Setting setting : Setting.getHauptSettings()) {
-				setting.getIncluded().add("S"+name);
-			}
+			// TODO clean up this method
+			Class SF = Class.forName("helden.framework.D.P");
+			Constructor<?> SFc = SF.getDeclaredConstructor(String.class, int.class, int.class);
+			SFc.setAccessible(true);
+			Object sf = SFc.newInstance(name, kosten, category);
 
-			Class SF2 = Class.forName("helden.framework.D.P");
-			Constructor<?> SF2c = SF2.getDeclaredConstructor(String.class, int.class, int.class);
-			SF2c.setAccessible(true);
-			Object sf1_real = SF2c.newInstance(name, kosten, category);
-
-			Class SFList = Class.forName("helden.framework.D.OoOo");
-			Class OtherSFList = Class.forName("helden.framework.D.OOOo");
-			Method getOtherList = getMethodByReturnType(SFList, OtherSFList);
-			Object otherList = getOtherList.invoke(null);
-			Method addToOtherList = null; // for reasons I don't know, the add method has a type parameter.
-			for (Method m : OtherSFList.getDeclaredMethods()) {
-				if (m.getReturnType().equals(void.class) && m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(SF2) && m.getTypeParameters().length > 0) {
-					addToOtherList = m;
+			Class SFRegistry = Class.forName("helden.framework.D.OoOo");
+			Class SFList = Class.forName("helden.framework.D.OOOo");
+			Method getSFListFromRegistry = getMethodByReturnType(SFRegistry, SFList);
+			Object otherList = getSFListFromRegistry.invoke(null);
+			Method addToSFList = null; // for reasons I don't know, the add method has a type parameter. add should be o00000
+			for (Method m : SFList.getDeclaredMethods()) {
+				if (m.getReturnType().equals(void.class) && m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(SF) && m.getTypeParameters().length > 0) {
+					addToSFList = m;
 					break;
 				}
 			}
-			System.out.println(addToOtherList.getName()); // should be o00000
-			addToOtherList.invoke(otherList, sf1_real);
+			addToSFList.invoke(otherList, sf);
 
-			// find method returning hashmap, add P instance
-			/*Method getSFListMap = getStaticMapMethod(SFList);
-			Map<String, Object> SFMap = (Map<String, Object>) getSFListMap.invoke(null);
-			SFMap.put(name, sf1_real);*/
-
-			return sf;
+			Object sfname = newSonderfertigkeitName.newInstance(name);
+			for (Setting setting : Setting.getHauptSettings()) {
+				setting.getIncluded().add("S"+name);
+			}
+			return sfname;
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 			return null;
