@@ -497,18 +497,21 @@ public class EntryCreator {
 		}
 	}
 
-	public void createRepresentation(String name, String shortname, boolean hasRitualkenntnis) {
+	public RepresentationWrapper createRepresentation(String name, String shortname, boolean hasRitualkenntnis) {
 		try {
 			Object sf1 = createSonderfertigkeit("Repräsentation: "+name, 2000, 5);
 			Object sf2 = hasRitualkenntnis ? createSonderfertigkeit("Ritualkenntnis: "+name, 250, 7) : null;
 			Object repr = newRepresentation.newInstance("z"+(numRepresentations++), name, shortname, sf1, sf2);
-			System.out.println("repr = "+repr.toString());
+			alleRepresentationen.put(name, repr);
 
 			for (Setting setting : Setting.getHauptSettings()) {
 				setting.getIncluded().add("R"+name);
 			}
+
+			return new RepresentationWrapper(name, repr);
 		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			ErrorHandler.handleException(e);
+			return null;
 		}
 	}
 
@@ -687,6 +690,28 @@ public class EntryCreator {
 			}
 		}
 
+	}
+
+
+	public static class RepresentationWrapper {
+		public final String name;
+		public final Object repr;
+
+		public RepresentationWrapper(String name, Object repr) {
+			this.name = name;
+			this.repr = repr;
+		}
+
+		public void addZauber(String name, int verbreitung) {
+			try {
+				Zauber zauber = ZauberFabrik.getInstance().getZauberfertigkeit(name);
+				zauber.getVerbreitung().add(instance.newZauberVerbreitung.newInstance(repr, repr, verbreitung));
+			} catch (RuntimeException e) {
+				ErrorHandler.handleException(new RuntimeException("Unbekannter Zauber: " + name, e));
+			} catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+				ErrorHandler.handleException(e);
+			}
+		}
 	}
 
 }

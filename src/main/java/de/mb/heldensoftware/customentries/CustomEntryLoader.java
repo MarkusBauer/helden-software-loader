@@ -4,6 +4,7 @@ import de.mb.heldensoftware.customentries.EntryCreator.Probe;
 import de.mb.heldensoftware.customentries.EntryCreator.Quellenangabe;
 import de.mb.heldensoftware.customentries.EntryCreator.ZauberWrapper;
 import helden.comm.CommUtilities;
+import jdk.nashorn.internal.scripts.JS;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -47,7 +48,12 @@ public class CustomEntryLoader {
 			}
 		}
 
-		EntryCreator.getInstance().createRepresentation("Testisch", "Tes", true);
+		if (customEntries.containsKey("repräsentationen")) {
+			JSONArray reprs = (JSONArray) customEntries.get("repräsentationen");
+			for (Object o : reprs) {
+				loadRepresentation((JSONObject) o);
+			}
+		}
 	}
 
 	protected void loadZauber(JSONObject zauber) {
@@ -100,7 +106,7 @@ public class CustomEntryLoader {
 	protected void loadSF(JSONObject sf) {
 		String name = (String) sf.get("name");
 		Long kosten = (Long) sf.get("kosten");
-		String cat = sf.containsKey("category") ? (String) sf.get("category") : "";
+		String cat = sf.containsKey("kategorie") ? (String) sf.get("kategorie") : "";
 		EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), getSFCategory(cat));
 	}
 
@@ -147,6 +153,20 @@ public class CustomEntryLoader {
 			default:
 				System.err.println("[CustomEntryLoader] Unbekannte Kategorie: " + cat);
 				return 0;
+		}
+	}
+
+	protected void loadRepresentation(JSONObject o) {
+		String name = (String) o.get("name");
+		String shortname = (String) o.get("abkürzung");
+		boolean rk = o.containsKey("ritualkenntnis") && (Boolean) o.get("ritualkenntnis");
+		EntryCreator.RepresentationWrapper repr = EntryCreator.getInstance().createRepresentation(name, shortname, rk);
+		if (o.containsKey("zauber")) {
+			JSONObject zauber = (JSONObject) o.get("zauber");
+			for (Object key : zauber.keySet()) {
+				Number n = (Number) zauber.get(key);
+				repr.addZauber((String) key, n.intValue());
+			}
 		}
 	}
 
