@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 /**
  * Created by Markus on 19.03.2017.
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "JavaDoc"})
 public class EntryCreator {
 
 	private static EntryCreator instance;
@@ -368,6 +368,31 @@ public class EntryCreator {
 		return result;
 	}
 
+	protected Method getStaticMapMethod(Class type) {
+		for (Method m : type.getDeclaredMethods()) {
+			if (Modifier.isStatic(m.getModifiers()) && m.getParameterTypes().length == 0 && Map.class.isAssignableFrom(m.getReturnType())) {
+				return m;
+			}
+		}
+		return null;
+	}
+
+	protected Method getMethodByReturnType(Class type, Class returntype) {
+		for (Method m : type.getDeclaredMethods()) {
+			if (m.getParameterTypes().length == 0 && m.getReturnType().equals(returntype))
+				return m;
+		}
+		return null;
+	}
+
+	protected Method getVoidMethodByParameterType(Class type, Class param1) {
+		for (Method m : type.getDeclaredMethods()) {
+			if (m.getReturnType().equals(void.class) && m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(param1))
+				return m;
+		}
+		return null;
+	}
+
 	/**
 	 * Converts an array of Strings to an array of the corresponding "Merkmal" instances
 	 * @param merkmale
@@ -424,12 +449,54 @@ public class EntryCreator {
 		}
 	}
 
-	public Object createSonderfertigkeit(String name) {
+	public Object createSonderfertigkeit(String name, int kosten, int category) {
+		/*
+		0: Allgemein
+		1: Geländekunde
+		2: Kampf: Nahkampf
+		3: Kampf: Fernkampf
+		4: Magisch
+		5: Magisch: Repräsentation
+		6: Magisch: Merkmalskenntnis
+		7: Magisch: Objektritual
+		8: Elfenlied
+		9: Kampf: Manöver
+		10: Geweiht: Liturgie
+		11: Geweiht
+		12: Magisch: Schamanenritual
+		13: Magisch: Magische Lieder
+		 */
 		try {
+			System.err.println("Add SF: "+name);
 			Object sf = newSonderfertigkeit.newInstance(name);
 			for (Setting setting : Setting.getHauptSettings()) {
 				setting.getIncluded().add("S"+name);
 			}
+
+			Class SF2 = Class.forName("helden.framework.D.P");
+			Constructor<?> SF2c = SF2.getDeclaredConstructor(String.class, int.class, int.class);
+			SF2c.setAccessible(true);
+			Object sf1_real = SF2c.newInstance(name, kosten, category);
+
+			Class SFList = Class.forName("helden.framework.D.OoOo");
+			Class OtherSFList = Class.forName("helden.framework.D.OOOo");
+			Method getOtherList = getMethodByReturnType(SFList, OtherSFList);
+			Object otherList = getOtherList.invoke(null);
+			Method addToOtherList = null; // for reasons I don't know, the add method has a type parameter.
+			for (Method m : OtherSFList.getDeclaredMethods()) {
+				if (m.getReturnType().equals(void.class) && m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(SF2) && m.getTypeParameters().length > 0) {
+					addToOtherList = m;
+					break;
+				}
+			}
+			System.out.println(addToOtherList.getName()); // should be o00000
+			addToOtherList.invoke(otherList, sf1_real);
+
+			// find method returning hashmap, add P instance
+			/*Method getSFListMap = getStaticMapMethod(SFList);
+			Map<String, Object> SFMap = (Map<String, Object>) getSFListMap.invoke(null);
+			SFMap.put(name, sf1_real);*/
+
 			return sf;
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
@@ -439,25 +506,15 @@ public class EntryCreator {
 
 	public void createRepresentation(String name, String shortname, boolean hasRitualkenntnis) {
 		try {
-			// SF 5 = Repr
-			Class SF2 = Class.forName("helden.framework.D.P");
-			Constructor<?> SF2c = SF2.getDeclaredConstructor(String.class, int.class, int.class);
-			SF2c.setAccessible(true);
-			Object sf1_real = SF2c.newInstance("Repräsentation: "+name, 2000, 5);
-
-			Class SFList = Class.forName("helden.framework.D.OoOo");
-			//TODO find method returning hashmap, add P instance
-
-			Object sf1 =
-					createSonderfertigkeit("Repräsentation: "+name);
-			Object sf2 = hasRitualkenntnis ? createSonderfertigkeit("Ritualkenntnis: "+name) : null;
+			Object sf1 = createSonderfertigkeit("Repräsentation: "+name, 2000, 5);
+			Object sf2 = hasRitualkenntnis ? createSonderfertigkeit("Ritualkenntnis: "+name, 250, 7) : null;
 			Object repr = newRepresentation.newInstance("z"+(numRepresentations++), name, shortname, sf1, sf2);
 			System.out.println("repr = "+repr.toString());
 
 			for (Setting setting : Setting.getHauptSettings()) {
 				setting.getIncluded().add("R"+name);
 			}
-		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException e) {
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			ErrorHandler.handleException(e);
 		}
 	}

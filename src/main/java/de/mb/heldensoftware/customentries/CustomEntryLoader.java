@@ -99,7 +99,8 @@ public class CustomEntryLoader {
 
 	protected void loadSF(JSONObject sf) {
 		String name = (String) sf.get("name");
-		EntryCreator.getInstance().createSonderfertigkeit(name);
+		Long kosten = (Long) sf.get("kosten");
+		EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), 0);
 	}
 
 
