@@ -4,7 +4,6 @@ import de.mb.heldensoftware.customentries.EntryCreator.Probe;
 import de.mb.heldensoftware.customentries.EntryCreator.Quellenangabe;
 import de.mb.heldensoftware.customentries.EntryCreator.ZauberWrapper;
 import helden.comm.CommUtilities;
-import jdk.nashorn.internal.scripts.JS;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
