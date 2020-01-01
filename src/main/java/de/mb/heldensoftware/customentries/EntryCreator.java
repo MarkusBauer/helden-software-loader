@@ -3,6 +3,7 @@ package de.mb.heldensoftware.customentries;
 import com.openpojo.reflection.PojoClass;
 import com.openpojo.reflection.impl.PojoClassFactory;
 import helden.framework.EigeneErweiterungenMoeglich;
+import helden.framework.held.persistenz.BasisXMLParser;
 import helden.framework.held.persistenz.ModsDatenParser;
 import helden.framework.settings.Setting;
 import helden.framework.zauber.Zauber;
@@ -387,6 +388,14 @@ public class EntryCreator {
 		return null;
 	}
 
+	protected Method getMethodByName(Class type, String name) {
+		for (Method m: type.getDeclaredMethods()) {
+			if (m.getName().equals(name))
+				return m;
+		}
+		return null;
+	}
+
 	protected Method getVoidMethodByParameterType(Class type, Class param1) {
 		for (Method m : type.getDeclaredMethods()) {
 			if (m.getReturnType().equals(void.class) && m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(param1))
@@ -471,7 +480,10 @@ public class EntryCreator {
 		 */
 		try {
 			// TODO clean up this method
-			Class SF = Class.forName("helden.framework.D.P");
+			Class SF = getMethodByName(BasisXMLParser.class, "getSonderfertigkeit").getReturnType();
+			// Class SF = Class.forName("helden.framework.D.P");
+			//TODO remove
+			assert SF.getName().equals("helden.framework.D.P");
 			Constructor<?> SFc = SF.getDeclaredConstructor(String.class, int.class, int.class);
 			SFc.setAccessible(true);
 			Object sf = SFc.newInstance(name, kosten, category);
