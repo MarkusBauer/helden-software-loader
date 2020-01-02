@@ -76,6 +76,12 @@ public class EntryCreator {
 	// Sonderfertigkeit
 	Class sonderfertigkeitNameType;
 	Constructor<?> newSonderfertigkeitName;
+	Class sonderfertigkeitType;
+	Constructor<?> newSonderfertigkeit;
+	Class sonderfertigkeitRegistryType;
+	Class sonderfertigkeitListType;
+	Method sonderfertigkeitListAdd;
+	Method sonderfertigkeitRegistryGetList;
 
 	// new Zauber: (String name, Kategorie spalte, Merkmal[] merkmale, Probe probe, QuellenObj quellenangabe, String mod) -> Zauber
 	Constructor<Zauber> newZauber = null;
@@ -176,10 +182,17 @@ public class EntryCreator {
 				sonderfertigkeitNameType = m.getReturnType();
 				break;
 			}
+			assert sonderfertigkeitNameType != null;
 			for (Constructor<?> c : sonderfertigkeitNameType.getConstructors()) {
 				if (c.getParameterTypes().length == 1) newSonderfertigkeitName = c;
 			}
 			assert newSonderfertigkeitName != null;
+
+			sonderfertigkeitType = getMethodByName(BasisXMLParser.class, "getSonderfertigkeit").getReturnType();
+			assert sonderfertigkeitType != null;
+			newSonderfertigkeit = sonderfertigkeitType.getDeclaredConstructor(String.class, int.class, int.class);
+			assert newSonderfertigkeit != null;
+			newSonderfertigkeit.setAccessible(true);
 
 			// Zauber
 			for (Constructor<?> c : Zauber.class.getConstructors()) {
@@ -249,7 +262,6 @@ public class EntryCreator {
 			if (EigenesTalentType == null) throw new RuntimeException("EigenesTalentType not found");
 			if (EigenesSprachTalentType == null) throw new RuntimeException("EigenesSprachTalentType not found");
 			if (EigenesKampfTalentType == null) throw new RuntimeException("EigenesKampfTalentType not found");
-			if (sonderfertigkeitNameType == null) throw new RuntimeException("sonderfertigkeitNameType not found");
 
 			for (Constructor c : EigenesTalentType.getConstructors()) {
 				if (c.getParameterTypes().length == 9) newEigenesTalent = c;
@@ -283,6 +295,38 @@ public class EntryCreator {
 			}
 			if (talentFactoryInst == null) throw new RuntimeException("talentFactoryInst not found");
 			if (talentFactoryMapField == null) throw new RuntimeException("talentFactoryMapField not found");
+
+			// Sonderfertigkeiten - Registry
+			// The registry class is fully static/final and has two private fields - a hashmap and a list of sonderfertigkeit.
+			for (PojoClass pojoClass : PojoClassFactory.getPojoClasses(sonderfertigkeitType.getPackage().getName())) {
+				Class c = pojoClass.getClazz();
+				if (Modifier.isFinal(c.getModifiers()) && c.getDeclaredFields().length == 2
+						&& c.getDeclaredConstructors().length == 1 && Modifier.isPrivate(c.getDeclaredConstructors()[0].getModifiers())) {
+					sonderfertigkeitRegistryType = c;
+					break;
+				}
+			}
+			assert sonderfertigkeitRegistryType != null;
+			for (Field f: sonderfertigkeitRegistryType.getDeclaredFields()) {
+				if (f.getType().getPackage().equals(sonderfertigkeitType.getPackage())) {
+					sonderfertigkeitListType = f.getType();
+					break;
+				}
+			}
+			assert sonderfertigkeitListType != null;
+			// for reasons I don't know, the add method has a type parameter. add should be o00000
+			for (Method m : sonderfertigkeitListType.getDeclaredMethods()) {
+				if (m.getReturnType().equals(void.class)
+						&& m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(sonderfertigkeitType)
+						&& m.getTypeParameters().length > 0) {
+					sonderfertigkeitListAdd = m;
+					break;
+				}
+			}
+			assert sonderfertigkeitListAdd != null;
+			// Get the central SF list from the SF registry
+			sonderfertigkeitRegistryGetList = getMethodByReturnType(sonderfertigkeitRegistryType, sonderfertigkeitListType);
+			assert sonderfertigkeitRegistryGetList != null;
 
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
@@ -389,7 +433,7 @@ public class EntryCreator {
 	}
 
 	protected Method getMethodByName(Class type, String name) {
-		for (Method m: type.getDeclaredMethods()) {
+		for (Method m : type.getDeclaredMethods()) {
 			if (m.getName().equals(name))
 				return m;
 		}
@@ -480,27 +524,9 @@ public class EntryCreator {
 		 */
 		try {
 			// TODO clean up this method
-			Class SF = getMethodByName(BasisXMLParser.class, "getSonderfertigkeit").getReturnType();
-			// Class SF = Class.forName("helden.framework.D.P");
-			//TODO remove
-			assert SF.getName().equals("helden.framework.D.P");
-			Constructor<?> SFc = SF.getDeclaredConstructor(String.class, int.class, int.class);
-			SFc.setAccessible(true);
-			Object sf = SFc.newInstance(name, kosten, category);
-
-			Class SFRegistry = Class.forName("helden.framework.D.OoOo");
-			Class SFList = Class.forName("helden.framework.D.OOOo");
-			Method getSFListFromRegistry = getMethodByReturnType(SFRegistry, SFList);
-			Object otherList = getSFListFromRegistry.invoke(null);
-			Method addToSFList = null; // for reasons I don't know, the add method has a type parameter. add should be o00000
-			for (Method m : SFList.getDeclaredMethods()) {
-				if (m.getReturnType().equals(void.class) && m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(SF) && m.getTypeParameters().length > 0) {
-					addToSFList = m;
-					break;
-				}
-			}
-			addToSFList.invoke(otherList, sf);
-
+			Object sf = newSonderfertigkeit.newInstance(name, kosten, category);
+			Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
+			sonderfertigkeitListAdd.invoke(otherList, sf);
 			Object sfname = newSonderfertigkeitName.newInstance(name);
 			for (Setting setting : Setting.getHauptSettings()) {
 				setting.getIncluded().add("S" + name);
