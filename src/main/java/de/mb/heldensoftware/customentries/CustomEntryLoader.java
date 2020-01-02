@@ -243,15 +243,30 @@ public class CustomEntryLoader {
 					System.err.println("[CustomEntryLoader] Keine Erweiterungen in " + p.toAbsolutePath());
 					continue;
 				}
-				System.err.println("[CustomEntryLoader] Lade Erweiterungen von \"" + p.toAbsolutePath() + "\"");
-				try (Reader r = new InputStreamReader(new CsvConverter().convertToJson(p), StandardCharsets.UTF_8)) {
-					new CustomEntryLoader().loadCustomEntries(r);
-				} catch (IOException ex) {
-					throw new RuntimeException(ex);
-				}
+				read(p);
 				result = true;
 			}
+			if (folder.exists() && folder.isDirectory()) {
+				File subfolder = new File(folder, "erweiterungen");
+				if (subfolder.exists() && subfolder.isDirectory()) {
+					for (File f : subfolder.listFiles()) {
+						if (f.getName().endsWith(".csv")) {
+							read(f.toPath());
+							result = true;
+						}
+					}
+				}
+			}
 			return result;
+		}
+
+		private void read(Path p) throws ParseException {
+			System.err.println("[CustomEntryLoader] Lade Erweiterungen von \"" + p.toAbsolutePath() + "\"");
+			try (Reader r = new InputStreamReader(new CsvConverter().convertToJson(p), StandardCharsets.UTF_8)) {
+				new CustomEntryLoader().loadCustomEntries(r);
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
+			}
 		}
 	}
 
@@ -259,9 +274,20 @@ public class CustomEntryLoader {
 
 		@Override
 		public boolean loadCustomEntries(File folder) throws ParseException {
-			return loadFile(new File(folder, "customentries.json")) |
+			boolean result = loadFile(new File(folder, "customentries.json")) |
 					loadFile(new File(folder, "erweiterungen.json")) |
 					loadFile(new File(folder, "erweiterungen.json.txt")); // I know my dear Windows users...
+			if (folder.exists() && folder.isDirectory()) {
+				File subfolder = new File(folder, "erweiterungen");
+				if (subfolder.exists() && subfolder.isDirectory()) {
+					for (File f : subfolder.listFiles()) {
+						if (f.getName().endsWith(".json") || f.getName().endsWith(".json.txt")) {
+							result |= loadFile(f);
+						}
+					}
+				}
+			}
+			return result;
 		}
 
 		private boolean loadFile(File f) throws ParseException {
