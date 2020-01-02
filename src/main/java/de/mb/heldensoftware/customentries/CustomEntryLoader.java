@@ -104,6 +104,10 @@ public class CustomEntryLoader {
 	protected void loadSF(JSONObject sf) {
 		String name = (String) sf.get("name");
 		Long kosten = (Long) sf.get("kosten");
+		if (name == null)
+			throw new RuntimeException("Eigene Sonderfertigkeit: \"name\" fehlt.");
+		if (kosten == null)
+			throw new RuntimeException("Eigene Sonderfertigkeit: \"kosten\" fehlt.");
 		String cat = sf.containsKey("kategorie") ? (String) sf.get("kategorie") : "";
 		EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), getSFCategory(cat));
 	}
@@ -157,6 +161,10 @@ public class CustomEntryLoader {
 	protected void loadRepresentation(JSONObject o) {
 		String name = (String) o.get("name");
 		String shortname = (String) o.get("abkürzung");
+		if (name == null)
+			throw new RuntimeException("Eigene Repräsentation: \"name\" fehlt.");
+		if (shortname == null)
+			throw new RuntimeException("Eigene Repräsentation: \"shortname\" fehlt.");
 		boolean rk = o.containsKey("ritualkenntnis") && (Boolean) o.get("ritualkenntnis");
 		EntryCreator.RepresentationWrapper repr = EntryCreator.getInstance().createRepresentation(name, shortname, rk);
 		if (o.containsKey("zauber")) {
