@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.Callable;
 
 public class NewTalentDialog extends JDialog {
 	private JPanel contentPane;
