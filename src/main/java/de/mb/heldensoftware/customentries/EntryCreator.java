@@ -523,7 +523,6 @@ public class EntryCreator {
 		13: Magisch: Magische Lieder
 		 */
 		try {
-			// TODO clean up this method
 			Object sf = newSonderfertigkeit.newInstance(name, kosten, category);
 			Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
 			sonderfertigkeitListAdd.invoke(otherList, sf);

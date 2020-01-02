@@ -54,5 +54,33 @@
             "settings": ["Aventurien"]
             // Keine Verbreitung - nur per Editor wählbar
         }
+    ],
+
+
+    "sonderfertigkeiten": [
+        {"name": "Gesegnet", "kosten":  200},
+        {"name": "Feenwelten-kundig", "kosten":  200, "kategorie":  "Geländekunde"}
+    ],
+
+
+    "repräsentationen": [
+        // Einfache Repräsentation ohne Ritualkenntnis oder bekannte Zauber
+        // Zauber können nur über den Editor aktiviert werden (und danach normal gesteigert werden)
+        {
+            "name": "Simple",
+            "abkürzung": "Sim"
+        },
+
+        // Komplette Repräsentation inklusive Ritualkenntnis und Liste bekannter Zauber.
+        // Die unten genannten Zauber können auf üblichem Wege in dieser Repräsentation aktiviert werden.
+        {
+            "name":  "Hochelfisch",
+            "abkürzung": "Hoc",
+            "ritualkenntnis":  true,   // true oder false - ob eine Ritualkenntnis existiert
+            "zauber": {   // Verbreitung der in dieser Repräsentation bekannten Zauber
+                "Armatrutz":  7,   // Format: "Zaubername": Verbreitung (1-7)
+                "Fulminictus Donnerkeil":  7
+            }
+        }
     ]
 }

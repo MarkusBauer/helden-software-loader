@@ -257,7 +257,7 @@ Neue Repräsentationen werden wie folgt konfiguriert:
             "ritualkenntnis":  true,   // true oder false - ob eine Ritualkenntnis existiert
             "zauber": {   // Verbreitung der in dieser Repräsentation bekannten Zauber
             	"Armatrutz":  7,   // Format: "Zaubername": Verbreitung (1-7)
-            	"Fulminictus Donnerkeil":  7,
+            	"Fulminictus Donnerkeil":  7
             }
         }
     ]
