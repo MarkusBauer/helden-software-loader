@@ -93,6 +93,7 @@ Konfigurationsdatei (`erweiterungen.json`) geschrieben.
 Diese Datei kommt ins gleiche Verzeichnis wie eure `helden.zip.hld` - also
 `C:\Benutzer\XXX\helden\erweiterungen.json` unter Windows bzw. `~/helden/erweiterungen.json` unter Linux.
 Sollen mehrere Dateien geladen werden, können diese in einem Unterordner `erweiterungen` abgelegt werden (mit der Endung `.json`).
+Bei Installation mit `-hslocal` (USB-Sticks etc.) können Erweiterungen auch neben die `helden.jar` gelegt werden.
 
 Neue Talente benötigen keine Konfiguration, und können im "Erweiterungen"-Menü erstellt werden.
 

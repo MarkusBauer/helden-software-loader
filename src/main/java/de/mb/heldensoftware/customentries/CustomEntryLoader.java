@@ -205,8 +205,10 @@ public class CustomEntryLoader {
 				// Config files next to helden.jar
 				File jarpath = new CommUtilities().getJarPath();
 				if (handler.loadCustomEntries(jarpath)) continue;
+				if (handler.loadCustomEntries(new File(jarpath, "helden"))) continue; // hslocal
 				if (jarpath.getName().toLowerCase().endsWith(".jar")) {
 					if (handler.loadCustomEntries(jarpath.getParentFile())) continue;
+					if (handler.loadCustomEntries(new File(jarpath.getParentFile(), "helden"))) continue; // hslocal
 				}
 				// Config files next to helden.zip.hld
 				File heldenPath = new File(new File(System.getProperty("user.home")), "helden");
@@ -285,6 +287,8 @@ public class CustomEntryLoader {
 							result |= loadFile(f);
 						}
 					}
+				} else {
+					System.err.println("[CustomEntryLoader] Keine Erweiterungen in " + subfolder.getAbsolutePath() + "/");
 				}
 			}
 			return result;
