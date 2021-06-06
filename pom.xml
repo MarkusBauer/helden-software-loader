@@ -116,7 +116,8 @@
             </plugin>
 
             <!-- Building the form using IDEA -->
-            <plugin>
+            <!-- Compile in IDEA to source code, commit final .java file to git. Maven plugin is broken. -->
+            <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>ideauidesigner-maven-plugin</artifactId>
                 <version>1.0-beta-1</version>
@@ -133,7 +134,7 @@
                     <debug>true</debug>
                     <failOnError>true</failOnError>
                 </configuration>
-            </plugin>
+            </plugin>-->
 
             <!-- Copy helden.jar to target directory to make development easier -->
             <plugin>
