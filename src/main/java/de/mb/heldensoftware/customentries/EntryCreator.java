@@ -120,6 +120,7 @@ public class EntryCreator {
 	Class TalentFactoryType;
 	Object talentFactoryInst;
 	Field talentFactoryMapField;
+	ArrayList<Method> talentFactoryAccessors = new ArrayList<>();
 	// Internal map: Talent.toString() -> Talent
 	HashMap<String, Object> talentFactoryMap;
 
@@ -279,7 +280,9 @@ public class EntryCreator {
 			for (Method m : TalentFactoryType.getMethods()) {
 				if (Modifier.isStatic(m.getModifiers()) && m.getReturnType().equals(TalentFactoryType)) {
 					talentFactoryInst = m.invoke(null);
-					break;
+				}
+				if (m.getReturnType().equals(TalentType) && m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(String.class)) {
+					talentFactoryAccessors.add(m);
 				}
 			}
 			// EntryCreator gets initialized before any calls to TalentFactory can happen
@@ -330,6 +333,26 @@ public class EntryCreator {
 
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
+		}
+	}
+
+	private void debug() {
+		try {
+			for (Field f : this.getClass().getDeclaredFields()) {
+				f.setAccessible(true);
+				if (f.getType() == Class.class) {
+					Object o = f.get(this);
+					System.out.println("Class " + f.getName() + " = " + (o != null ? ((Class<?>) o).getName() : "<null>"));
+				} else if (f.getType() == Method.class) {
+					Object o = f.get(this);
+					System.out.println("Method " + f.getName() + " = " + (o != null ? ((Method) o).getDeclaringClass().getName() + " : " + ((Method) o).getName() : "<null>"));
+				} else if (f.getType() == Field.class) {
+					Object o = f.get(this);
+					System.out.println("Method " + f.getName() + " = " + (o != null ? ((Field) o).getDeclaringClass().getName() + " : " + ((Field) o).getName() : "<null>"));
+				}
+			}
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -574,7 +597,18 @@ public class EntryCreator {
 	public void registerTalentForEditor(Object talent) throws IllegalAccessException {
 		if (talentFactoryMap == null) {
 			talentFactoryMap = (HashMap<String, Object>) talentFactoryMapField.get(talentFactoryInst);
-			if (talentFactoryMap == null) throw new RuntimeException("Map is null, TODO");
+			if (talentFactoryMap == null) {
+				// Force initialization of this map
+				for (Method m: talentFactoryAccessors) {
+					try {
+						m.invoke(talentFactoryInst, "doesnotexist");
+					} catch (Exception ignored) {}
+				}
+				// and retry
+				talentFactoryMap = (HashMap<String, Object>) talentFactoryMapField.get(talentFactoryInst);
+				if (talentFactoryMap == null)
+					throw new RuntimeException("Map is null even after forced initialization!");
+			}
 		}
 		talentFactoryMap.put(talent.toString(), talent);
 	}
