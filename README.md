@@ -246,6 +246,18 @@ Sonderfertigkeiten werden wie folgt konfiguriert:
 Der Name darf nicht verändert werden, sobald die Sonderfertigkeit bei einem Held aktiviert wurde. 
 Gültige Kategorien sind: `"Allgemein", "Geländekunde", "Kampf: Nahkampf", "Kampf: Fernkampf", "Magisch", "Magisch: Repräsentation", "Magisch: Merkmalskenntnis", "Magisch: Objektritual", "Elfenlied", "Kampf: Manöver", "Geweiht: Liturgie", "Geweiht", "Magisch: Schamanenritual", "Magisch: Magische Lieder"`.
 
+Eine eigene Ritualkenntnis oder Liturgiekenntnis kann ebenfalls über Sonderfertigkeiten realisiert werden. 
+Bei Aktivierung einer solchen Sonderfertigkeit wird automatisch ein passender Talentwert angelegt und aktiviert.
+Die Konfiguration sollte so aussehen:
+```
+{
+    "sonderfertigkeiten": [
+        {"name": "Ritualkenntnis: Alt-Druidisch", "kosten":  250, "kategorie":  "Magisch"},
+        {"name": "Liturgiekenntnis (Rastullah)", "kosten":  0, "kategorie":  "Geweiht"}
+    ]
+}
+```
+
 
 ### Neue Repräsentationen
 Neue Repräsentationen werden wie folgt konfiguriert:
