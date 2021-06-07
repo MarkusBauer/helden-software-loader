@@ -120,7 +120,7 @@ public class NewTalentDialog extends JDialog {
 		// Arten
 		for (Object o : ec.getAllStaticInstances(ec.TalentArtType)) {
 			boolean b = ((Boolean) ec.talentArtIsPrimitive.invoke(o)).booleanValue();
-			if (b && !o.toString().equals("Kampf"))
+			if ((b && !o.toString().equals("Kampf")) || o.toString().equals("Gaben"))
 				comboArt.addItem(o); // "Kampf" is not importable, "Nahkampf"/"Fernkampf" is broken
 		}
 		// Sprachfamilien
@@ -136,6 +136,8 @@ public class NewTalentDialog extends JDialog {
 		boolean isKoerper = art.equals("Körperlich");
 		boolean isSprache = art.equals("Sprachen");
 		boolean isSpracheSchrift = isSprache || art.equals("Schriften");
+		boolean isRK = art.equals("Ritualkenntnis");
+		boolean isF = art.equals("Liturgiekenntnis") || art.equals("Gaben");
 
 		// Probe
 		comboProbe1.setEnabled(!isKampf && !isSpracheSchrift);
@@ -164,7 +166,7 @@ public class NewTalentDialog extends JDialog {
 		comboKategorie.setEnabled(isKampf || isSpracheSchrift);
 		lblKategorie.setEnabled(isKampf || isSpracheSchrift);
 		if (!isKampf && !isSpracheSchrift) {
-			comboKategorie.setSelectedItem(EntryCreator.getInstance().alleKategorien.get(isKoerper ? "D" : "B"));
+			comboKategorie.setSelectedItem(EntryCreator.getInstance().alleKategorien.get(isKoerper ? "D" : isRK ? "E" : isF ? "F" : "B"));
 		}
 
 		// Sprachen

@@ -9,6 +9,7 @@ import helden.framework.settings.Setting;
 import helden.framework.zauber.Zauber;
 import helden.framework.zauber.ZauberFabrik;
 import helden.framework.zauber.ZauberVerbreitung;
+import org.w3c.dom.Element;
 
 import java.io.File;
 import java.lang.reflect.*;
@@ -78,6 +79,7 @@ public class EntryCreator {
 	Constructor<?> newSonderfertigkeitName;
 	Class sonderfertigkeitType;
 	Constructor<?> newSonderfertigkeit;
+	Method sonderfertigkeitSetCorrespondingTalent;
 	Class sonderfertigkeitRegistryType;
 	Class sonderfertigkeitListType;
 	Method sonderfertigkeitListAdd;
@@ -194,6 +196,8 @@ public class EntryCreator {
 			newSonderfertigkeit = sonderfertigkeitType.getDeclaredConstructor(String.class, int.class, int.class);
 			assert newSonderfertigkeit != null;
 			newSonderfertigkeit.setAccessible(true);
+			sonderfertigkeitSetCorrespondingTalent = getVoidMethodByParameterType(sonderfertigkeitType, Zauber.class.getSuperclass());
+			assert sonderfertigkeitSetCorrespondingTalent != null;
 
 			// Zauber
 			for (Constructor<?> c : Zauber.class.getConstructors()) {
@@ -550,6 +554,27 @@ public class EntryCreator {
 			Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
 			sonderfertigkeitListAdd.invoke(otherList, sf);
 			Object sfname = newSonderfertigkeitName.newInstance(name);
+
+			// Some SF activate a special talent when skilled:
+			if (name.startsWith("Ritualkenntnis: ")) {
+				XmlEntryCreator xmlec = XmlEntryCreator.getInstance();
+				Element xmlnode = xmlec.createBasicTalentNode(name, "Ritualkenntnis",
+						"RK " + name.substring(16), "E",
+						//"--", "--", "--",
+						"MU", "KL", "IN",  // parser does not support "none"
+						"", "CustomEntryLoader Plugin", "");
+				Object talent = xmlec.talentNodeToObject(xmlnode);
+				sonderfertigkeitSetCorrespondingTalent.invoke(sf, talent);
+			} else if (name.startsWith("Liturgiekenntnis")) {
+				XmlEntryCreator xmlec = XmlEntryCreator.getInstance();
+				Element xmlnode = xmlec.createBasicTalentNode(name, "Liturgiekenntnis",
+						"LK " + name.substring(17), "F",
+						"MU", "IN", "CH",
+						"", "CustomEntryLoader Plugin", "");
+				Object talent = xmlec.talentNodeToObject(xmlnode);
+				sonderfertigkeitSetCorrespondingTalent.invoke(sf, talent);
+			}
+
 			for (Setting setting : Setting.getHauptSettings()) {
 				setting.getIncluded().add("S" + name);
 			}
