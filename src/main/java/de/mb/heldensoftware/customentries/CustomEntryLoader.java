@@ -4,6 +4,10 @@ import de.mb.heldensoftware.customentries.EntryCreator.Probe;
 import de.mb.heldensoftware.customentries.EntryCreator.Quellenangabe;
 import de.mb.heldensoftware.customentries.EntryCreator.ZauberWrapper;
 import helden.comm.CommUtilities;
+import helden.framework.bedingungen.AbstraktBedingung;
+import helden.framework.bedingungen.BedingungsVerknuepfung;
+import helden.framework.zauber.Zauber;
+import helden.framework.zauber.ZauberFabrik;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -19,9 +23,10 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -109,7 +114,11 @@ public class CustomEntryLoader {
 		if (kosten == null)
 			throw new RuntimeException("Eigene Sonderfertigkeit: \"kosten\" fehlt.");
 		String cat = sf.containsKey("kategorie") ? (String) sf.get("kategorie") : "";
-		EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), getSFCategory(cat));
+		BedingungsVerknuepfung bedingung = null;
+		if (sf.get("bedingungen") != null && sf.get("bedingungen") instanceof JSONArray) {
+			bedingung = loadBedingungen((JSONArray) sf.get("bedingungen"));
+		}
+		EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), getSFCategory(cat), bedingung);
 	}
 
 	protected int getSFCategory(String cat) {
@@ -156,6 +165,43 @@ public class CustomEntryLoader {
 				System.err.println("[CustomEntryLoader] Unbekannte Kategorie: " + cat);
 				return 0;
 		}
+	}
+
+	protected BedingungsVerknuepfung loadBedingungen(JSONArray arr) {
+		ArrayList<AbstraktBedingung> lst = new ArrayList<>();
+		for (Object o: arr) {
+			if (!(o instanceof JSONObject)) throw new RuntimeException("Bedingung muss ein Objekt sein!");
+			JSONObject jo = (JSONObject) o;
+			int value = 0;
+			if (jo.get("value") != null) {
+				value = ((Long) jo.get("value")).intValue();
+			}
+			switch (((String) jo.get("type")).toLowerCase()) {
+				case "sonderfertigkeit":
+				case "sf":
+					lst.add(EntryCreator.getInstance().createBedingungSF((String) jo.get("name")));
+					break;
+				case "zauber":
+					Zauber zauber = ZauberFabrik.getInstance().getZauberfertigkeit((String) jo.get("name"));
+					if (zauber == null) throw new RuntimeException("Zauber \"" + jo.get("name") + "\" nicht gefunden!");
+					lst.add(EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(zauber, value));
+					break;
+				case "talent":
+					Object talent = EntryCreator.getInstance().talentFactoryMap.get((String) jo.get("name"));
+					if (talent == null) throw new RuntimeException("Talent \"" + jo.get("name") + "\" nicht gefunden!");
+					lst.add(EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(talent, value));
+					break;
+				case "eigenschaft":
+					Object eigenschaft = EntryCreator.getInstance().alleEigenschaften.get((String) jo.get("name"));
+					if (eigenschaft == null) throw new RuntimeException("Eigenschaft \"" + jo.get("name") + "\" nicht gefunden!");
+					lst.add(EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(eigenschaft, value));
+					break;
+				default:
+					System.err.println("[CustomEntryLoader] Ignorierte Bedingung: " + jo.toJSONString());
+					throw new RuntimeException("Ungültige Bedingung: type \"" + ((String) jo.get("type")).toLowerCase() + "\" ist nicht bekannt!");
+			}
+		}
+		return BedingungsVerknuepfung.AND(lst.toArray(new AbstraktBedingung[0]));
 	}
 
 	protected void loadRepresentation(JSONObject o) {

@@ -3,6 +3,9 @@ package de.mb.heldensoftware.customentries;
 import com.openpojo.reflection.PojoClass;
 import com.openpojo.reflection.impl.PojoClassFactory;
 import helden.framework.EigeneErweiterungenMoeglich;
+import helden.framework.bedingungen.AbstraktBedingung;
+import helden.framework.bedingungen.Bedingung;
+import helden.framework.bedingungen.BedingungsVerknuepfung;
 import helden.framework.held.persistenz.BasisXMLParser;
 import helden.framework.held.persistenz.ModsDatenParser;
 import helden.framework.settings.Setting;
@@ -129,6 +132,11 @@ public class EntryCreator {
 	// Held
 	Class HeldType;
 	Method heldAddTalent;
+
+	// Bedingung
+	Method bedingungHatSonderfertigkeit;
+	Method bedingungHatAbstrakteEigenschaft;
+	Method sonderfertigkeitSetBedingung;
 
 	private int numRepresentations = 0; // number of representations already created
 
@@ -335,6 +343,14 @@ public class EntryCreator {
 			sonderfertigkeitRegistryGetList = getMethodByReturnType(sonderfertigkeitRegistryType, sonderfertigkeitListType);
 			assert sonderfertigkeitRegistryGetList != null;
 
+			// Bedingung
+			bedingungHatSonderfertigkeit = getStaticMethodByNameAndParameterType(Bedingung.class, "hat", sonderfertigkeitNameType);
+			bedingungHatAbstrakteEigenschaft = getStaticMethodByNameAndParameterType(Bedingung.class, "hat", eigenschaftType.getSuperclass(), Integer.class);
+			sonderfertigkeitSetBedingung = getVoidMethodByParameterType(sonderfertigkeitType, BedingungsVerknuepfung.class);
+			if (bedingungHatSonderfertigkeit == null) throw new RuntimeException("bedingungHatSonderfertigkeit is null");
+			if (bedingungHatAbstrakteEigenschaft == null) throw new RuntimeException("bedingungHatAbstrakteEigenschaft is null");
+			if (sonderfertigkeitSetBedingung == null) throw new RuntimeException("sonderfertigkeitSetBedingung is null");
+
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 		}
@@ -475,6 +491,21 @@ public class EntryCreator {
 		return null;
 	}
 
+	protected Method getStaticMethodByNameAndParameterType(Class type, String name, Class... params) {
+		outer:
+		for (Method m : type.getDeclaredMethods()) {
+			if (Modifier.isStatic(m.getModifiers()) && m.getName().equals(name) && m.getParameterTypes().length == params.length) {
+				for (int i = 0; i < params.length; i++) {
+					if (!m.getParameterTypes()[i].equals(params[i])) {
+						continue outer;
+					}
+				}
+				return m;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Converts an array of Strings to an array of the corresponding "Merkmal" instances
 	 *
@@ -532,7 +563,7 @@ public class EntryCreator {
 		}
 	}
 
-	public Object createSonderfertigkeit(String name, int kosten, int category) {
+	public Object createSonderfertigkeit(String name, int kosten, int category, BedingungsVerknuepfung bedingung) {
 		/*
 		0: Allgemein
 		1: Geländekunde
@@ -551,6 +582,8 @@ public class EntryCreator {
 		 */
 		try {
 			Object sf = newSonderfertigkeit.newInstance(name, kosten, category);
+			if (bedingung != null)
+				sonderfertigkeitSetBedingung.invoke(sf, bedingung);
 			Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
 			sonderfertigkeitListAdd.invoke(otherList, sf);
 			Object sfname = newSonderfertigkeitName.newInstance(name);
@@ -587,8 +620,8 @@ public class EntryCreator {
 
 	public RepresentationWrapper createRepresentation(String name, String shortname, boolean hasRitualkenntnis) {
 		try {
-			Object sf1 = createSonderfertigkeit("Repräsentation: " + name, 2000, 5);
-			Object sf2 = hasRitualkenntnis ? createSonderfertigkeit("Ritualkenntnis: " + name, 250, 7) : null;
+			Object sf1 = createSonderfertigkeit("Repräsentation: " + name, 2000, 5, null);
+			Object sf2 = hasRitualkenntnis ? createSonderfertigkeit("Ritualkenntnis: " + name, 250, 4, null) : null;
 			Object repr = newRepresentation.newInstance("z" + (numRepresentations++), name, shortname, sf1, sf2);
 			alleRepresentationen.put(name, repr);
 
@@ -636,6 +669,22 @@ public class EntryCreator {
 			}
 		}
 		talentFactoryMap.put(talent.toString(), talent);
+	}
+
+	public AbstraktBedingung createBedingungSF(String name) {
+		try {
+			return (AbstraktBedingung) bedingungHatSonderfertigkeit.invoke(null, newSonderfertigkeitName.newInstance(name));
+		} catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public AbstraktBedingung createBedingungAbstrakteEigenschaft(Object eigenschaft, int value) {
+		try {
+			return (AbstraktBedingung) bedingungHatAbstrakteEigenschaft.invoke(null, eigenschaft, Integer.valueOf(value));
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
