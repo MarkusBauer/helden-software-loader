@@ -102,6 +102,7 @@ public class EntryCreator {
 	Class SprachTalentType;
 	Class KampfTalentType;
 	Class RunenFertigkeitType;
+	Method talentSetProbe; // (probe) -> void , works for both Talent and Zauber
 
 	// TalentArt (Natur, ...)
 	Class TalentArtType;
@@ -218,6 +219,9 @@ public class EntryCreator {
 			// Talent
 			Method einlesenTalent = ModsDatenParser.class.getMethod("einlesenTalent", File.class);
 			TalentType = einlesenTalent.getReturnType();
+			talentSetProbe = getVoidMethodByParameterType(TalentType.getSuperclass(), talentprobeType);
+			if (talentSetProbe == null) throw new RuntimeException("talentSetProbe is null");
+			talentSetProbe.setAccessible(true);
 
 			// TalentArt
 			TalentArtType = TalentType.getConstructors()[0].getParameterTypes()[1];
@@ -597,6 +601,7 @@ public class EntryCreator {
 						"MU", "KL", "IN",  // parser does not support "none"
 						"", "CustomEntryLoader Plugin", "");
 				Object talent = xmlec.talentNodeToObject(xmlnode);
+				talentSetProbe.invoke(talent, new Probe("--/--/--").getProbe());
 				sonderfertigkeitSetCorrespondingTalent.invoke(sf, talent);
 			} else if (name.startsWith("Liturgiekenntnis")) {
 				XmlEntryCreator xmlec = XmlEntryCreator.getInstance();
