@@ -116,7 +116,11 @@ public class CustomEntryLoader {
 		String cat = sf.containsKey("kategorie") ? (String) sf.get("kategorie") : "";
 		BedingungsVerknuepfung bedingung = null;
 		if (sf.get("bedingungen") != null && sf.get("bedingungen") instanceof JSONArray) {
-			bedingung = loadBedingungen((JSONArray) sf.get("bedingungen"));
+			try {
+				bedingung = loadBedingungen((JSONArray) sf.get("bedingungen"));
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), getSFCategory(cat), bedingung);
 	}
@@ -167,7 +171,7 @@ public class CustomEntryLoader {
 		}
 	}
 
-	protected BedingungsVerknuepfung loadBedingungen(JSONArray arr) {
+	protected BedingungsVerknuepfung loadBedingungen(JSONArray arr) throws IllegalAccessException {
 		ArrayList<AbstraktBedingung> lst = new ArrayList<>();
 		for (Object o: arr) {
 			if (!(o instanceof JSONObject)) throw new RuntimeException("Bedingung muss ein Objekt sein!");
@@ -187,6 +191,7 @@ public class CustomEntryLoader {
 					lst.add(EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(zauber, value));
 					break;
 				case "talent":
+					EntryCreator.getInstance().initTalentFactoryMap();
 					Object talent = EntryCreator.getInstance().talentFactoryMap.get((String) jo.get("name"));
 					if (talent == null) throw new RuntimeException("Talent \"" + jo.get("name") + "\" nicht gefunden!");
 					lst.add(EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(talent, value));

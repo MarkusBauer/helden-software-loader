@@ -658,6 +658,15 @@ public class EntryCreator {
 	 * @throws IllegalAccessException
 	 */
 	public void registerTalentForEditor(Object talent) throws IllegalAccessException {
+		initTalentFactoryMap();
+		talentFactoryMap.put(talent.toString(), talent);
+	}
+
+	/**
+	 * Ensure TalentFactoryMap is initialized properly
+	 * @throws IllegalAccessException
+	 */
+	public void initTalentFactoryMap() throws IllegalAccessException {
 		if (talentFactoryMap == null) {
 			talentFactoryMap = (HashMap<String, Object>) talentFactoryMapField.get(talentFactoryInst);
 			if (talentFactoryMap == null) {
@@ -673,7 +682,6 @@ public class EntryCreator {
 					throw new RuntimeException("Map is null even after forced initialization!");
 			}
 		}
-		talentFactoryMap.put(talent.toString(), talent);
 	}
 
 	public AbstraktBedingung createBedingungSF(String name) {
