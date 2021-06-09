@@ -111,10 +111,10 @@ Eine leere `erweiterungen.json` ohne neue Zauber, Sonderfertigkeiten und Repräs
         // Hier kommen eure neuen Zauber hin
     ],
     "sonderfertigkeiten": [
-    	// Hier kommen eure neuen Sonderfertigkeiten hin
+        // Hier kommen eure neuen Sonderfertigkeiten hin
     ],
     "repräsentationen": [
-    	// Hier kommen eure neuen Repräsentationen hin
+        // Hier kommen eure neuen Repräsentationen hin
     ]
 }
 Die `//` sind Kommentarzeichen - alles was dahinter steht gehört nicht zum
@@ -160,6 +160,7 @@ Der folgende Zauber verwendet alle möglichen Optionen:
                 "Elf": 4,
                 "Hex(Mag)": 2  // Hexen können den Spruch in gildenmagischer Repräsentation lernen
             },
+            // An dieser Stelle keine eigenen Repräsentationen eintragen.
 
             // Spezialisierungen (optional)
             // Mögliche Zauberspezialisierungen (spontane Modifikationen, Varianten, ...)
@@ -202,13 +203,14 @@ Mein Zauber,D,Antimagie,MU/KL/CH,,Mag3,Aventurien
 Sonderfertigkeiten werden wie folgt konfiguriert:
 {
     "sonderfertigkeiten": [
-    	{"name": "Gesegnet", "kosten":  200},
+        {"name": "Gesegnet", "kosten":  200},
         {"name": "Feenwelten-kundig", "kosten":  200, "kategorie":  "Geländekunde"}
     ]
 }
 Der Name darf nicht verändert werden, sobald die Sonderfertigkeit bei einem Held aktiviert wurde.
 Gültige Kategorien sind:
-"Allgemein", "Geländekunde", "Kampf: Nahkampf", "Kampf: Fernkampf", "Magisch", "Magisch: Repräsentation", "Magisch: Merkmalskenntnis", "Magisch: Objektritual", "Elfenlied", "Kampf: Manöver", "Geweiht: Liturgie", "Geweiht", "Magisch: Schamanenritual", "Magisch: Magische Lieder".
+"Allgemein", "Geländekunde", "Kampf: Nahkampf", "Kampf: Fernkampf", "Magisch", "Magisch: Repräsentation", "Magisch: Merkmalskenntnis",
+"Magisch: Objektritual", "Elfenlied", "Kampf: Manöver", "Geweiht: Liturgie", "Geweiht", "Magisch: Schamanenritual", "Magisch: Magische Lieder".
 
 Eine eigene Ritualkenntnis oder Liturgiekenntnis kann ebenfalls über Sonderfertigkeiten realisiert werden.
 Bei Aktivierung einer solchen Sonderfertigkeit wird automatisch ein passender Talentwert angelegt und aktiviert.
@@ -220,24 +222,42 @@ Die Konfiguration sollte so aussehen:
     ]
 }
 
+Zu Sonderfertigkeiten können Vorbedingungen hinzugefügt werden.
+Nur Helden, die diese Bedingungen erfüllen können die Sonderfertigkeit erlernen.
+Es müssen immer alle Bedingungen erfüllt werden, mögliche Bedingungen sind `Eigenschaft`, `Talent`, `Zauber` und `Sonderfertigkeit`.
+{
+    "sonderfertigkeiten": [
+        {"name": "Kristall-Stab", "kosten":  750, "kategorie":  "Objektritual", "bedingungen": [
+            {"type": "Sonderfertigkeit", "name": "Ritualkenntnis: Kristallomantie"},  // Sonderfertigkeit muss aktiviert sein (eigene SF möglich)
+            {"type": "Zauber", "name": "Hartes schmelze!", "value": 10},  // ZfW "Hartes schmelze!" >= 10 (eigene Zauber möglich)
+            {"type": "Talent", "name": "Steinschneider/Juwelier", "value": 10},  // TaW Steinschneider >= 10 (eigene Talente nicht möglich)
+            {"type": "Eigenschaft", "name": "FF", "value": 15}  // Fingerfertigkeit >= 15
+        ]}
+    ]
+}
+Bei magischen Sonderfertigkeiten entscheidet sich an den Bedingungen, ob eine Verbilligung durch "Akademische Ausbildung (Magier)" zum Tragen kommt.
+Generell verbilligt die Ausbildung alle irgendwie magischen Sonderfertigkeiten, die entweder eine Bedingung Gildenmagie (Repr oder RK) haben, oder gar keine Ritualkenntnis zur Bedingung haben.
+Soll eine eigene magische Sonderfertigkeit für Magier also nicht verbilligt sein, muss zwangsläufig eine andere Ritualkenntnis zur Bedingung gemacht werden.
+
 
 
 --- Neue Repräsentationen ---
 Neue Repräsentationen werden wie folgt konfiguriert:
 {
-	"repräsentationen": [
+    "repräsentationen": [
         {
             "name":  "Hochelfisch",
             "abkürzung": "Hoc",
             "ritualkenntnis":  true,   // true oder false - ob eine Ritualkenntnis existiert
             "zauber": {   // Verbreitung der in dieser Repräsentation bekannten Zauber
-            	"Armatrutz":  7,   // Format: "Zaubername": Verbreitung (1-7)
-            	"Fulminictus Donnerkeil":  7,
+                "Armatrutz":  7,   // Format: "Zaubername": Verbreitung (1-7)
+                "Fulminictus Donnerkeil":  7,
             }
         }
     ]
 }
 Name und Abkürzung dürfen nicht verändert werden, sobald die Repräsentation oder ein Zauber in dieser Repräsentation aktiviert wurden.
+Eigene Zauber können hier verwendet werden.
 
 
 
