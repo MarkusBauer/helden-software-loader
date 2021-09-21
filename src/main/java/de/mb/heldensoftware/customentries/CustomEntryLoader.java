@@ -4,8 +4,10 @@ import de.mb.heldensoftware.customentries.EntryCreator.Probe;
 import de.mb.heldensoftware.customentries.EntryCreator.Quellenangabe;
 import de.mb.heldensoftware.customentries.EntryCreator.ZauberWrapper;
 import helden.comm.CommUtilities;
+import helden.framework.Einstellungen;
 import helden.framework.bedingungen.AbstraktBedingung;
 import helden.framework.bedingungen.BedingungsVerknuepfung;
+import helden.framework.held.persistenz.XMLEinstellungenParser;
 import helden.framework.zauber.Zauber;
 import helden.framework.zauber.ZauberFabrik;
 import org.json.simple.JSONArray;
@@ -248,6 +250,16 @@ public class CustomEntryLoader {
 		if (filesLoaded) return;
 		filesLoaded = true;
 
+		// Check for custom paths in settings
+		File einstellungen = new File(Einstellungen.getInstance().getPfade().getPfad("einstellungsPfad"));
+		if (einstellungen.exists()) {
+			try {
+				new XMLEinstellungenParser().ladeEinstellungen(einstellungen);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		try {
 			final List<CustomEntryHandler> customEntryHandler = new ArrayList<>();
 			customEntryHandler.add(new JsonFileProvider());
@@ -264,6 +276,11 @@ public class CustomEntryLoader {
 				// Config files next to helden.zip.hld
 				File heldenPath = new File(new File(System.getProperty("user.home")), "helden");
 				handler.loadCustomEntries(heldenPath);
+
+				File heldenPath2 = new File(Einstellungen.getInstance().getPfade().getPfad("heldenPfad")).getAbsoluteFile().getParentFile();
+				if (!heldenPath2.equals(heldenPath)) {
+					handler.loadCustomEntries(heldenPath2);
+				}
 			}
 
 
