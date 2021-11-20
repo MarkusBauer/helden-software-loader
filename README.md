@@ -338,6 +338,6 @@ Dieses Plugin basiert auf verschiedenen anderen Projekten:
  
 Kontakt
 -------
- - "Rothen" bei [dsaforum.de](http://dsaforum.de/memberlist.php?mode=viewprofile&u=12050)
+ - "Rothen" bei [dsaforum.de](http://dsaforum.de/memberlist.php?mode=viewprofile&u=12050) | [Thread](https://dsaforum.de/viewtopic.php?f=9&t=44850)
  - Per Mail: markus-7y5wrhdz (AT) mk-bauer.de
- 
+ - Github: [MarkusBauer/helden-software-loader](https://github.com/MarkusBauer/helden-software-loader)
