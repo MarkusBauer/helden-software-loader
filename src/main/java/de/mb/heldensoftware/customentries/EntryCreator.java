@@ -82,6 +82,8 @@ public class EntryCreator {
 	Constructor<?> newSonderfertigkeitName;
 	Class sonderfertigkeitType;
 	Constructor<?> newSonderfertigkeit;
+	Class sonderfertigkeitLiturgieType;
+	Constructor<?> newLiturgieSonderfertigkeit;
 	Method sonderfertigkeitSetCorrespondingTalent;
 	Class sonderfertigkeitRegistryType;
 	Class sonderfertigkeitListType;
@@ -354,6 +356,13 @@ public class EntryCreator {
 			sonderfertigkeitRegistryGetList = getMethodByReturnType(sonderfertigkeitRegistryType, sonderfertigkeitListType);
 			assert sonderfertigkeitRegistryGetList != null;
 
+			// Liturgie is a special subclass
+			sonderfertigkeitLiturgieType = getMethodByParameterTypes(sonderfertigkeitType, String.class, int.class, boolean.class).getReturnType();
+			System.out.println(sonderfertigkeitLiturgieType.getName());
+			newLiturgieSonderfertigkeit = sonderfertigkeitLiturgieType.getDeclaredConstructors()[0];
+			assert newLiturgieSonderfertigkeit != null;
+			newLiturgieSonderfertigkeit.setAccessible(true);
+
 			// Bedingung
 			bedingungHatSonderfertigkeit = getStaticMethodByNameAndParameterType(Bedingung.class, "hat", sonderfertigkeitNameType);
 			bedingungHatAbstrakteEigenschaft = getStaticMethodByNameAndParameterType(Bedingung.class, "hat", eigenschaftType.getSuperclass(), Integer.class);
@@ -494,6 +503,14 @@ public class EntryCreator {
 	protected Method getMethodByName(Class type, String name) {
 		for (Method m : type.getDeclaredMethods()) {
 			if (m.getName().equals(name))
+				return m;
+		}
+		return null;
+	}
+
+	protected Method getMethodByParameterTypes(Class type, Class... params) {
+		for (Method m : type.getDeclaredMethods()) {
+			if (Arrays.equals(m.getParameterTypes(), params))
 				return m;
 		}
 		return null;
@@ -653,6 +670,38 @@ public class EntryCreator {
 		}
 	}
 
+	public Object createLiturgieSonderfertigkeit(String name, int grad, List<String> liturgiekenntnis, BedingungsVerknuepfung bedingung) {
+		try {
+			Object sf = newLiturgieSonderfertigkeit.newInstance(name, grad, false);
+			if (bedingung == null) {
+				bedingung = Bedingung.AND(
+						Bedingung.istMindestens(alleMagielevel.get("Geweihter")),
+						Bedingung.hatLkW(grad * 3)
+				);
+				if (!liturgiekenntnis.isEmpty()) {
+					BedingungsVerknuepfung liturgieBedingung = Bedingung.OR();
+					for (String s : liturgiekenntnis) {
+						liturgieBedingung.addBedingung(createBedingungSF(s));
+					}
+					bedingung.addBedingung(liturgieBedingung);
+				}
+			}
+			if (bedingung != null)
+				sonderfertigkeitSetBedingung.invoke(sf, bedingung);
+			Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
+			sonderfertigkeitListAdd.invoke(otherList, sf);
+			Object sfname = newSonderfertigkeitName.newInstance(name);
+
+			for (Setting setting : Setting.getHauptSettings()) {
+				setting.getIncluded().add("S" + name);
+			}
+			return sfname;
+		} catch (Exception e) {
+			ErrorHandler.handleException(e);
+			return null;
+		}
+	}
+
 
 	public void addTalentToHeld(Object held, Object talent, int value) {
 		if (HeldType == null) initHeldTypes(held);
@@ -729,7 +778,7 @@ public class EntryCreator {
 				}
 			}
 		} catch (IllegalAccessException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+			ErrorHandler.handleException(e);
 		}
 	}
 

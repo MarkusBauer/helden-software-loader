@@ -114,9 +114,9 @@ public class CustomEntryLoader {
 		Long kosten = (Long) sf.get("kosten");
 		if (name == null)
 			throw new RuntimeException("Eigene Sonderfertigkeit: \"name\" fehlt.");
-		if (kosten == null)
+		int cat = getSFCategory(sf.containsKey("kategorie") ? (String) sf.get("kategorie") : "");
+		if (kosten == null && cat != 10)
 			throw new RuntimeException("Eigene Sonderfertigkeit: \"kosten\" fehlt.");
-		String cat = sf.containsKey("kategorie") ? (String) sf.get("kategorie") : "";
 		BedingungsVerknuepfung bedingung = null;
 		if (sf.get("bedingungen") != null && sf.get("bedingungen") instanceof JSONArray) {
 			try {
@@ -125,8 +125,32 @@ public class CustomEntryLoader {
 				throw new RuntimeException(e);
 			}
 		}
-		Object sfname = EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), getSFCategory(cat), bedingung);
 
+		// Liturgien
+		if (cat == 10) {
+			Long grad = (Long) sf.get("grad");
+			if (grad == null)
+				throw new RuntimeException("Eigene Liturgie: \"grad\" fehlt.");
+			// list of gods that have access
+			ArrayList<String> liturgiekenntnis = new ArrayList<>();
+			if (sf.get("liturgiekenntnis") != null && sf.get("liturgiekenntnis") instanceof JSONArray) {
+				for (Object o : (JSONArray) sf.get("liturgiekenntnis")) {
+					if (o instanceof String) {
+						String s = (String) o;
+						if (!s.startsWith("Liturgiekenntnis ("))
+							s = "Liturgiekenntnis (" + s + ")";
+						liturgiekenntnis.add(s);
+					}
+				}
+			}
+			EntryCreator.getInstance().createLiturgieSonderfertigkeit(name, grad.intValue(), liturgiekenntnis, bedingung);
+			return;
+		}
+
+		// normal SF
+		Object sfname = EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), cat, bedingung);
+
+		// Liturgiekenntnis
 		if (sf.get("liturgien") != null && sf.get("liturgien") instanceof JSONArray) {
 			ArrayList<String> liturgien = new ArrayList<>();
 			for (Object o: (JSONArray) sf.get("liturgien")) {
@@ -199,6 +223,9 @@ public class CustomEntryLoader {
 			switch (((String) jo.get("type")).toLowerCase()) {
 				case "or":
 					lst.add(loadBedingungen((JSONArray) jo.get("bedingungen"), true));
+					break;
+				case "and":
+					lst.add(loadBedingungen((JSONArray) jo.get("bedingungen"), false));
 					break;
 				case "sonderfertigkeit":
 				case "sf":
