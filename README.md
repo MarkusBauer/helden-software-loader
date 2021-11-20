@@ -276,6 +276,21 @@ Es müssen immer alle Bedingungen erfüllt werden, mögliche Bedingungen sind `E
     ]
 }
 ```
+Komplexere Bedingungen können mit dem Typ `or` erstellt werden. Aus der Liste von `or`-Bedingungen muss nur eine erfüllt werden.
+```
+{
+    "sonderfertigkeiten": [
+        {"name": "Liturgie: X", "kosten":  50, "kategorie": "Liturgie", "bedingungen": [
+            {"type": "MagieLevel", "name": "Geweihter"},
+            {"type": "LKW", "value": 3},  // Liturgiekenntnis >= 3
+            {"type": "or", "bedingungen": [  // Held muss entweder Praios- oder Rondrageweihter sein
+                {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Praios)"},
+                {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Rondra)"}
+            ]}
+        ]}
+    ]
+}
+```
 Bei magischen Sonderfertigkeiten entscheidet sich an den Bedingungen, ob eine Verbilligung durch "Akademische Ausbildung (Magier)" zum Tragen kommt.
 Generell verbilligt die Ausbildung alle irgendwie magischen Sonderfertigkeiten, die entweder eine Bedingung Gildenmagie (Repr oder RK) haben, oder gar keine Ritualkenntnis zur Bedingung haben.
 Soll eine eigene magische Sonderfertigkeit für Magier also nicht verbilligt sein, muss zwangsläufig eine andere Ritualkenntnis zur Bedingung gemacht werden.

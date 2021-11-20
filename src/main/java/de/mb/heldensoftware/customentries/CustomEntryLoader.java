@@ -120,7 +120,7 @@ public class CustomEntryLoader {
 		BedingungsVerknuepfung bedingung = null;
 		if (sf.get("bedingungen") != null && sf.get("bedingungen") instanceof JSONArray) {
 			try {
-				bedingung = loadBedingungen((JSONArray) sf.get("bedingungen"));
+				bedingung = loadBedingungen((JSONArray) sf.get("bedingungen"), false);
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
@@ -174,7 +174,7 @@ public class CustomEntryLoader {
 		}
 	}
 
-	protected BedingungsVerknuepfung loadBedingungen(JSONArray arr) throws IllegalAccessException {
+	protected BedingungsVerknuepfung loadBedingungen(JSONArray arr, boolean isOr) throws IllegalAccessException {
 		ArrayList<AbstraktBedingung> lst = new ArrayList<>();
 		for (Object o: arr) {
 			if (!(o instanceof JSONObject)) throw new RuntimeException("Bedingung muss ein Objekt sein!");
@@ -184,6 +184,9 @@ public class CustomEntryLoader {
 				value = ((Long) jo.get("value")).intValue();
 			}
 			switch (((String) jo.get("type")).toLowerCase()) {
+				case "or":
+					lst.add(loadBedingungen((JSONArray) jo.get("bedingungen"), true));
+					break;
 				case "sonderfertigkeit":
 				case "sf":
 					lst.add(EntryCreator.getInstance().createBedingungSF((String) jo.get("name")));
@@ -211,12 +214,17 @@ public class CustomEntryLoader {
 					Bedingung.MagieLevel level = EntryCreator.getInstance().alleMagielevel.get((String) jo.get("name"));
 					if (level == null) throw new RuntimeException("MagieLevel \"" + jo.get("name") + "\" nicht gefunden!");
 					lst.add(Bedingung.istMindestens(level));
+					break;
 				default:
 					System.err.println("[CustomEntryLoader] Ignorierte Bedingung: " + jo.toJSONString());
 					throw new RuntimeException("Ungültige Bedingung: type \"" + ((String) jo.get("type")).toLowerCase() + "\" ist nicht bekannt!");
 			}
 		}
-		return BedingungsVerknuepfung.AND(lst.toArray(new AbstraktBedingung[0]));
+		if (isOr) {
+			return BedingungsVerknuepfung.OR(lst.toArray(new AbstraktBedingung[0]));
+		} else {
+			return BedingungsVerknuepfung.AND(lst.toArray(new AbstraktBedingung[0]));
+		}
 	}
 
 	protected void loadRepresentation(JSONObject o) {
