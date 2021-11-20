@@ -125,7 +125,20 @@ public class CustomEntryLoader {
 				throw new RuntimeException(e);
 			}
 		}
-		EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), getSFCategory(cat), bedingung);
+		Object sfname = EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), getSFCategory(cat), bedingung);
+
+		if (sf.get("liturgien") != null && sf.get("liturgien") instanceof JSONArray) {
+			ArrayList<String> liturgien = new ArrayList<>();
+			for (Object o: (JSONArray) sf.get("liturgien")) {
+				if (o instanceof String) {
+					String s = (String) o;
+					if (!s.startsWith("Liturgie: "))
+						s = "Liturgie: " + s;
+					liturgien.add(s);
+				}
+			}
+			EntryCreator.getInstance().addLiturgiekenntnisToLiturgien(sfname, liturgien);
+		}
 	}
 
 	protected int getSFCategory(String cat) {

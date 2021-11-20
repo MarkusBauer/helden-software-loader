@@ -86,6 +86,7 @@ public class EntryCreator {
 	Class sonderfertigkeitRegistryType;
 	Class sonderfertigkeitListType;
 	Method sonderfertigkeitListAdd;
+	Method sonderfertigkeitListGet;
 	Method sonderfertigkeitRegistryGetList;
 
 	// new Zauber: (String name, Kategorie spalte, Merkmal[] merkmale, Probe probe, QuellenObj quellenangabe, String mod) -> Zauber
@@ -138,6 +139,7 @@ public class EntryCreator {
 	Method bedingungHatSonderfertigkeit;
 	Method bedingungHatAbstrakteEigenschaft;
 	Method sonderfertigkeitSetBedingung;
+	Method sonderfertigkeitGetBedingung;
 
 	HashMap<String, Bedingung.MagieLevel> alleMagielevel = new HashMap<>();
 
@@ -341,10 +343,13 @@ public class EntryCreator {
 						&& m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(sonderfertigkeitType)
 						&& m.getTypeParameters().length > 0) {
 					sonderfertigkeitListAdd = m;
-					break;
+				} else if (m.getReturnType().equals(sonderfertigkeitType)
+						&& m.getParameterTypes().length == 1 && m.getParameterTypes()[0].equals(String.class)) {
+					sonderfertigkeitListGet = m;
 				}
 			}
 			assert sonderfertigkeitListAdd != null;
+			assert sonderfertigkeitListGet != null;
 			// Get the central SF list from the SF registry
 			sonderfertigkeitRegistryGetList = getMethodByReturnType(sonderfertigkeitRegistryType, sonderfertigkeitListType);
 			assert sonderfertigkeitRegistryGetList != null;
@@ -353,9 +358,11 @@ public class EntryCreator {
 			bedingungHatSonderfertigkeit = getStaticMethodByNameAndParameterType(Bedingung.class, "hat", sonderfertigkeitNameType);
 			bedingungHatAbstrakteEigenschaft = getStaticMethodByNameAndParameterType(Bedingung.class, "hat", eigenschaftType.getSuperclass(), Integer.class);
 			sonderfertigkeitSetBedingung = getVoidMethodByParameterType(sonderfertigkeitType, BedingungsVerknuepfung.class);
+			sonderfertigkeitGetBedingung = getMethodByReturnType(sonderfertigkeitType, BedingungsVerknuepfung.class);
 			if (bedingungHatSonderfertigkeit == null) throw new RuntimeException("bedingungHatSonderfertigkeit is null");
 			if (bedingungHatAbstrakteEigenschaft == null) throw new RuntimeException("bedingungHatAbstrakteEigenschaft is null");
 			if (sonderfertigkeitSetBedingung == null) throw new RuntimeException("sonderfertigkeitSetBedingung is null");
+			if (sonderfertigkeitGetBedingung == null) throw new RuntimeException("sonderfertigkeitGetBedingung is null");
 
 			createStringMap((Map) alleMagielevel, Bedingung.MagieLevel.class);
 			assert !alleMagielevel.isEmpty();
@@ -700,6 +707,27 @@ public class EntryCreator {
 	public AbstraktBedingung createBedingungAbstrakteEigenschaft(Object eigenschaft, int value) {
 		try {
 			return (AbstraktBedingung) bedingungHatAbstrakteEigenschaft.invoke(null, eigenschaft, Integer.valueOf(value));
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void addLiturgiekenntnisToLiturgien(Object sfname, List<String> liturgien) {
+		try {
+			Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
+			for (String name: liturgien) {
+				Object sf = sonderfertigkeitListGet.invoke(otherList, name);
+				Object bedingungObj = sonderfertigkeitGetBedingung.invoke(sf);
+				if (bedingungObj != null) {
+					BedingungsVerknuepfung v = (BedingungsVerknuepfung) bedingungObj;
+					if (v.getBedingungen().size() >= 3 && v.getBedingungen().get(2) instanceof BedingungsVerknuepfung) {
+						BedingungsVerknuepfung v2 = (BedingungsVerknuepfung) v.getBedingungen().get(2);
+						if (v2.getVerknuepfungsArt().toString().equals("OR")) {
+							v2.getBedingungen().add(createBedingungSF(sfname.toString()));
+						}
+					}
+				}
+			}
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
