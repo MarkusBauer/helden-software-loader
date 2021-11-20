@@ -6,6 +6,7 @@ import de.mb.heldensoftware.customentries.EntryCreator.ZauberWrapper;
 import helden.comm.CommUtilities;
 import helden.framework.Einstellungen;
 import helden.framework.bedingungen.AbstraktBedingung;
+import helden.framework.bedingungen.Bedingung;
 import helden.framework.bedingungen.BedingungsVerknuepfung;
 import helden.framework.held.persistenz.XMLEinstellungenParser;
 import helden.framework.zauber.Zauber;
@@ -203,6 +204,13 @@ public class CustomEntryLoader {
 					if (eigenschaft == null) throw new RuntimeException("Eigenschaft \"" + jo.get("name") + "\" nicht gefunden!");
 					lst.add(EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(eigenschaft, value));
 					break;
+				case "lkw":
+					lst.add(Bedingung.hatLkW(value));
+					break;
+				case "magielevel":
+					Bedingung.MagieLevel level = EntryCreator.getInstance().alleMagielevel.get((String) jo.get("name"));
+					if (level == null) throw new RuntimeException("MagieLevel \"" + jo.get("name") + "\" nicht gefunden!");
+					lst.add(Bedingung.istMindestens(level));
 				default:
 					System.err.println("[CustomEntryLoader] Ignorierte Bedingung: " + jo.toJSONString());
 					throw new RuntimeException("Ungültige Bedingung: type \"" + ((String) jo.get("type")).toLowerCase() + "\" ist nicht bekannt!");

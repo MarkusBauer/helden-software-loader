@@ -139,6 +139,8 @@ public class EntryCreator {
 	Method bedingungHatAbstrakteEigenschaft;
 	Method sonderfertigkeitSetBedingung;
 
+	HashMap<String, Bedingung.MagieLevel> alleMagielevel = new HashMap<>();
+
 	private int numRepresentations = 0; // number of representations already created
 
 	/**
@@ -354,6 +356,9 @@ public class EntryCreator {
 			if (bedingungHatSonderfertigkeit == null) throw new RuntimeException("bedingungHatSonderfertigkeit is null");
 			if (bedingungHatAbstrakteEigenschaft == null) throw new RuntimeException("bedingungHatAbstrakteEigenschaft is null");
 			if (sonderfertigkeitSetBedingung == null) throw new RuntimeException("sonderfertigkeitSetBedingung is null");
+
+			createStringMap((Map) alleMagielevel, Bedingung.MagieLevel.class);
+			assert !alleMagielevel.isEmpty();
 
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);

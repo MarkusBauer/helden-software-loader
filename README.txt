@@ -224,14 +224,16 @@ Die Konfiguration sollte so aussehen:
 
 Zu Sonderfertigkeiten können Vorbedingungen hinzugefügt werden.
 Nur Helden, die diese Bedingungen erfüllen können die Sonderfertigkeit erlernen.
-Es müssen immer alle Bedingungen erfüllt werden, mögliche Bedingungen sind `Eigenschaft`, `Talent`, `Zauber` und `Sonderfertigkeit`.
+Es müssen immer alle Bedingungen erfüllt werden, mögliche Bedingungen sind `Eigenschaft`, `Talent`, `Zauber`, `Sonderfertigkeit`, `LKW` und `MagieLevel`.
 {
     "sonderfertigkeiten": [
         {"name": "Kristall-Stab", "kosten":  750, "kategorie":  "Objektritual", "bedingungen": [
             {"type": "Sonderfertigkeit", "name": "Ritualkenntnis: Kristallomantie"},  // Sonderfertigkeit muss aktiviert sein (eigene SF möglich)
             {"type": "Zauber", "name": "Hartes schmelze!", "value": 10},  // ZfW "Hartes schmelze!" >= 10 (eigene Zauber möglich)
             {"type": "Talent", "name": "Steinschneider/Juwelier", "value": 10},  // TaW Steinschneider >= 10 (eigene Talente nicht möglich)
-            {"type": "Eigenschaft", "name": "FF", "value": 15}  // Fingerfertigkeit >= 15
+            {"type": "Eigenschaft", "name": "FF", "value": 15},  // Fingerfertigkeit >= 15
+            {"type": "LKW", "value": 3},  // Liturgiekenntnis >= 3
+            {"type": "MagieLevel", "name": "Geweihter"}  // Optionen: "Viertelzauberer", "Spruchzauberer", "Schamane", "Halbzauberer", "Vollzauberer", "Geweihter"
         ]}
     ]
 }
