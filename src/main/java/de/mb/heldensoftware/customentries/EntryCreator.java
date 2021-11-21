@@ -747,6 +747,13 @@ public class EntryCreator {
 
 	public AbstraktBedingung createBedingungSF(String name) {
 		try {
+			Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
+			try {
+				sonderfertigkeitListGet.invoke(otherList, name);
+			} catch (InvocationTargetException e) {
+				ErrorHandler.handleException(e.getCause());
+			}
+
 			return (AbstraktBedingung) bedingungHatSonderfertigkeit.invoke(null, newSonderfertigkeitName.newInstance(name));
 		} catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
 			throw new RuntimeException(e);
