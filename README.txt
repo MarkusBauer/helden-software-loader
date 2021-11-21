@@ -232,8 +232,8 @@ Es müssen immer alle Bedingungen erfüllt werden, mögliche Bedingungen sind `E
             {"type": "Zauber", "name": "Hartes schmelze!", "value": 10},  // ZfW "Hartes schmelze!" >= 10 (eigene Zauber möglich)
             {"type": "Talent", "name": "Steinschneider/Juwelier", "value": 10},  // TaW Steinschneider >= 10 (eigene Talente nicht möglich)
             {"type": "Eigenschaft", "name": "FF", "value": 15},  // Fingerfertigkeit >= 15
-            {"type": "LKW", "value": 3},  // Liturgiekenntnis >= 3
-            {"type": "MagieLevel", "name": "Geweihter"}  // Optionen: "Viertelzauberer", "Spruchzauberer", "Schamane", "Halbzauberer", "Vollzauberer", "Geweihter"
+            {"type": "LKW", "value": 0},  // Liturgiekenntnis >= 0
+            {"type": "MagieLevel", "name": "Vollzauberer"}  // Optionen: "Viertelzauberer", "Spruchzauberer", "Schamane", "Halbzauberer", "Vollzauberer", "Geweihter"
         ]}
     ]
 }
@@ -241,9 +241,9 @@ Komplexere Bedingungen können mit dem Typ `or` erstellt werden. Aus der Liste v
 ```
 {
     "sonderfertigkeiten": [
-        {"name": "Liturgie: X", "kosten":  50, "kategorie": "Liturgie", "bedingungen": [
+        {"name": "Karmaler Schub", "kosten":  500, "kategorie": "Liturgie", "bedingungen": [
             {"type": "MagieLevel", "name": "Geweihter"},
-            {"type": "LKW", "value": 3},  // Liturgiekenntnis >= 3
+            {"type": "LKW", "value": 15},  // Liturgiekenntnis >= 15
             {"type": "or", "bedingungen": [  // Held muss entweder Praios- oder Rondrageweihter sein
                 {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Praios)"},
                 {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Rondra)"}
@@ -255,6 +255,40 @@ Komplexere Bedingungen können mit dem Typ `or` erstellt werden. Aus der Liste v
 Bei magischen Sonderfertigkeiten entscheidet sich an den Bedingungen, ob eine Verbilligung durch "Akademische Ausbildung (Magier)" zum Tragen kommt.
 Generell verbilligt die Ausbildung alle irgendwie magischen Sonderfertigkeiten, die entweder eine Bedingung Gildenmagie (Repr oder RK) haben, oder gar keine Ritualkenntnis zur Bedingung haben.
 Soll eine eigene magische Sonderfertigkeit für Magier also nicht verbilligt sein, muss zwangsläufig eine andere Ritualkenntnis zur Bedingung gemacht werden.
+
+
+
+--- Neue Liturgien und Geweihte ---
+Eine neue Liturgiekenntnis und neue Liturgien können als Sonderfertigkeit angelegt werden.
+Neue Liturgien haben standardmäßig die Bedingung, dass ein Held geweiht sein muss und LkW >= 3*Grad der Liturgie besitzen muss, um sie aktivieren zu können.
+Weiterhin kann eine Liste mit Göttern angegeben werden - dann ist die Liturgie nur zugänglich, wenn die SF `Liturgiekenntnis (<Gott>)` vorhanden ist.
+Bei Bedarf können die Bedingungen aber auch vollständig überschrieben werden (analog zu Sonderfertigkeiten).
+
+Eine neue Liturgiekenntnis aktiviert gleichzeitig ein dazugehöriges, gleichnamiges Talent.
+Der Name sollte im Format `Liturgiekenntis (<Gott>)` gehalten sein.
+Hier kann eine Liste mit bereits existierenden Liturgien angegeben werden - die neue Liturgiekenntnis wird in die Vorbedingungen dieser Liturgien aufgenommen.
+{
+    "sonderfertigkeiten": [
+        // Neue Liturgiekenntnis - inkl. Talent
+        {
+            "name": "Liturgiekenntnis (Rastullah)", "kosten":  0, "kategorie":  "Geweiht",
+            // nur zugänglich, wenn Vorteil "Geweiht" etc bereits vorhanden
+            "bedingungen": [{"type": "MagieLevel", "name": "Geweihter"}],
+            // diese bereits existierenden Liturgien sind zugänglich
+            "liturgien": ["Schutzsegen", "Grabsegen", "Weisheitssegen"]
+        },
+        // Neue Liturgie für neue Liturgiekenntnis
+        {
+            "name": "Liturgie: Rastullah's Zelt", "kategorie": "Liturgie", "grad": 2,
+            "liturgiekenntnis": ["Rastullah"]
+        },
+        // Neue Liturgie für neue und alte Liturgiekenntnis
+        {
+            "name": "Liturgie: Fluch der Wüste", "kategorie": "Liturgie", "grad": 3,
+            "liturgiekenntnis": ["Rastullah", "Praios", "Ingerimm"]  // zugänglich für diese Götter
+        },
+    ]
+}
 
 
 

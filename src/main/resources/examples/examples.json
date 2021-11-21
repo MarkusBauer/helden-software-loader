@@ -62,14 +62,42 @@
         {"name": "Feenwelten-kundig", "kosten":  200, "kategorie":  "Geländekunde"},
 
         {"name": "Ritualkenntnis: Alt-Druidisch", "kosten":  250, "kategorie":  "Magisch"},
-        {"name": "Liturgiekenntnis (Rastullah)", "kosten":  0, "kategorie":  "Geweiht"},
 
         {"name": "Kristall-Stab", "kosten":  750, "kategorie":  "Objektritual", "bedingungen": [
             {"type": "Sonderfertigkeit", "name": "Ritualkenntnis: Kristallomantie"},  // Sonderfertigkeit muss aktiviert sein (eigene SF möglich)
             {"type": "Zauber", "name": "Hartes schmelze!", "value": 10},  // ZfW "Hartes schmelze!" >= 10 (eigene Zauber möglich)
             {"type": "Talent", "name": "Steinschneider/Juwelier", "value": 10},  // TaW Steinschneider >= 10 (eigene Talente nicht möglich)
             {"type": "Eigenschaft", "name": "FF", "value": 15}  // Fingerfertigkeit >= 15
+        ]},
+
+        // Komplexe Bedingungen:
+        {"name": "Karmaler Schub", "kosten":  500, "kategorie": "Liturgie", "bedingungen": [
+            {"type": "MagieLevel", "name": "Geweihter"},
+            {"type": "LKW", "value": 15},  // Liturgiekenntnis >= 15
+            {"type": "or", "bedingungen": [  // Held muss entweder Praios- oder Rondrageweihter sein
+                {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Praios)"},
+                {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Rondra)"}
+            ]}
         ]}
+
+        // Eigene Liturgiekenntnis - inkl. Talent
+        {
+            "name": "Liturgiekenntnis (Rastullah)", "kosten":  0, "kategorie":  "Geweiht",
+            // nur zugänglich, wenn Vorteil "Geweiht" etc bereits vorhanden
+            "bedingungen": [{"type": "MagieLevel", "name": "Geweihter"}],
+            // diese bereits existierenden Liturgien sind zugänglich
+            "liturgien": ["Schutzsegen", "Grabsegen", "Weisheitssegen"]
+        },
+        // Neue Liturgie für neue Liturgiekenntnis
+        {
+            "name": "Liturgie: Rastullah's Zelt", "kategorie": "Liturgie", "grad": 2,
+            "liturgiekenntnis": ["Rastullah"]
+        },
+        // Neue Liturgie für neue und alte Liturgiekenntnis
+        {
+            "name": "Liturgie: Fluch der Wüste", "kategorie": "Liturgie", "grad": 3,
+            "liturgiekenntnis": ["Rastullah", "Praios", "Ingerimm"]  // zugänglich für diese Götter
+        }
     ],
 
 
