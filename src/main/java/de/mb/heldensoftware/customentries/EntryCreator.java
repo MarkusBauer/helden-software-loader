@@ -358,7 +358,6 @@ public class EntryCreator {
 
 			// Liturgie is a special subclass
 			sonderfertigkeitLiturgieType = getMethodByParameterTypes(sonderfertigkeitType, String.class, int.class, boolean.class).getReturnType();
-			System.out.println(sonderfertigkeitLiturgieType.getName());
 			newLiturgieSonderfertigkeit = sonderfertigkeitLiturgieType.getDeclaredConstructors()[0];
 			assert newLiturgieSonderfertigkeit != null;
 			newLiturgieSonderfertigkeit.setAccessible(true);
