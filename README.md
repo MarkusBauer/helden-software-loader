@@ -280,7 +280,7 @@ Komplexere Bedingungen können mit dem Typ `or` erstellt werden. Aus der Liste v
 ```
 {
     "sonderfertigkeiten": [
-        {"name": "Karmaler Schub", "kosten":  500, "kategorie": "Liturgie", "bedingungen": [
+        {"name": "Karmaler Schub", "kosten":  500, "kategorie": "Geweiht", "bedingungen": [
             {"type": "MagieLevel", "name": "Geweihter"},
             {"type": "LKW", "value": 15},  // Liturgiekenntnis >= 15
             {"type": "or", "bedingungen": [  // Held muss entweder Praios- oder Rondrageweihter sein

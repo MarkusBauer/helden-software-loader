@@ -71,14 +71,14 @@
         ]},
 
         // Komplexe Bedingungen:
-        {"name": "Karmaler Schub", "kosten":  500, "kategorie": "Liturgie", "bedingungen": [
+        {"name": "Karmaler Schub", "kosten":  500, "kategorie": "Geweiht", "bedingungen": [
             {"type": "MagieLevel", "name": "Geweihter"},
             {"type": "LKW", "value": 15},  // Liturgiekenntnis >= 15
             {"type": "or", "bedingungen": [  // Held muss entweder Praios- oder Rondrageweihter sein
                 {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Praios)"},
                 {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Rondra)"}
             ]}
-        ]}
+        ]},
 
         // Eigene Liturgiekenntnis - inkl. Talent
         {
