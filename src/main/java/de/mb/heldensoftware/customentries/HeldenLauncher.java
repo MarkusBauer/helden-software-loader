@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -87,12 +88,12 @@ public class HeldenLauncher {
 			command.add("-Djava.security.manager=allow");
 
 			// The JAR
-			String jarPath = HeldenLauncher.class
+			String jarPath = Paths.get(HeldenLauncher.class
 					.getProtectionDomain()
 					.getCodeSource()
 					.getLocation()
-					.toURI()
-					.getPath();
+					.toURI())
+					.toFile().getAbsolutePath();
 			if (jarPath.endsWith(".jar")) {
 				command.add("-jar");
 				command.add(jarPath);
