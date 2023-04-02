@@ -69,7 +69,7 @@ public class InstrumentationEngine {
 
 
 	/**
-	 * Wraps every "return X" by a static method call: "return <classname>.<method>(X)". X must be an object type.
+	 * Wraps every "return X" by a static method call: "return <classname>.<method>(X)". X must be an object type (or boolean).
 	 */
 	public static class MethodResultAModifier implements MethodModifierGenerator {
 		private final String wrapperResultType; // can be null
@@ -123,19 +123,30 @@ public class InstrumentationEngine {
 		public MethodVisitor getMethodVisitor(MethodVisitor parent, int access, String name, String desc, String signature, String[] exceptions) {
 			final String originalResultType = extractResultType(desc);
 			final String methodResultType = wrapperResultType != null ? wrapperResultType : originalResultType;
-			final String callbackType = "("+methodResultType+";"+(thisReferenceType == null ? "" : thisReferenceType+";")+")"+methodResultType+";";
+			final boolean isIntReturn = methodResultType.equals("Z");
+			final String callbackType = isIntReturn
+					? "(" + methodResultType + ")" + methodResultType
+					: "(" + methodResultType + ";" + (thisReferenceType == null ? "" : thisReferenceType + ";") + ")" + methodResultType + ";";
+
 			return new MethodAdapter(parent) {
 				@Override
 				public void visitInsn(int opcode) {
 					// Before "return X", add call to hook
-					if (opcode == Opcodes.ARETURN) {
+					if (!isIntReturn && opcode == Opcodes.ARETURN) {
 						if (thisReferenceType != null)
 							super.visitIntInsn(Opcodes.ALOAD, 0);
+						if (!originalResultType.equals(methodResultType)) {
+							super.visitTypeInsn(Opcodes.CHECKCAST, methodResultType.substring(1));
+						}
 						super.visitMethodInsn(Opcodes.INVOKESTATIC, classname, method, callbackType);
 						// if return types do not match, we add a cast (just to be sure)
 						if (!originalResultType.equals(methodResultType)) {
 							super.visitTypeInsn(Opcodes.CHECKCAST, originalResultType.substring(1));
 						}
+					} else if (isIntReturn && opcode == Opcodes.IRETURN) {
+						if (thisReferenceType != null)
+							super.visitIntInsn(Opcodes.ILOAD, 0);
+						super.visitMethodInsn(Opcodes.INVOKESTATIC, classname, method, callbackType);
 					}
 					super.visitInsn(opcode);
 				}
