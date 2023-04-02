@@ -595,6 +595,14 @@ public class EntryCreator {
 		}
 	}
 
+	private boolean isSonderfertigkeitKnown(String name) {
+		for (Setting setting : Setting.getHauptSettings()) {
+			if (setting.getIncluded().contains("S" + name))
+				return true;
+		}
+		return false;
+	}
+
 	public Object createSonderfertigkeit(String name, int kosten, int category, BedingungsVerknuepfung bedingung) {
 		/*
 		0: Allgemein
@@ -613,6 +621,9 @@ public class EntryCreator {
 		13: Magisch: Magische Lieder
 		 */
 		try {
+			if (isSonderfertigkeitKnown(name)) {
+				throw new IllegalArgumentException("Sonderfertigkeit \"" + name + "\" ist bereits bekannt!");
+			}
 			Object sf = newSonderfertigkeit.newInstance(name, kosten, category);
 			if (bedingung != null)
 				sonderfertigkeitSetBedingung.invoke(sf, bedingung);
