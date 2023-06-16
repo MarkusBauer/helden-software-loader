@@ -277,6 +277,7 @@ Es müssen immer alle Bedingungen erfüllt werden, mögliche Bedingungen sind `E
 }
 ```
 Komplexere Bedingungen können mit dem Typ `or` erstellt werden. Aus der Liste von `or`-Bedingungen muss nur eine erfüllt werden.
+Mit `"not": true` können Bedingungen gestellt werden, die _nicht_ erfüllt sein dürfen.
 ```
 {
     "sonderfertigkeiten": [
@@ -286,7 +287,8 @@ Komplexere Bedingungen können mit dem Typ `or` erstellt werden. Aus der Liste v
             {"type": "or", "bedingungen": [  // Held muss entweder Praios- oder Rondrageweihter sein
                 {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Praios)"},
                 {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Rondra)"}
-            ]}
+            ]},
+            {"type": "SF", "name": "Blutmagie", "not": true}  // Darf nicht die Sonderfertigkeit Blutmagie haben
         ]}
     ]
 }

@@ -77,7 +77,8 @@
             {"type": "or", "bedingungen": [  // Held muss entweder Praios- oder Rondrageweihter sein
                 {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Praios)"},
                 {"type": "Sonderfertigkeit", "name": "Liturgiekenntnis (Rondra)"}
-            ]}
+            ]},
+            {"type": "SF", "name": "Blutmagie", "not": true}  // Darf nicht die Sonderfertigkeit Blutmagie haben
         ]},
 
         // Eigene Liturgiekenntnis - inkl. Talent

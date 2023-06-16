@@ -140,6 +140,7 @@ public class EntryCreator {
 	// Bedingung
 	Method bedingungHatSonderfertigkeit;
 	Method bedingungHatAbstrakteEigenschaft;
+	Method bedingungSetNegieren;
 	Method sonderfertigkeitSetBedingung;
 	Method sonderfertigkeitGetBedingung;
 
@@ -365,10 +366,13 @@ public class EntryCreator {
 			// Bedingung
 			bedingungHatSonderfertigkeit = getStaticMethodByNameAndParameterType(Bedingung.class, "hat", sonderfertigkeitNameType);
 			bedingungHatAbstrakteEigenschaft = getStaticMethodByNameAndParameterType(Bedingung.class, "hat", eigenschaftType.getSuperclass(), Integer.class);
+			bedingungSetNegieren = getMethodByName(Bedingung.class, "setNegieren");
+			bedingungSetNegieren.setAccessible(true);
 			sonderfertigkeitSetBedingung = getVoidMethodByParameterType(sonderfertigkeitType, BedingungsVerknuepfung.class);
 			sonderfertigkeitGetBedingung = getMethodByReturnType(sonderfertigkeitType, BedingungsVerknuepfung.class);
 			if (bedingungHatSonderfertigkeit == null) throw new RuntimeException("bedingungHatSonderfertigkeit is null");
 			if (bedingungHatAbstrakteEigenschaft == null) throw new RuntimeException("bedingungHatAbstrakteEigenschaft is null");
+			if (bedingungSetNegieren == null) throw new RuntimeException("bedingungSetNegieren is null");
 			if (sonderfertigkeitSetBedingung == null) throw new RuntimeException("sonderfertigkeitSetBedingung is null");
 			if (sonderfertigkeitGetBedingung == null) throw new RuntimeException("sonderfertigkeitGetBedingung is null");
 

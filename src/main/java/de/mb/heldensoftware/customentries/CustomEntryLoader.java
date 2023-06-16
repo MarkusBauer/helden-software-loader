@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -220,44 +221,61 @@ public class CustomEntryLoader {
 			if (jo.get("value") != null) {
 				value = ((Long) jo.get("value")).intValue();
 			}
+			boolean negiere = jo.get("not") != null && (Boolean) jo.get("not");
+			AbstraktBedingung b = null;
 			switch (((String) jo.get("type")).toLowerCase()) {
 				case "or":
-					lst.add(loadBedingungen((JSONArray) jo.get("bedingungen"), true));
+					b = loadBedingungen((JSONArray) jo.get("bedingungen"), true);
 					break;
 				case "and":
-					lst.add(loadBedingungen((JSONArray) jo.get("bedingungen"), false));
+					b = loadBedingungen((JSONArray) jo.get("bedingungen"), false);
 					break;
 				case "sonderfertigkeit":
 				case "sf":
-					lst.add(EntryCreator.getInstance().createBedingungSF((String) jo.get("name")));
+					b = EntryCreator.getInstance().createBedingungSF((String) jo.get("name"));
 					break;
 				case "zauber":
 					Zauber zauber = ZauberFabrik.getInstance().getZauberfertigkeit((String) jo.get("name"));
 					if (zauber == null) throw new RuntimeException("Zauber \"" + jo.get("name") + "\" nicht gefunden!");
-					lst.add(EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(zauber, value));
+					b = EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(zauber, value);
 					break;
 				case "talent":
 					EntryCreator.getInstance().initTalentFactoryMap();
 					Object talent = EntryCreator.getInstance().talentFactoryMap.get((String) jo.get("name"));
 					if (talent == null) throw new RuntimeException("Talent \"" + jo.get("name") + "\" nicht gefunden!");
-					lst.add(EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(talent, value));
+					b = EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(talent, value);
 					break;
 				case "eigenschaft":
 					Object eigenschaft = EntryCreator.getInstance().alleEigenschaften.get((String) jo.get("name"));
 					if (eigenschaft == null) throw new RuntimeException("Eigenschaft \"" + jo.get("name") + "\" nicht gefunden!");
-					lst.add(EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(eigenschaft, value));
+					b = EntryCreator.getInstance().createBedingungAbstrakteEigenschaft(eigenschaft, value);
 					break;
 				case "lkw":
-					lst.add(Bedingung.hatLkW(value));
+					b = Bedingung.hatLkW(value);
 					break;
 				case "magielevel":
 					Bedingung.MagieLevel level = EntryCreator.getInstance().alleMagielevel.get((String) jo.get("name"));
 					if (level == null) throw new RuntimeException("MagieLevel \"" + jo.get("name") + "\" nicht gefunden!");
-					lst.add(Bedingung.istMindestens(level));
+					b = Bedingung.istMindestens(level);
 					break;
 				default:
 					System.err.println("[CustomEntryLoader] Ignorierte Bedingung: " + jo.toJSONString());
 					throw new RuntimeException("Ungültige Bedingung: type \"" + ((String) jo.get("type")).toLowerCase() + "\" ist nicht bekannt!");
+			}
+
+			if (b != null) {
+				if (negiere) {
+					if (b instanceof Bedingung) {
+						try {
+							EntryCreator.getInstance().bedingungSetNegieren.invoke(b, true);
+						} catch (InvocationTargetException e) {
+							throw new RuntimeException(e);
+						}
+					} else {
+						throw new RuntimeException("Kann Bedingung nicht negieren: " + b);
+					}
+				}
+				lst.add(b);
 			}
 		}
 		if (isOr) {
