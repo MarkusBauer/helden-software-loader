@@ -27,10 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -38,9 +35,21 @@ import java.util.Map;
  */
 public class CustomEntryLoader {
 
+	protected HashSet<String> newSFNames = new HashSet<>();
+
 	protected void loadCustomEntries(Reader in) throws IOException, ParseException {
 		JSONParser parser = new JSONParser();
 		JSONObject customEntries = (JSONObject) parser.parse(in);
+		// build a list of new SF names
+		if (customEntries.containsKey("sonderfertigkeiten")) {
+			JSONArray sf = (JSONArray) customEntries.get("sonderfertigkeiten");
+			for (Object o : sf) {
+				String name = (String) ((JSONObject) o).get("name");
+				newSFNames.add(name);
+			}
+		}
+
+		// load all zauber
 		if (customEntries.containsKey("zauber")) {
 			JSONArray zauber = (JSONArray) customEntries.get("zauber");
 			for (Object o : zauber) {
@@ -48,6 +57,7 @@ public class CustomEntryLoader {
 			}
 		}
 
+		// load all sonderfertigkeit
 		if (customEntries.containsKey("sonderfertigkeiten")) {
 			JSONArray sf = (JSONArray) customEntries.get("sonderfertigkeiten");
 			for (Object o : sf) {
@@ -55,6 +65,7 @@ public class CustomEntryLoader {
 			}
 		}
 
+		// load all repräsentationen
 		if (customEntries.containsKey("repräsentationen")) {
 			JSONArray reprs = (JSONArray) customEntries.get("repräsentationen");
 			for (Object o : reprs) {
@@ -232,7 +243,8 @@ public class CustomEntryLoader {
 					break;
 				case "sonderfertigkeit":
 				case "sf":
-					b = EntryCreator.getInstance().createBedingungSF((String) jo.get("name"));
+					String name = (String) jo.get("name");
+					b = EntryCreator.getInstance().createBedingungSF(name, newSFNames.contains(name));
 					break;
 				case "zauber":
 					Zauber zauber = ZauberFabrik.getInstance().getZauberfertigkeit((String) jo.get("name"));

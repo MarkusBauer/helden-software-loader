@@ -695,7 +695,7 @@ public class EntryCreator {
 				if (!liturgiekenntnis.isEmpty()) {
 					BedingungsVerknuepfung liturgieBedingung = Bedingung.OR();
 					for (String s : liturgiekenntnis) {
-						liturgieBedingung.addBedingung(createBedingungSF(s));
+						liturgieBedingung.addBedingung(createBedingungSF(s, false));
 					}
 					bedingung.addBedingung(liturgieBedingung);
 				}
@@ -759,13 +759,15 @@ public class EntryCreator {
 		}
 	}
 
-	public AbstraktBedingung createBedingungSF(String name) {
+	public AbstraktBedingung createBedingungSF(String name, boolean allowNonExistentName) {
 		try {
-			Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
-			try {
-				sonderfertigkeitListGet.invoke(otherList, name);
-			} catch (InvocationTargetException e) {
-				ErrorHandler.handleException(e.getCause());
+			if (!allowNonExistentName) {
+				Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
+				try {
+					sonderfertigkeitListGet.invoke(otherList, name);
+				} catch (InvocationTargetException e) {
+					ErrorHandler.handleException(e.getCause());
+				}
 			}
 
 			return (AbstraktBedingung) bedingungHatSonderfertigkeit.invoke(null, newSonderfertigkeitName.newInstance(name));
@@ -793,7 +795,7 @@ public class EntryCreator {
 					if (v.getBedingungen().size() >= 3 && v.getBedingungen().get(2) instanceof BedingungsVerknuepfung) {
 						BedingungsVerknuepfung v2 = (BedingungsVerknuepfung) v.getBedingungen().get(2);
 						if (v2.getVerknuepfungsArt().toString().equals("OR")) {
-							v2.getBedingungen().add(createBedingungSF(sfname.toString()));
+							v2.getBedingungen().add(createBedingungSF(sfname.toString(), false));
 						}
 					}
 				}
