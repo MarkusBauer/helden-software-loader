@@ -297,6 +297,15 @@ Bei magischen Sonderfertigkeiten entscheidet sich an den Bedingungen, ob eine Ve
 Generell verbilligt die Ausbildung alle irgendwie magischen Sonderfertigkeiten, die entweder eine Bedingung Gildenmagie (Repr oder RK) haben, oder gar keine Ritualkenntnis zur Bedingung haben.
 Soll eine eigene magische Sonderfertigkeit für Magier also nicht verbilligt sein, muss zwangsläufig eine andere Ritualkenntnis zur Bedingung gemacht werden.
 
+Auch Sonderfertigkeiten mit mehreren Varianten sind möglich:
+```
+{
+    "sonderfertigkeiten": [
+        {"name": "Gesegnet", "kosten":  200, "varianten": ["Zwölfgötter", "Halbgott", "Namenloser"]}
+    ]
+}
+```
+
 
 ### Neue Liturgien und Geweihte
 Eine neue Liturgiekenntnis und neue Liturgien können als Sonderfertigkeit angelegt werden. 

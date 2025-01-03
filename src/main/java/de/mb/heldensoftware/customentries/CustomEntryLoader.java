@@ -159,8 +159,22 @@ public class CustomEntryLoader {
 			return;
 		}
 
-		// normal SF
-		Object sfname = EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), cat, bedingung);
+		// SF mit Varianten
+		Object sfname;
+		if (sf.get("varianten") != null) {
+			HashSet<String> varianten = new HashSet<>();
+			for (Object o: (JSONArray) sf.get("varianten")) {
+				if (o instanceof String) {
+					varianten.add((String) o);
+				}
+			}
+
+			sfname = EntryCreator.getInstance().createSonderfertigkeitWithParams(name, kosten.intValue(), cat, bedingung, varianten);
+
+		} else {
+			// normal SF
+			sfname = EntryCreator.getInstance().createSonderfertigkeit(name, kosten.intValue(), cat, bedingung);
+		}
 
 		// Liturgiekenntnis
 		if (sf.get("liturgien") != null && sf.get("liturgien") instanceof JSONArray) {

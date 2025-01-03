@@ -9,6 +9,7 @@ import helden.framework.bedingungen.BedingungsVerknuepfung;
 import helden.framework.held.persistenz.BasisXMLParser;
 import helden.framework.held.persistenz.ModsDatenParser;
 import helden.framework.settings.Setting;
+import helden.framework.settings.Settings;
 import helden.framework.zauber.Zauber;
 import helden.framework.zauber.ZauberFabrik;
 import helden.framework.zauber.ZauberVerbreitung;
@@ -84,6 +85,8 @@ public class EntryCreator {
 	Constructor<?> newSonderfertigkeit;
 	Class sonderfertigkeitLiturgieType;
 	Constructor<?> newLiturgieSonderfertigkeit;
+	Class sonderfertigkeitWithParamsType;
+	Constructor<?> newSonderfertigkeitWithParams;
 	Method sonderfertigkeitSetCorrespondingTalent;
 	Class sonderfertigkeitRegistryType;
 	Class sonderfertigkeitListType;
@@ -359,9 +362,25 @@ public class EntryCreator {
 
 			// Liturgie is a special subclass
 			sonderfertigkeitLiturgieType = getMethodByParameterTypes(sonderfertigkeitType, String.class, int.class, boolean.class).getReturnType();
-			newLiturgieSonderfertigkeit = sonderfertigkeitLiturgieType.getDeclaredConstructors()[0];
 			assert newLiturgieSonderfertigkeit != null;
+			newLiturgieSonderfertigkeit = sonderfertigkeitLiturgieType.getDeclaredConstructors()[0];
 			newLiturgieSonderfertigkeit.setAccessible(true);
+
+			// SF with pre-selected parameters
+			for (Method m: Settings.class.getDeclaredMethods()) {
+				if (m.getName().equals("containsAuswahl") && sonderfertigkeitType.isAssignableFrom(m.getParameterTypes()[0])) {
+					sonderfertigkeitWithParamsType = m.getParameterTypes()[0];
+					break;
+				}
+			}
+			assert sonderfertigkeitWithParamsType != null;
+			for (Constructor<?> c: sonderfertigkeitWithParamsType.getDeclaredConstructors()) {
+				if (c.getParameterTypes()[1].equals(int.class)) {
+					newSonderfertigkeitWithParams = c;
+					break;
+				}
+			}
+			assert newSonderfertigkeitWithParams != null;
 
 			// Bedingung
 			bedingungHatSonderfertigkeit = getStaticMethodByNameAndParameterType(Bedingung.class, "hat", sonderfertigkeitNameType);
@@ -631,39 +650,59 @@ public class EntryCreator {
 			Object sf = newSonderfertigkeit.newInstance(name, kosten, category);
 			if (bedingung != null)
 				sonderfertigkeitSetBedingung.invoke(sf, bedingung);
-			Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
-			sonderfertigkeitListAdd.invoke(otherList, sf);
-			Object sfname = newSonderfertigkeitName.newInstance(name);
-
-			// Some SF activate a special talent when skilled:
-			if (name.startsWith("Ritualkenntnis: ")) {
-				XmlEntryCreator xmlec = XmlEntryCreator.getInstance();
-				Element xmlnode = xmlec.createBasicTalentNode(name, "Ritualkenntnis",
-						"RK " + name.substring(16), "E",
-						//"--", "--", "--",
-						"MU", "KL", "IN",  // parser does not support "none"
-						"", "CustomEntryLoader Plugin", "");
-				Object talent = xmlec.talentNodeToObject(xmlnode);
-				talentSetProbe.invoke(talent, new Probe("--/--/--").getProbe());
-				sonderfertigkeitSetCorrespondingTalent.invoke(sf, talent);
-			} else if (name.startsWith("Liturgiekenntnis")) {
-				XmlEntryCreator xmlec = XmlEntryCreator.getInstance();
-				Element xmlnode = xmlec.createBasicTalentNode(name, "Liturgiekenntnis",
-						"LK " + name.substring(17), "F",
-						"MU", "IN", "CH",
-						"", "CustomEntryLoader Plugin", "");
-				Object talent = xmlec.talentNodeToObject(xmlnode);
-				sonderfertigkeitSetCorrespondingTalent.invoke(sf, talent);
-			}
-
-			for (Setting setting : Setting.getHauptSettings()) {
-				setting.getIncluded().add("S" + name);
-			}
-			return sfname;
+			return registerSonderfertigkeit(name, sf);
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 			return null;
 		}
+	}
+
+	public Object createSonderfertigkeitWithParams(String name, int kosten, int category, BedingungsVerknuepfung bedingung, Set<String> params) {
+		try {
+			if (isSonderfertigkeitKnown(name)) {
+				throw new IllegalArgumentException("Sonderfertigkeit \"" + name + "\" ist bereits bekannt!");
+			}
+			Object sf = newSonderfertigkeitWithParams.newInstance(name, kosten, params, category);
+			if (bedingung != null)
+				sonderfertigkeitSetBedingung.invoke(sf, bedingung);
+			return registerSonderfertigkeit(name, sf);
+		} catch (Exception e) {
+			ErrorHandler.handleException(e);
+			return null;
+		}
+	}
+
+	private Object registerSonderfertigkeit(String name, Object sf) throws Exception {
+		Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
+		sonderfertigkeitListAdd.invoke(otherList, sf);
+		Object sfname = newSonderfertigkeitName.newInstance(name);
+
+		// Some SF activate a special talent when skilled:
+		if (name.startsWith("Ritualkenntnis: ")) {
+			XmlEntryCreator xmlec = XmlEntryCreator.getInstance();
+			Element xmlnode = xmlec.createBasicTalentNode(name, "Ritualkenntnis",
+					"RK " + name.substring(16), "E",
+					//"--", "--", "--",
+					"MU", "KL", "IN",  // parser does not support "none"
+					"", "CustomEntryLoader Plugin", "");
+			Object talent = xmlec.talentNodeToObject(xmlnode);
+			talentSetProbe.invoke(talent, new Probe("--/--/--").getProbe());
+			sonderfertigkeitSetCorrespondingTalent.invoke(sf, talent);
+		} else if (name.startsWith("Liturgiekenntnis")) {
+			XmlEntryCreator xmlec = XmlEntryCreator.getInstance();
+			Element xmlnode = xmlec.createBasicTalentNode(name, "Liturgiekenntnis",
+					"LK " + name.substring(17), "F",
+					"MU", "IN", "CH",
+					"", "CustomEntryLoader Plugin", "");
+			Object talent = xmlec.talentNodeToObject(xmlnode);
+			sonderfertigkeitSetCorrespondingTalent.invoke(sf, talent);
+		}
+
+		for (Setting setting : Setting.getHauptSettings()) {
+			setting.getIncluded().add("S" + name);
+			setting.getIncluded().add("S" + name + "#*");
+		}
+		return sfname;
 	}
 
 	public RepresentationWrapper createRepresentation(String name, String shortname, boolean hasRitualkenntnis) {
