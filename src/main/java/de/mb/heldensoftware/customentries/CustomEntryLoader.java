@@ -162,13 +162,7 @@ public class CustomEntryLoader {
 		// SF mit Varianten
 		Object sfname;
 		if (sf.get("varianten") != null) {
-			HashSet<String> varianten = new HashSet<>();
-			for (Object o: (JSONArray) sf.get("varianten")) {
-				if (o instanceof String) {
-					varianten.add((String) o);
-				}
-			}
-
+			Set<String> varianten = toStringSet((JSONArray) sf.get("varianten"));
 			sfname = EntryCreator.getInstance().createSonderfertigkeitWithParams(name, kosten.intValue(), cat, bedingung, varianten);
 
 		} else {
@@ -334,6 +328,14 @@ public class CustomEntryLoader {
 		String[] result = new String[arr.size()];
 		for (int i = 0; i < result.length; i++) {
 			result[i] = (String) arr.get(i);
+		}
+		return result;
+	}
+
+	private static Set<String> toStringSet(JSONArray arr) {
+		Set<String> result = new HashSet<>();
+		for (Object o: arr) {
+			result.add((String) o);
 		}
 		return result;
 	}
