@@ -362,9 +362,10 @@ public class EntryCreator {
 
 			// Liturgie is a special subclass
 			sonderfertigkeitLiturgieType = getMethodByParameterTypes(sonderfertigkeitType, String.class, int.class, boolean.class).getReturnType();
-			assert newLiturgieSonderfertigkeit != null;
+			assert sonderfertigkeitLiturgieType != null;
 			newLiturgieSonderfertigkeit = sonderfertigkeitLiturgieType.getDeclaredConstructors()[0];
 			newLiturgieSonderfertigkeit.setAccessible(true);
+			assert newLiturgieSonderfertigkeit != null;
 
 			// SF with pre-selected parameters
 			for (Method m: Settings.class.getDeclaredMethods()) {
