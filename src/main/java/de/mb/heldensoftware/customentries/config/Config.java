@@ -21,6 +21,10 @@ public class Config {
     @Valid
     public ArrayList<RepraesentationConfig> repraesentationen = new ArrayList<>();
 
+    // Filename or whatever where we got that config from.
+    // Optional, not compared etc.
+    public String source = null;
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

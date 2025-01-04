@@ -58,19 +58,23 @@ public class Loader {
     }
 
     public static Config load(File file, FileType type) throws IOException {
+        Reader reader = null;
         try {
             if (type == FileType.CSV) {
-                // convert CSV to JSON
-                try (Reader reader = new InputStreamReader(new CsvConverter().convertToJson(file.toPath()), StandardCharsets.UTF_8)) {
-                    return load(reader, FileType.JSON);
-                }
+                // convert CSV to JSON stream
+                reader = new InputStreamReader(new CsvConverter().convertToJson(file.toPath()), StandardCharsets.UTF_8);
             } else {
-                try (Reader reader = preprocessStream(Files.newInputStream(file.toPath()))) {
-                    return load(reader, type);
-                }
+                reader = preprocessStream(Files.newInputStream(file.toPath()));
             }
+            Config config = load(reader, FileType.JSON);
+            config.source = file.getAbsolutePath();
+            return config;
+
         } catch (ConfigError e) {
             throw new ConfigError("In " + file.getAbsolutePath() + ": \n" + e.getMessage());
+        } finally {
+            if (reader != null)
+                reader.close();
         }
     }
 
