@@ -62,7 +62,13 @@
         {"name": "Feenwelten-kundig", "kosten": 200, "kategorie": "Geländekunde"},
 
         // Sonderfertigkeit mit Varianten
-        {"name": "Göttliche Berührung", "kosten": 300, "varianten": ["Alveranische Gottheit", "Halbgott", "Namenloser"]},
+        {
+            "name": "Göttliche Berührung", "kosten": 300,
+            "varianten": [
+                "Praios", "Rondra", "Namenloser",
+                {"name": "Swafnir", "kosten": 200}  // Kosten können pro Variante gesetzt werden
+            ]
+        },
 
         // Eigene Ritualkenntnis / Rituale
         {"name": "Ritualkenntnis: Alt-Druidisch", "kosten": 250, "kategorie":  "Magisch"},

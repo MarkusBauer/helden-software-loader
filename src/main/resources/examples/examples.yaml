@@ -61,9 +61,12 @@ sonderfertigkeiten:
   - name: Göttliche Berührung
     kosten: 300
     varianten:
-      - Alveranische Gottheit
-      - Halbgott
+      - Praios
+      - Rondra
       - Namenloser
+      # Kosten können pro Variante überschrieben werden:
+      - name: Swafnir
+        kosten: 200
 
   # Eigene Ritualkenntnis / Rituale
   - name: "Ritualkenntnis: Alt-Druidisch"
