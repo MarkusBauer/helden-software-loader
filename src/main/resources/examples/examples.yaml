@@ -1,0 +1,151 @@
+$schema: "../../../../extensions.schema.json"
+
+zauber:
+  # === Inarcanitas - ein neuer Zauber aus unserer Runde ===
+  - name: Inarcanitas  # Zaubername, darf noch nicht existieren
+    kategorie: F  # A-H
+    merkmale: [ Anti, Kraft, Metamagie ]  # Kurzfassung und Langfassung möglich
+    probe: MU/KL/KL  # Probe "XX/YY/ZZ", auch "**" möglich
+    mod: "+Mod"  # (optional) "+MR", "+Mod", ...
+    quelle: "LCD:123"  # (optional) Format muss "XXX:<seitenzahl>" sein
+
+    # Settings (optional)
+    # In welchem Regel-System kommt der Spruch vor?
+    # Die Auswahl eines / mehrerer Settings erlaubt es, den Spruch im Editor zu aktivieren
+    # Mögliche Werte: "Alle", "DSA4.1"/"Aventurien", "Myranor", "Tharun", ...
+    settings:
+      - Aventurien
+
+    # Verbreitungen (optional)
+    # In welcher Repräsentation existiert der Spruch, wie häufig (0-7)?
+    # Setting + Verbreitung erlaubt es, den Spruch regulär zu aktivieren
+    verbreitung:
+      Mag: 7
+      Elf: 4
+      Hex(Mag): 2  # Hexen können den Spruch in gildenmagischer Repräsentation lernen
+
+    # Spezialisierungen (optional)
+    # Mögliche Zauberspezialisierungen (spontane Modifikationen, Varianten, ...)
+    spezialisierungen:
+      - Reichweite
+      - Zauberdauer
+      - Variante X
+
+  # === Kurzfassung - Bannbaladin aus der Zauberwerkstatt ===
+  - name: Bannbaladin (erhöhte Reichweite)
+    kategorie: B
+    merkmale: [ Einfluss ]
+    probe: IN/CH/CH
+    mod: "+MR"
+    settings: [ Aventurien ]
+    verbreitung: { Mag: 2 }
+    spezialisierungen: [ Reichweite, Wirkungsdauer, Zauberdauer, Zielobjekt ]
+
+  # === Nur für Meisterpersonen ===
+  - name: Armageddon Weltenbrand
+    kategorie: G
+    merkmale: [ Elementar (Feuer), Umwelt ]
+    probe: MU/KL/KO
+    settings: [ Aventurien ]
+    # Keine Verbreitung - nur per Editor wählbar
+
+
+sonderfertigkeiten:
+  - name: Gesegnet
+    kosten: 200
+  - name: "Feenwelten-kundig"
+    kosten: 200
+    kategorie: Geländekunde
+
+  # Sonderfertigkeit mit Varianten
+  - name: Göttliche Berührung
+    kosten: 300
+    varianten:
+      - Alveranische Gottheit
+      - Halbgott
+      - Namenloser
+
+  # Eigene Ritualkenntnis / Rituale
+  - name: "Ritualkenntnis: Alt-Druidisch"
+    kosten: 250
+    kategorie: Magisch
+
+  - name: Kristall-Stab
+    kosten: 750
+    kategorie: Objektritual
+    bedingungen:
+      - type: Sonderfertigkeit  # Sonderfertigkeit muss aktiviert sein (eigene SF möglich)
+        name: "Ritualkenntnis: Kristallomantie"
+      - type: Zauber  # ZfW "Hartes schmelze!" >= 10 (eigene Zauber möglich)
+        name: "Hartes schmelze!"
+        value: 10
+      - type: Talent  # TaW Steinschneider >= 10 (eigene Talente nicht möglich)
+        name: "Steinschneider/Juwelier"
+        value: 10
+      - type: Eigenschaft  # Fingerfertigkeit >= 15
+        name: "FF"
+        value: 15
+
+  # Komplexe Bedingungen:
+  - name: Karmaler Schub
+    kosten: 500
+    kategorie: Geweiht
+    bedingungen:
+      - type: MagieLevel
+        name: Geweihter
+      - type: LKW  # Liturgiekenntnis >= 15
+        value: 15
+      - type: or
+        bedingungen: # Held muss entweder Praios- oder Rondrageweihter sein
+          - type: Sonderfertigkeit
+            name: "Liturgiekenntnis (Praios)"
+          - type: Sonderfertigkeit
+            name: "Liturgiekenntnis (Rondra)"
+      - type: SF  # Darf nicht die Sonderfertigkeit Blutmagie haben
+        name: "Blutmagie"
+        not: true
+
+  # Eigene Liturgiekenntnis - inkl. Talent
+  - name: "Liturgiekenntnis (Rastullah)"
+    kosten: 0
+    kategorie: Geweiht
+    # nur zugänglich, wenn Vorteil "Geweiht" etc bereits vorhanden
+    bedingungen:
+      - type: MagieLevel
+        name: Geweihter
+    # diese bereits existierenden Liturgien sind zugänglich
+    liturgien:
+      - Schutzsegen
+      - Grabsegen
+      - Weisheitssegen
+
+  # Neue Liturgie für neue Liturgiekenntnis
+  - name: "Liturgie: Rastullah's Zelt"
+    kategorie: Liturgie
+    grad: 2
+    liturgiekenntnis: [ Rastullah ]
+
+  # Neue Liturgie für neue und alte Liturgiekenntnis
+  - name: "Liturgie: Fluch der Wüste"
+    kategorie: Liturgie
+    grad: 3
+    liturgiekenntnis: # zugänglich für diese Götter
+      - Rastullah
+      - Praios
+      - Ingerimm
+
+
+repräsentationen:
+  # Einfache Repräsentation ohne Ritualkenntnis oder bekannte Zauber
+  # Zauber können nur über den Editor aktiviert werden (und danach normal gesteigert werden)
+  - name: Simple
+    abkürzung: Sim
+
+  # Komplette Repräsentation inklusive Ritualkenntnis und Liste bekannter Zauber.
+  # Die unten genannten Zauber können auf üblichem Wege in dieser Repräsentation aktiviert werden.
+  - name: Hochelfisch
+    abkürzung: Hoc
+    ritualkenntnis: true   # true falls eine Ritualkenntnis existiert
+    zauber: # Verbreitung der in dieser Repräsentation bekannten Zauber
+      Armatrutz: 7  # Format: Zaubername: Verbreitung (1-7)
+      Fulminictus Donnerkeil: 7

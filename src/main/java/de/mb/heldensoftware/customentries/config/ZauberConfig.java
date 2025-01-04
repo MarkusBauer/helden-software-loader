@@ -47,7 +47,7 @@ public class ZauberConfig {
 
     @JsonProperty
     @JsonPropertyDescription("Spielwelten, in denen der Zauber zur Verfügung steht. Beispiel: [\"Aventurien\"]")
-    @JsonSchema(defaultValue = "[Aventurien]")
+    @JsonSchema(defaultValue = "[Alle]")
     @NotNull
     public ArrayList<@NotBlank String> settings = new ArrayList<>(); // TODO default
 

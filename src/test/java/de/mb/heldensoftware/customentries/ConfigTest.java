@@ -15,9 +15,18 @@ import java.io.*;
 
 public class ConfigTest {
     @Test
-    public void testExampleFile() {
+    public void testExampleJsonFile() {
         try (Reader r = Loader.preprocessStream(getClass().getResourceAsStream("/examples/examples.json"))) {
             Loader.loadFromJson(r);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testExampleYamlFile() {
+        try (Reader r = Loader.preprocessStream(getClass().getResourceAsStream("/examples/examples.yaml"))) {
+            Loader.loadFromYaml(r);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
