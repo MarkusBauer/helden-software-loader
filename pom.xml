@@ -66,6 +66,10 @@
                                     <exclude>junit</exclude>
                                     <exclude>org.hamcrest:*</exclude>
                                     <exclude>com.jgoodies:*</exclude>
+                                    <exclude>com.github.imifou:*</exclude>
+                                    <exclude>com.github.victools:*</exclude>
+                                    <!-- version from schema generator, jackson uses 1.5.1 -->
+                                    <exclude>com.fasterxml:classmate:1.7.0</exclude>
                                 </excludes>
                             </artifactSet>
                             <filters>
@@ -218,21 +222,21 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.17.0</version>
+            <version>2.17.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.17.0</version>
+            <version>2.17.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.17.3</version>
+            <version>2.17.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.github.victools/jsonschema-generator -->
