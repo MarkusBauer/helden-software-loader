@@ -8,6 +8,7 @@ import com.github.imifou.jsonschema.module.addon.annotation.JsonSchema;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -50,7 +51,7 @@ public class ZauberConfig {
     @JsonPropertyDescription("Spielwelten, in denen der Zauber zur Verfügung steht. Beispiel: [\"Aventurien\"]")
     @JsonSchema(defaultValue = "[Alle]")
     @NotNull
-    public ArrayList<@NotBlank String> settings = new ArrayList<>(); // TODO default
+    public ArrayList<@NotBlank String> settings = new ArrayList<>(Collections.singletonList("Alle"));
 
     @JsonProperty
     @JsonPropertyDescription("Verbreitung in Repräsentationen. Beispiele: \n" +

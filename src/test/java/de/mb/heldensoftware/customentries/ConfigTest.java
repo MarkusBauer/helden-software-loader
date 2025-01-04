@@ -2,6 +2,7 @@ package de.mb.heldensoftware.customentries;
 
 import de.mb.heldensoftware.customentries.config.Config;
 import de.mb.heldensoftware.customentries.config.Loader;
+import de.mb.heldensoftware.customentries.config.ZauberConfig;
 import org.junit.Test;
 
 import java.io.*;
@@ -39,6 +40,26 @@ public class ConfigTest {
         }
 
         assertEquals(json, yaml);
+    }
+
+    @Test
+    public void testZauberDefaultValues() {
+        String json = "{\"zauber\": [" +
+                "{\"name\": \"Test\", \"kategorie\": \"F\", \"probe\": \"MU/KL/KL\", \"merkmale\": [\"Anti\"]}" +
+                "]}";
+        Config config = Loader.load(json, Loader.FileType.JSON);
+        assertEquals(1, config.zauber.size());
+        ZauberConfig zauber = config.zauber.get(0);
+        assertEquals("Test", zauber.name);
+        assertEquals("F", zauber.kategorie);
+        assertEquals("Anti", zauber.merkmale.get(0));
+        assertEquals("MU/KL/KL", zauber.probe);
+        assertEquals("", zauber.mod);
+        assertEquals("", zauber.quelle);
+        assertEquals(1, zauber.settings.size());
+        assertEquals("Alle", zauber.settings.get(0));
+        assertEquals(0, zauber.spezialisierungen.size());
+        assertEquals(0, zauber.verbreitung.size());
     }
 
     @Test
