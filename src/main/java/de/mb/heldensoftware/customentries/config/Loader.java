@@ -1,6 +1,8 @@
 package de.mb.heldensoftware.customentries.config;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +15,7 @@ import javax.validation.ValidatorFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Set;
 
 public class Loader {
@@ -23,10 +26,26 @@ public class Loader {
         }
     }
 
-    public static Config loadFromJson(Reader reader) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-        mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true);
+    public static enum FileType {
+        JSON,
+        YAML,
+        CSV
+    }
+
+    public static Config load(Reader reader, FileType type) throws IOException {
+        ObjectMapper mapper;
+        if (type == FileType.JSON) {
+            mapper = new ObjectMapper(JsonFactory.builder().enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION).build());
+            mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+            mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true);
+
+        } else if (type == FileType.YAML) {
+            mapper = new ObjectMapper(YAMLFactory.builder().enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION).build());
+            mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true);
+        } else {
+            throw new RuntimeException("Unsupported file type: " + type);
+        }
+
         try {
             Config config = mapper.readValue(reader, Config.class);
             validate(config);
@@ -36,15 +55,31 @@ public class Loader {
         }
     }
 
-    public static Config loadFromYaml(Reader reader) throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true);
-        try {
-            Config config = mapper.readValue(reader, Config.class);
-            validate(config);
-            return config;
-        } catch (DatabindException e) {
-            throw new ConfigError(e.getMessage());
+    public static Config load(File file, FileType type) throws IOException {
+        try (Reader reader = preprocessStream(Files.newInputStream(file.toPath()))) {
+            return load(reader, type);
+        } catch (ConfigError e) {
+            throw new ConfigError("In " + file.getAbsolutePath() + ": \n" + e.getMessage());
+        }
+    }
+
+    public static Config load(File file) throws IOException {
+        if (file.getName().endsWith(".json") || file.getName().endsWith(".json.txt")) {
+            return load(file, FileType.JSON);
+        } else if (file.getName().endsWith(".yaml") || file.getName().endsWith(".yaml.txt")) {
+            return load(file, FileType.YAML);
+        } else if (file.getName().endsWith(".csv") || file.getName().endsWith(".csv.txt")) {
+            return load(file, FileType.CSV);
+        } else {
+            return null;
+        }
+    }
+
+    public static Config load(String data, FileType type) {
+        try (Reader r = new StringReader(data)) {
+            return Loader.load(r, type);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

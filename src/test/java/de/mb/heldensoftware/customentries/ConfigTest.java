@@ -1,23 +1,18 @@
 package de.mb.heldensoftware.customentries;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.imifou.jsonschema.module.addon.AddonModule;
-import com.github.victools.jsonschema.generator.*;
-import com.github.victools.jsonschema.module.jackson.JacksonModule;
-import com.github.victools.jsonschema.module.jackson.JacksonOption;
-import com.github.victools.jsonschema.module.javax.validation.JavaxValidationModule;
-import com.github.victools.jsonschema.module.javax.validation.JavaxValidationOption;
 import de.mb.heldensoftware.customentries.config.Config;
 import de.mb.heldensoftware.customentries.config.Loader;
 import org.junit.Test;
 
 import java.io.*;
 
+import static org.junit.Assert.assertEquals;
+
 public class ConfigTest {
     @Test
     public void testExampleJsonFile() {
         try (Reader r = Loader.preprocessStream(getClass().getResourceAsStream("/examples/examples.json"))) {
-            Loader.loadFromJson(r);
+            Loader.load(r, Loader.FileType.JSON);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -26,10 +21,24 @@ public class ConfigTest {
     @Test
     public void testExampleYamlFile() {
         try (Reader r = Loader.preprocessStream(getClass().getResourceAsStream("/examples/examples.yaml"))) {
-            Loader.loadFromYaml(r);
+            Loader.load(r, Loader.FileType.YAML);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    public void testExampleConfigsEqual() throws IOException {
+        Config json;
+        Config yaml;
+        try (Reader r = Loader.preprocessStream(getClass().getResourceAsStream("/examples/examples.json"))) {
+            json = Loader.load(r, Loader.FileType.JSON);
+        }
+        try (Reader r = Loader.preprocessStream(getClass().getResourceAsStream("/examples/examples.yaml"))) {
+            yaml = Loader.load(r, Loader.FileType.YAML);
+        }
+
+        assertEquals(json, yaml);
     }
 
     @Test
@@ -95,19 +104,13 @@ public class ConfigTest {
     }
 
     private static void assertValidJson(String json) {
-        try (Reader r = new StringReader(json)) {
-            Loader.loadFromJson(r);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Loader.load(json, Loader.FileType.JSON);
     }
 
     private static void assertInvalidJson(String json) {
-        try (Reader r = new StringReader(json)) {
-            Loader.loadFromJson(r);
+        try {
+            Loader.load(json, Loader.FileType.JSON);
             throw new AssertionError("Invalid JSON should not have passed: " + json);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         } catch (Loader.ConfigError e) {
             System.out.println("Success: " + json + "\n => " + e.getMessage());
         }

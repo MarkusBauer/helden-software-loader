@@ -2,6 +2,8 @@ package de.mb.heldensoftware.customentries;
 
 import com.openpojo.reflection.PojoClass;
 import com.openpojo.reflection.impl.PojoClassFactory;
+import de.mb.heldensoftware.customentries.config.Loader;
+import de.mb.heldensoftware.customentries.config.SonderfertigkeitConfig;
 import helden.framework.EigeneErweiterungenMoeglich;
 import helden.framework.bedingungen.AbstraktBedingung;
 import helden.framework.bedingungen.Bedingung;
@@ -568,11 +570,11 @@ public class EntryCreator {
 	 * @param merkmale
 	 * @return
 	 */
-	private Object getMerkmale(String[] merkmale) {
-		Object result = Array.newInstance(merkmalType, merkmale.length);
-		for (int i = 0; i < merkmale.length; i++) {
-			Object mkml = alleMerkmale.get(merkmale[i]);
-			if (mkml == null) throw new IllegalArgumentException("Unbekanntes Merkmal: " + merkmale[i]);
+	private Object getMerkmale(List<String> merkmale) {
+		Object result = Array.newInstance(merkmalType, merkmale.size());
+		for (int i = 0; i < merkmale.size(); i++) {
+			Object mkml = alleMerkmale.get(merkmale.get(i));
+			if (mkml == null) throw new IllegalArgumentException("Unbekanntes Merkmal: " + merkmale.get(i));
 			Array.set(result, i, mkml);
 		}
 		return result;
@@ -590,7 +592,7 @@ public class EntryCreator {
 	 * @param mod       Modifikationen der Probe ("", "+MR", "+Mod", ...), null ist erlaubt
 	 * @return
 	 */
-	public ZauberWrapper createSpell(String name, String kategorie, String[] merkmale, Probe probe, Quellenangabe q, String mod) {
+	public ZauberWrapper createSpell(String name, String kategorie, List<String> merkmale, Probe probe, Quellenangabe q, String mod) {
 		try {
 			if (q == null)
 				q = Quellenangabe.leereQuelle;
@@ -658,15 +660,18 @@ public class EntryCreator {
 		}
 	}
 
-	public Object createSonderfertigkeitWithParams(String name, int kosten, int category, BedingungsVerknuepfung bedingung, Set<String> params, Map<String, Integer> kostenPerParam) {
+	public Object createSonderfertigkeitWithParams(String name, int kosten, int category, BedingungsVerknuepfung bedingung, Collection<SonderfertigkeitConfig.SFVariante> variants) {
 		try {
 			if (isSonderfertigkeitKnown(name)) {
 				throw new IllegalArgumentException("Sonderfertigkeit \"" + name + "\" ist bereits bekannt!");
 			}
+
 			HashMap<Object, Integer> kostenMap = new HashMap<>();
-			for (String param : params)
-				kostenMap.put(param, kosten);
-            kostenMap.putAll(kostenPerParam);
+			HashSet<String> params = new HashSet<>();
+			for (SonderfertigkeitConfig.SFVariante v: variants) {
+				params.add(v.name);
+                kostenMap.put(v.name, v.kosten == null ? kosten : v.kosten);
+			}
 			Object sf = newSonderfertigkeitWithParams.newInstance(name, params, kostenMap, category);
 			if (bedingung != null)
 				sonderfertigkeitSetBedingung.invoke(sf, bedingung);
@@ -783,22 +788,26 @@ public class EntryCreator {
 
 	/**
 	 * Ensure TalentFactoryMap is initialized properly
-	 * @throws IllegalAccessException
 	 */
-	public void initTalentFactoryMap() throws IllegalAccessException {
+	public void initTalentFactoryMap() {
 		if (talentFactoryMap == null) {
-			talentFactoryMap = (HashMap<String, Object>) talentFactoryMapField.get(talentFactoryInst);
-			if (talentFactoryMap == null) {
-				// Force initialization of this map
-				for (Method m: talentFactoryAccessors) {
-					try {
-						m.invoke(talentFactoryInst, "doesnotexist");
-					} catch (Exception ignored) {}
-				}
-				// and retry
+			try {
 				talentFactoryMap = (HashMap<String, Object>) talentFactoryMapField.get(talentFactoryInst);
-				if (talentFactoryMap == null)
-					throw new RuntimeException("Map is null even after forced initialization!");
+				if (talentFactoryMap == null) {
+					// Force initialization of this map
+					for (Method m : talentFactoryAccessors) {
+						try {
+							m.invoke(talentFactoryInst, "doesnotexist");
+						} catch (Exception ignored) {
+						}
+					}
+					// and retry
+					talentFactoryMap = (HashMap<String, Object>) talentFactoryMapField.get(talentFactoryInst);
+					if (talentFactoryMap == null)
+						throw new RuntimeException("Map is null even after forced initialization!");
+				}
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -858,9 +867,12 @@ public class EntryCreator {
 		public final String p1, p2, p3;
 
 		public Probe(String p1, String p2, String p3) {
-			assert getInstance().alleEigenschaften.containsKey(p1);
-			assert instance.alleEigenschaften.containsKey(p2);
-			assert instance.alleEigenschaften.containsKey(p3);
+			if (!getInstance().alleEigenschaften.containsKey(p1))
+				throw new Loader.ConfigError("Ungültige Eigenschaft: " + p1);
+			if (!instance.alleEigenschaften.containsKey(p2))
+				throw new Loader.ConfigError("Ungültige Eigenschaft: " + p2);
+			if (!instance.alleEigenschaften.containsKey(p3))
+				throw new Loader.ConfigError("Ungültige Eigenschaft: " + p3);
 			this.p1 = p1;
 			this.p2 = p2;
 			this.p3 = p3;
@@ -870,9 +882,11 @@ public class EntryCreator {
 			if (probe.startsWith("(") && probe.endsWith(")"))
 				probe = probe.substring(1, probe.length() - 1);
 			String[] p = probe.split("/");
-			assert p.length == 3;
+			if (p.length != 3)
+				throw new Loader.ConfigError("Ungültige Probe: "+probe);
 			for (String s : p) {
-				assert getInstance().alleEigenschaften.containsKey(s);
+				if (!getInstance().alleEigenschaften.containsKey(s))
+					throw new Loader.ConfigError("Ungültige Eigenschaft: " + p);
 			}
 			this.p1 = p[0];
 			this.p2 = p[1];

@@ -5,18 +5,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Objects;
 
 @JsonIgnoreProperties("$schema")
 public class Config {
     @JsonProperty
     @Valid
-    ArrayList<ZauberConfig> zauber = new ArrayList<>();
+    public ArrayList<ZauberConfig> zauber = new ArrayList<>();
 
     @JsonProperty
     @Valid
-    ArrayList<SonderfertigkeitConfig> sonderfertigkeiten = new ArrayList<>();
+    public ArrayList<SonderfertigkeitConfig> sonderfertigkeiten = new ArrayList<>();
 
     @JsonProperty("repräsentationen")
     @Valid
-    ArrayList<RepraesentationConfig> repraesentationen = new ArrayList<>();
+    public ArrayList<RepraesentationConfig> repraesentationen = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Config config = (Config) o;
+        return Objects.equals(zauber, config.zauber) && Objects.equals(sonderfertigkeiten, config.sonderfertigkeiten) && Objects.equals(repraesentationen, config.repraesentationen);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(zauber, sonderfertigkeiten, repraesentationen);
+    }
 }

@@ -18,16 +18,6 @@ import java.util.Arrays;
  */
 public class HeldenLauncher {
 
-	public static void addExampleSpell(){
-		EntryCreator sc = EntryCreator.getInstance();
-		ZauberWrapper z = sc.createSpell("Inarcanitas", "F", new String[]{"Anti", "Krft", "Meta"}, new Probe("MU", "KL", "KL"), Quellenangabe.leereQuelle, "");
-		z.addVerbreitung("Mag", 7);
-		z.addVerbreitung("Elf", 5);
-		z.addVerbreitung("Hex", "Geo", 2);
-		z.setSpezialisierungen("Reichweite");
-		z.addToAllSettings();
-	}
-
 	public static void main(String[] args) {
 		try {
 			// Register the plugin component

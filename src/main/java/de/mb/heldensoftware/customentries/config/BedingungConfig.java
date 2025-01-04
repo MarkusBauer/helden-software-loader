@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class BedingungConfig {
     @JsonProperty(required = true)
@@ -38,7 +39,7 @@ public class BedingungConfig {
 
     @AssertTrue(message = "ist erforderlich")
     private boolean isName() {
-        if (type != BedingungType.or && type != BedingungType.LKW) {
+        if (type != BedingungType.or && type != BedingungType.and && type != BedingungType.LKW) {
             return name != null && !name.isEmpty();
         }
         return true;
@@ -46,9 +47,21 @@ public class BedingungConfig {
 
     @AssertTrue(message = "ist erforderlich")
     private boolean isBedingungen() {
-        if (type == BedingungType.or) {
+        if (type == BedingungType.or || type == BedingungType.and) {
             return bedingungen != null && !bedingungen.isEmpty();
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BedingungConfig that = (BedingungConfig) o;
+        return value == that.value && not == that.not && type == that.type && Objects.equals(name, that.name) && Objects.equals(bedingungen, that.bedingungen);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, name, value, bedingungen, not);
     }
 }

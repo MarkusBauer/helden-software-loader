@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 @JsonClassDescription("Eigener, neuer Zauber")
 public class ZauberConfig {
@@ -78,5 +79,17 @@ public class ZauberConfig {
                 ", verbreitung=" + verbreitung +
                 ", spezialisierungen=" + spezialisierungen +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ZauberConfig that = (ZauberConfig) o;
+        return Objects.equals(name, that.name) && Objects.equals(kategorie, that.kategorie) && Objects.equals(merkmale, that.merkmale) && Objects.equals(probe, that.probe) && Objects.equals(mod, that.mod) && Objects.equals(quelle, that.quelle) && Objects.equals(settings, that.settings) && Objects.equals(verbreitung, that.verbreitung) && Objects.equals(spezialisierungen, that.spezialisierungen);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, kategorie, merkmale, probe, mod, quelle, settings, verbreitung, spezialisierungen);
     }
 }

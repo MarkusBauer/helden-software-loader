@@ -9,4 +9,5 @@ public enum BedingungType {
     MagieLevel,
     LKW,
     or,
+    and,
 }

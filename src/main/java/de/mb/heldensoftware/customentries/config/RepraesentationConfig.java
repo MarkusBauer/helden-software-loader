@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 public class RepraesentationConfig {
     @JsonProperty(required = true)
@@ -23,12 +24,24 @@ public class RepraesentationConfig {
 
     @JsonProperty
     @JsonPropertyDescription("true um eine passende Ritualkenntnis anzulegen")
-    boolean ritualkenntnis = false;
+    public boolean ritualkenntnis = false;
 
     @JsonProperty
     @JsonPropertyDescription("Verbreitungen der einzelnen Zauber in dieser Repräsentation. Nicht angegebene Zauber können später nur per Editor aktiviert werden. Beispiel:\n" +
             "{\"Armatrutz\": 7}")
     @NotNull
     @Valid
-    Verbreitungen zauber = new Verbreitungen();
+    public Verbreitungen zauber = new Verbreitungen();
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        RepraesentationConfig that = (RepraesentationConfig) o;
+        return ritualkenntnis == that.ritualkenntnis && Objects.equals(name, that.name) && Objects.equals(abkuerzung, that.abkuerzung) && Objects.equals(zauber, that.zauber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, abkuerzung, ritualkenntnis, zauber);
+    }
 }
