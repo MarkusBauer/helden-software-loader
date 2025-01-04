@@ -112,21 +112,4 @@ public class ConfigTest {
             System.out.println("Success: " + json + "\n => " + e.getMessage());
         }
     }
-
-    @Test
-    public void testSchema() throws FileNotFoundException, UnsupportedEncodingException {
-        SchemaGeneratorConfigBuilder configBuilder =
-                new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_7, OptionPreset.PLAIN_JSON)
-                        .with(new JacksonModule(JacksonOption.RESPECT_JSONPROPERTY_REQUIRED))
-                        .with(new AddonModule())
-                        .with(new JavaxValidationModule(JavaxValidationOption.INCLUDE_PATTERN_EXPRESSIONS));
-        SchemaGeneratorConfig config = configBuilder.build();
-        SchemaGenerator generator = new SchemaGenerator(config);
-        JsonNode jsonSchema = generator.generateSchema(Config.class);
-
-        System.out.println(jsonSchema.toPrettyString());
-        try (PrintWriter writer = new PrintWriter("extensions.schema.json", "UTF-8")) {
-            writer.println(jsonSchema.toPrettyString());
-        }
-    }
 }
