@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +30,12 @@ public class CsvConverter {
 		String Settings = "Settings";
 	}
 
-	@SuppressWarnings("unchecked")
 	public InputStream convertToJson(Path p) throws IOException {
-		byte[] content = Files.readAllBytes(p);
+		return convertToJson(Files.readAllBytes(p));
+	}
 
+	@SuppressWarnings("unchecked")
+	public InputStream convertToJson(byte[] content) throws IOException {
 		final String[] columns = new String[]{
 				Columns.Name, Columns.Kategorie,
 				Columns.Merkmale, Columns.Probe,

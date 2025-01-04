@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import de.mb.heldensoftware.customentries.CsvConverter;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -42,6 +43,7 @@ public class Loader {
         } else if (type == FileType.YAML) {
             mapper = new ObjectMapper(YAMLFactory.builder().enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION).build());
             mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true);
+
         } else {
             throw new RuntimeException("Unsupported file type: " + type);
         }
@@ -56,8 +58,17 @@ public class Loader {
     }
 
     public static Config load(File file, FileType type) throws IOException {
-        try (Reader reader = preprocessStream(Files.newInputStream(file.toPath()))) {
-            return load(reader, type);
+        try {
+            if (type == FileType.CSV) {
+                // convert CSV to JSON
+                try (Reader reader = new InputStreamReader(new CsvConverter().convertToJson(file.toPath()), StandardCharsets.UTF_8)) {
+                    return load(reader, FileType.JSON);
+                }
+            } else {
+                try (Reader reader = preprocessStream(Files.newInputStream(file.toPath()))) {
+                    return load(reader, type);
+                }
+            }
         } catch (ConfigError e) {
             throw new ConfigError("In " + file.getAbsolutePath() + ": \n" + e.getMessage());
         }
