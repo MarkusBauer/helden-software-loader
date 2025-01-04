@@ -1,4 +1,7 @@
 {
+    // Auto-Vervollständigung für VSCode etc.
+    "$schema": "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json",
+
     "zauber": [
         // === Inarcanitas - ein neuer Zauber aus unserer Runde ===
         {

@@ -6,7 +6,7 @@
 
     <groupId>de.mb.heldensoftware</groupId>
     <artifactId>helden-software-loader</artifactId>
-    <version>1.7.2</version>
+    <version>1.8.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -154,6 +154,45 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Build json schema -->
+            <plugin>
+                <groupId>com.github.victools</groupId>
+                <artifactId>jsonschema-maven-plugin</artifactId>
+                <version>4.37.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <classNames>
+                        <className>de.mb.heldensoftware.customentries.config.Config</className>
+                    </classNames>
+                    <schemaVersion>DRAFT_7</schemaVersion>
+                    <schemaFileName>erweiterungen.schema.json</schemaFileName>
+                    <schemaFilePath>.</schemaFilePath>
+                    <modules>
+                        <module>
+                            <name>Jackson</name>
+                            <options>
+                                <option>RESPECT_JSONPROPERTY_REQUIRED</option>
+                            </options>
+                        </module>
+                        <module>
+                            <name>JavaxValidation</name>
+                        </module>
+                        <module>
+                            <className>com.github.imifou.jsonschema.module.addon.AddonModule</className>
+                        </module>
+                        <module>
+                            <className>de.mb.heldensoftware.customentries.schema.StringConstructorModule</className>
+                        </module>
+                    </modules>
+                </configuration>
             </plugin>
         </plugins>
     </build>
