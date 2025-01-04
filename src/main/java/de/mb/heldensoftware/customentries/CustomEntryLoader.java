@@ -163,7 +163,8 @@ public class CustomEntryLoader {
 		Object sfname;
 		if (sf.get("varianten") != null) {
 			Set<String> varianten = toStringSet((JSONArray) sf.get("varianten"));
-			sfname = EntryCreator.getInstance().createSonderfertigkeitWithParams(name, kosten.intValue(), cat, bedingung, varianten);
+			Map<String, Integer> variantenKosten = new HashMap<>(); // TODO fill
+			sfname = EntryCreator.getInstance().createSonderfertigkeitWithParams(name, kosten.intValue(), cat, bedingung, varianten, variantenKosten);
 
 		} else {
 			// normal SF

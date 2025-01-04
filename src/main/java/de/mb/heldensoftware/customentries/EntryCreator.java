@@ -376,7 +376,7 @@ public class EntryCreator {
 			}
 			assert sonderfertigkeitWithParamsType != null;
 			for (Constructor<?> c: sonderfertigkeitWithParamsType.getDeclaredConstructors()) {
-				if (c.getParameterTypes()[1].equals(int.class)) {
+				if (c.getParameterTypes()[1].equals(Set.class)) {
 					newSonderfertigkeitWithParams = c;
 					break;
 				}
@@ -658,12 +658,16 @@ public class EntryCreator {
 		}
 	}
 
-	public Object createSonderfertigkeitWithParams(String name, int kosten, int category, BedingungsVerknuepfung bedingung, Set<String> params) {
+	public Object createSonderfertigkeitWithParams(String name, int kosten, int category, BedingungsVerknuepfung bedingung, Set<String> params, Map<String, Integer> kostenPerParam) {
 		try {
 			if (isSonderfertigkeitKnown(name)) {
 				throw new IllegalArgumentException("Sonderfertigkeit \"" + name + "\" ist bereits bekannt!");
 			}
-			Object sf = newSonderfertigkeitWithParams.newInstance(name, kosten, params, category);
+			HashMap<Object, Integer> kostenMap = new HashMap<>();
+			for (String param : params)
+				kostenMap.put(param, kosten);
+            kostenMap.putAll(kostenPerParam);
+			Object sf = newSonderfertigkeitWithParams.newInstance(name, params, kostenMap, category);
 			if (bedingung != null)
 				sonderfertigkeitSetBedingung.invoke(sf, bedingung);
 			return registerSonderfertigkeit(name, sf);
