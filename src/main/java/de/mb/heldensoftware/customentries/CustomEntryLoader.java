@@ -266,9 +266,12 @@ public class CustomEntryLoader {
             }
 
             CustomEntryLoader entryLoader = new CustomEntryLoader();
-            for (Config config : configs) {
-                entryLoader.loadCustomEntries(config);
+            ConfigMerger.ConfigMergeResult config = ConfigMerger.mergeAll(configs);
+            if (!config.duplicates.isEmpty()){
+                JOptionPane.showMessageDialog(null, String.join("\n", config.duplicates),
+                        "Helden-Software-Loader: Eigene Einträge mehrfach vorhanden!", JOptionPane.WARNING_MESSAGE);
             }
+            entryLoader.loadCustomEntries(config.config);
 
         } catch (Throwable e) {
             // Show message box and exit

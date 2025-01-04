@@ -1,6 +1,7 @@
 package de.mb.heldensoftware.customentries.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -63,14 +64,15 @@ public class Loader {
             if (type == FileType.CSV) {
                 // convert CSV to JSON stream
                 reader = new InputStreamReader(new CsvConverter().convertToJson(file.toPath()), StandardCharsets.UTF_8);
+                type = FileType.JSON;
             } else {
                 reader = preprocessStream(Files.newInputStream(file.toPath()));
             }
-            Config config = load(reader, FileType.JSON);
+            Config config = load(reader, type);
             config.source = file.getAbsolutePath();
             return config;
 
-        } catch (ConfigError e) {
+        } catch (ConfigError | JsonParseException e) {
             throw new ConfigError("In " + file.getAbsolutePath() + ": \n" + e.getMessage());
         } finally {
             if (reader != null)
