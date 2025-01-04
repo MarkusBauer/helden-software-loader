@@ -263,12 +263,17 @@
             <version>4.37.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/jakarta.el/jakarta.el-api -->
+        <dependency>
+            <groupId>jakarta.el</groupId>
+            <artifactId>jakarta.el-api</artifactId>
+            <version>3.0.3</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.glassfish/jakarta.el -->
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.el</artifactId>
             <version>3.0.3</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api -->
