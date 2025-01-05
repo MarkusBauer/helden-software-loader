@@ -1,22 +1,24 @@
 package de.mb.heldensoftware.customentries.config;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.StreamReadFeature;
+import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.mb.heldensoftware.customentries.CsvConverter;
+import org.mozilla.intl.chardet.nsDetector;
+import org.mozilla.intl.chardet.nsICharsetDetectionObserver;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 
 public class Loader {
@@ -33,7 +35,10 @@ public class Loader {
         CSV
     }
 
-    public static Config load(Reader reader, FileType type) throws IOException {
+    public static Config load(String content, FileType type) {
+        if (type == FileType.CSV)
+            return new CsvConverter().convertToConfig(content);
+
         ObjectMapper mapper;
         if (type == FileType.JSON) {
             mapper = new ObjectMapper(JsonFactory.builder().enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION).build());
@@ -49,45 +54,34 @@ public class Loader {
         }
 
         try {
-            Config config = mapper.readValue(reader, Config.class);
+            Config config = mapper.readValue(content, Config.class);
             validate(config);
             return config;
-        } catch (DatabindException e) {
+        } catch (JsonProcessingException e) {
             throw new ConfigError(e.getMessage());
         }
     }
 
-    public static Config load(File file, FileType type) throws IOException {
-        if (type == FileType.CSV) {
-            // read CSV with separate Loader (which processes Zauber only)
-            return new CsvConverter().convertToConfig(file.toPath());
-        }
-        try (Reader reader = preprocessStream(Files.newInputStream(file.toPath()))) {
-            Config config = load(reader, type);
-            config.source = file.getAbsolutePath();
-            return config;
-        } catch (ConfigError | JsonParseException e) {
-            throw new ConfigError("In " + file.getAbsolutePath() + ": \n" + e.getMessage());
-        }
+    public static Config load(byte[] content, FileType type) {
+        return load(new String(content, detectEncoding(content)), type);
     }
 
-    public static Config load(File file) throws IOException {
-        if (file.getName().endsWith(".json") || file.getName().endsWith(".json.txt")) {
-            return load(file, FileType.JSON);
-        } else if (file.getName().endsWith(".yaml") || file.getName().endsWith(".yaml.txt")) {
-            return load(file, FileType.YAML);
-        } else if (file.getName().endsWith(".csv") || file.getName().endsWith(".csv.txt")) {
-            return load(file, FileType.CSV);
+    public static Config load(Path p, FileType type) throws IOException {
+        Config config = load(Files.readAllBytes(p), type);
+        config.source = p.toAbsolutePath().toString();
+        return config;
+    }
+
+    public static Config load(Path p) throws IOException {
+        String fname = p.getFileName().toString();
+        if (fname.endsWith(".json") || fname.endsWith(".json.txt")) {
+            return load(p, FileType.JSON);
+        } else if (fname.endsWith(".yaml") || fname.endsWith(".yaml.txt")) {
+            return load(p, FileType.YAML);
+        } else if (fname.endsWith(".csv") || fname.endsWith(".csv.txt")) {
+            return load(p, FileType.CSV);
         } else {
             return null;
-        }
-    }
-
-    public static Config load(String data, FileType type) {
-        try (Reader r = new StringReader(data)) {
-            return Loader.load(r, type);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -99,6 +93,7 @@ public class Loader {
      * @throws IOException
      */
     public static Reader preprocessStream(InputStream is) throws IOException {
+        // TODO remove
         BufferedInputStream input = new BufferedInputStream(is);
         // Remove BOM - I know my Windows users
         byte[] buffer = new byte[3];
@@ -109,6 +104,33 @@ public class Loader {
         }
         // Read file as UTF-8
         return new InputStreamReader(input, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Automatic charset detection, based on jchardet. Typical charsets are windows-1252 and UTF-8.
+     *
+     * @param content File content to perform detection on
+     * @return A charset, with UTF-8 being default.
+     */
+    private static Charset detectEncoding(byte[] content) {
+        // TODO test BOM
+        // What an ugly library interface. Directly from hell...
+        final Charset[] result = new Charset[]{StandardCharsets.UTF_8};
+        nsDetector detector = new nsDetector();
+        detector.Init(new nsICharsetDetectionObserver() {
+            @Override
+            public void Notify(String s) {
+                result[0] = Charset.forName(s);
+            }
+        });
+        try {
+            detector.DoIt(content, content.length, false);
+            detector.DataEnd();
+            detector.Done();
+        } catch (UnsupportedCharsetException e) {
+            System.err.println(e.getMessage());
+        }
+        return result[0];
     }
 
     public static void validate(Config config) {

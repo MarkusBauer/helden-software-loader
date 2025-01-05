@@ -6,38 +6,31 @@ import de.mb.heldensoftware.customentries.config.ZauberConfig;
 import org.junit.Test;
 
 import java.io.*;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 
 public class ConfigTest {
     @Test
-    public void testExampleJsonFile() {
-        try (Reader r = Loader.preprocessStream(getClass().getResourceAsStream("/examples/examples.json"))) {
-            Loader.load(r, Loader.FileType.JSON);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void testExampleJsonFile() throws IOException, URISyntaxException {
+        Path p = Paths.get(getClass().getResource("/examples/examples.json").toURI());
+        Loader.load(p, Loader.FileType.JSON);
     }
 
     @Test
-    public void testExampleYamlFile() {
-        try (Reader r = Loader.preprocessStream(getClass().getResourceAsStream("/examples/examples.yaml"))) {
-            Loader.load(r, Loader.FileType.YAML);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void testExampleYamlFile() throws IOException, URISyntaxException {
+        Path p = Paths.get(getClass().getResource("/examples/examples.yaml").toURI());
+        Loader.load(p, Loader.FileType.YAML);
     }
 
     @Test
-    public void testExampleConfigsEqual() throws IOException {
-        Config json;
-        Config yaml;
-        try (Reader r = Loader.preprocessStream(getClass().getResourceAsStream("/examples/examples.json"))) {
-            json = Loader.load(r, Loader.FileType.JSON);
-        }
-        try (Reader r = Loader.preprocessStream(getClass().getResourceAsStream("/examples/examples.yaml"))) {
-            yaml = Loader.load(r, Loader.FileType.YAML);
-        }
+    public void testExampleConfigsEqual() throws IOException, URISyntaxException {
+        Path p = Paths.get(getClass().getResource("/examples/examples.json").toURI());
+        Config json = Loader.load(p, Loader.FileType.JSON);
+        p = Paths.get(getClass().getResource("/examples/examples.yaml").toURI());
+        Config yaml = Loader.load(p, Loader.FileType.YAML);
 
         assertEquals(json, yaml);
     }

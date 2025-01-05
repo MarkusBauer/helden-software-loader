@@ -6,15 +6,8 @@ import de.mb.heldensoftware.customentries.config.ZauberConfig;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.mozilla.intl.chardet.nsDetector;
-import org.mozilla.intl.chardet.nsICharsetDetectionObserver;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,13 +24,7 @@ public class CsvConverter {
         String Settings = "Settings";
     }
 
-    public Config convertToConfig(Path p) throws IOException {
-        Config config = convertToConfig(Files.readAllBytes(p));
-        config.source = p.toAbsolutePath().toString();
-        return config;
-    }
-
-    public Config convertToConfig(byte[] content) throws IOException {
+    public Config convertToConfig(String content) {
         final String[] columns = new String[]{
                 Columns.Name, Columns.Kategorie,
                 Columns.Merkmale, Columns.Probe,
@@ -45,9 +32,8 @@ public class CsvConverter {
                 Columns.Settings
         };
         CSVFormat csvFormat = detectFormat(content).withHeader(columns).withSkipHeaderRecord();
-        Charset charset = detectEncoding(content);
 
-        try (final Reader reader = new StringReader(new String(content, charset));
+        try (final Reader reader = new StringReader(content);
              final CSVParser parser = new CSVParser(reader, csvFormat)
         ) {
             final Map<String, Integer> headerMap = parser.getHeaderMap();
@@ -66,6 +52,8 @@ public class CsvConverter {
                 config.zauber.add(parseRecord(record));
             }
             return config;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -127,13 +115,13 @@ public class CsvConverter {
         return verbreitungObj;
     }
 
-    private static CSVFormat detectFormat(byte[] content) {
+    private static CSVFormat detectFormat(String content) {
         CSVFormat format = CSVFormat.DEFAULT;
         // detect separator: , or ;
         long count_comma = 0;
         long count_semicolon = 0;
         long count_tab = 0;
-        for (byte b : content) {
+        for (int b : content.toCharArray()) {
             if (b == ',') count_comma++;
             else if (b == ';') count_semicolon++;
             else if (b == '\t') count_tab++;
@@ -144,34 +132,6 @@ public class CsvConverter {
         else if (count_semicolon > count_comma)
             format = format.withDelimiter(';');
 
-        //TODO detect encoding + BOM
-
         return format;
-    }
-
-    /**
-     * Automatic charset detection, based on jchardet. Typical charsets are windows-1252 and UTF-8.
-     *
-     * @param content File content to perform detection on
-     * @return A charset, with UTF-8 being default.
-     */
-    private static Charset detectEncoding(byte[] content) {
-        // What an ugly library interface. Directly from hell...
-        final Charset result[] = new Charset[]{StandardCharsets.UTF_8};
-        nsDetector detector = new nsDetector();
-        detector.Init(new nsICharsetDetectionObserver() {
-            @Override
-            public void Notify(String s) {
-                result[0] = Charset.forName(s);
-            }
-        });
-        try {
-            detector.DoIt(content, content.length, false);
-            detector.DataEnd();
-            detector.Done();
-        } catch (UnsupportedCharsetException e) {
-            System.err.println(e.getMessage());
-        }
-        return result[0];
     }
 }

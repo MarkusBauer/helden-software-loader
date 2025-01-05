@@ -320,7 +320,7 @@ public class CustomEntryLoader {
 
     private static void tryLoad(List<Config> configs, File f) throws IOException {
         if (f.exists()) {
-            Config c = Loader.load(f);
+            Config c = Loader.load(f.toPath());
             if (c != null) {
                 configs.add(c);
                 System.err.println("[CustomEntryLoader] Lade " + f.getAbsolutePath());

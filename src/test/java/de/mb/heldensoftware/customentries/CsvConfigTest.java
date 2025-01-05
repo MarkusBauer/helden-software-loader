@@ -17,7 +17,7 @@ import static junit.framework.Assert.assertTrue;
 
 public class CsvConfigTest {
     private void testImportedZauber(Path p) throws IOException {
-        Config config = new CsvConverter().convertToConfig(p);
+        Config config = Loader.load(p, Loader.FileType.CSV);
         assertEquals(1, config.zauber.size());
         for (ZauberConfig z : config.zauber) {
             // Name
