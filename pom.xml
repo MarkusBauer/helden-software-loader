@@ -72,29 +72,7 @@
                                     <exclude>com.fasterxml:classmate:1.7.0</exclude>
                                 </excludes>
                             </artifactSet>
-                            <filters>
-                                <filter>
-                                    <artifact>com.googlecode.json-simple:json-simple</artifact>
-                                    <excludes>
-                                        <exclude>org/json/simple/parser/Yylex.class</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Add comment support to the JSON library's lexer -->
-            <plugin>
-                <groupId>de.jflex</groupId>
-                <artifactId>jflex-maven-plugin</artifactId>
-                <version>1.7.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -209,13 +187,6 @@
             <scope>system</scope>
             <!-- You can use a symlink to the installation directory, if you're on linux, and want life to be easy! -->
             <systemPath>${project.basedir}/heldensoftware/helden.jar</systemPath>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
@@ -334,6 +305,14 @@
             <groupId>net.sourceforge.jchardet</groupId>
             <artifactId>jchardet</artifactId>
             <version>1.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
