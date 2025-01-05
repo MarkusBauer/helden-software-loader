@@ -74,7 +74,7 @@ public class CsvConverter {
 
 			final JSONObject root = new JSONObject();
 			root.put("zauber", spells);
-			return new ByteArrayInputStream(root.toJSONString().getBytes());
+			return new ByteArrayInputStream(root.toJSONString().getBytes(StandardCharsets.UTF_8));
 		}
 	}
 
