@@ -4,7 +4,7 @@
     // nur das Kommentarzeichen ("//") ist dort "#".
 
     // Auto-Vervollständigung für VSCode etc.
-    "$schema": "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json",
+    "$schema": "https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json",
 
     "zauber": [
         // === Inarcanitas - ein neuer Zauber aus unserer Runde ===

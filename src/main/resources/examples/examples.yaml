@@ -1,4 +1,4 @@
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 zauber:
   # === Inarcanitas - ein neuer Zauber aus unserer Runde ===

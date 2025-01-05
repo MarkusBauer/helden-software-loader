@@ -102,7 +102,7 @@ Neue **Talente** benötigen keine Konfiguration, und können im "Erweiterungen"-
 Yaml-Dateien können mit einem beliebigen Texteditor angelegt oder bearbeitet werden
  (bspw. dem "Editor" von Windows). Die Datei sollte mit der Codierung "UTF-8" 
  gespeichert werden, sonst sind Umlaute später kaputt. Ein ordentlicher Editor 
- wie bspw. "VS Code", "Sublime Text" oder "Notepad++" kann das Leben einfacher machen, ist 
+ wie bspw. ["VS Code"](https://code.visualstudio.com/) mit YAML-Plugin, "Sublime Text" oder "Notepad++" kann das Leben einfacher machen, ist 
  aber nicht zwingend notwendig. Gute Editoren erkennen [das Schema](./erweiterungen.schema.json) 
  automatisch und können euch direkt auf eventuelle Fehler aufmerksam machen.
 
@@ -114,7 +114,7 @@ Einträge im JSON-Format können ohne Änderung im Yaml-Format verwendet werden.
 ### Grundstruktur
 Eine leere `erweiterungen.yaml` ohne neue Zauber, Sonderfertigkeiten und Repräsentationen sieht so aus: 
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 # zauber:
   # Hier kommen eure neuen Zauber hin 
@@ -126,11 +126,11 @@ $schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erwe
 Die `#` sind Kommentarzeichen - alles was dahinter steht gehört nicht zum 
  eigentlichen Inhalt der Datei (und wird nicht mit eingelesen). 
 Nicht benötigte Abschnitte können auskommentiert oder gelöscht werden, nur leere Abschnitte mag das Format nicht.
-Die Zeile mit `$schema` ist optional, unterstützt aber euren Editor beim Formatieren.
+Die Zeile mit `# yaml-language-server` ist optional, unterstützt aber euren Editor beim Formatieren.
  
 Eine vollständige Datei mit einem einfachen Zauber aus der Zauberwerkstatt sieht so aus: 
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 zauber:
   - name: Bannbaladin (erhöhte Reichweite)
@@ -143,7 +143,7 @@ zauber:
 ### Zauber konfigurieren
 Der folgende Zauber verwendet alle möglichen Optionen:
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 zauber:
   # === Inarcanitas - ein neuer Zauber aus unserer Runde ===
@@ -188,7 +188,7 @@ Zur Sichtbarkeit eines Zaubers gilt:
 ### Weitere Beispiel-Zauber
 Die komplette Beispiel-Datei gibt's hier: [examples.yaml](src/main/resources/examples/examples.yaml)
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 zauber:
   # === Kurzfassung - Bannbaladin aus der Zauberwerkstatt ===
@@ -231,7 +231,7 @@ Beispieldateien liegen dem Plugin bei (für Excel und Libreoffice).
 ### Neue Sonderfertigkeiten
 Sonderfertigkeiten werden wie folgt konfiguriert:
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 sonderfertigkeiten:
   - name: Gesegnet
@@ -245,7 +245,7 @@ Gültige Kategorien sind: `"Allgemein", "Geländekunde", "Kampf: Nahkampf", "Kam
 
 Auch Sonderfertigkeiten mit mehreren Varianten sind möglich:
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 sonderfertigkeiten:
   - name: Göttliche Berührung
@@ -262,7 +262,7 @@ Eine eigene **Ritualkenntnis** oder **Liturgiekenntnis** kann ebenfalls über So
 Bei Aktivierung einer solchen Sonderfertigkeit wird automatisch ein passender Talentwert angelegt und aktiviert.
 Die Konfiguration sollte so aussehen:
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 sonderfertigkeiten:
   - name: "Ritualkenntnis: Alt-Druidisch"
@@ -277,7 +277,7 @@ Zu Sonderfertigkeiten können **Vorbedingungen** hinzugefügt werden.
 Nur Helden, die diese Bedingungen erfüllen können die Sonderfertigkeit erlernen.
 Es müssen immer alle Bedingungen erfüllt werden, mögliche Bedingungen sind `Eigenschaft`, `Talent`, `Zauber`, `Sonderfertigkeit`, `LKW` und `MagieLevel`.
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 sonderfertigkeiten:
   - name: Kristall-Stab
@@ -303,7 +303,7 @@ sonderfertigkeiten:
 Komplexere Bedingungen können mit dem Typ `or` erstellt werden. Aus der Liste von `or`-Bedingungen muss nur eine erfüllt werden.
 Mit `not: true` können Bedingungen gestellt werden, die _nicht_ erfüllt sein dürfen.
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 sonderfertigkeiten:
   - name: Karmaler Schub
@@ -339,7 +339,7 @@ Eine neue Liturgiekenntnis aktiviert gleichzeitig ein dazugehöriges, gleichnami
 Der Name sollte im Format `Liturgiekenntis (<Gott>)` gehalten sein.
 Hier kann eine Liste mit bereits existierenden Liturgien angegeben werden - die neue Liturgiekenntnis wird in die Vorbedingungen dieser Liturgien aufgenommen.
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 sonderfertigkeiten:
   # Neue Liturgiekenntnis - inkl. Talent
@@ -376,7 +376,7 @@ sonderfertigkeiten:
 ### Neue Repräsentationen
 Neue Repräsentationen werden wie folgt konfiguriert:
 ```yaml
-$schema: "https://github.com/MarkusBauer/helden-software-loader/blob/master/erweiterungen.schema.json"
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 
 repräsentationen:
   - name: Hochelfisch
