@@ -1,7 +1,6 @@
 package de.mb.heldensoftware.customentries.config;
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -19,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Set;
 
 public class Loader {
@@ -63,7 +63,7 @@ public class Loader {
     }
 
     public static Config load(byte[] content, FileType type) {
-        return load(new String(content, detectEncoding(content)), type);
+        return load(bytesToString(content), type);
     }
 
     public static Config load(Path p, FileType type) throws IOException {
@@ -85,25 +85,12 @@ public class Loader {
         }
     }
 
-    /**
-     * Try to guess the encoding of an input stream, returning a proper Reader (for load... methods)
-     *
-     * @param is
-     * @return
-     * @throws IOException
-     */
-    public static Reader preprocessStream(InputStream is) throws IOException {
-        // TODO remove
-        BufferedInputStream input = new BufferedInputStream(is);
-        // Remove BOM - I know my Windows users
-        byte[] buffer = new byte[3];
-        input.mark(4);
-        input.read(buffer);
-        if (!(buffer[0] == (byte) 0xEF && buffer[1] == (byte) 0xBB && buffer[2] == (byte) 0xBF)) {
-            input.reset();
+    private static String bytesToString(byte[] content) {
+        // BOM check
+        if (content.length >= 3 && content[0] == (byte) 0xEF && content[1] == (byte) 0xBB && content[2] == (byte) 0xBF) {
+            return new String(Arrays.copyOfRange(content, 3, content.length), StandardCharsets.UTF_8);
         }
-        // Read file as UTF-8
-        return new InputStreamReader(input, StandardCharsets.UTF_8);
+        return new String(content, detectEncoding(content));
     }
 
     /**
@@ -113,7 +100,6 @@ public class Loader {
      * @return A charset, with UTF-8 being default.
      */
     private static Charset detectEncoding(byte[] content) {
-        // TODO test BOM
         // What an ugly library interface. Directly from hell...
         final Charset[] result = new Charset[]{StandardCharsets.UTF_8};
         nsDetector detector = new nsDetector();

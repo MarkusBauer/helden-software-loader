@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -128,5 +129,49 @@ public class ConfigTest {
         } catch (Loader.ConfigError e) {
             System.out.println("Success: " + json + "\n => " + e.getMessage());
         }
+    }
+
+    private static final byte[] BOM = new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
+    private static final byte[] UTF8_CHARS = new byte[]{(byte) 0xc3, (byte) 0xa4, (byte) 0xc3, (byte) 0xb6, (byte) 0xc3, (byte) 0xbc};
+
+    private static byte[] joinArrays(byte[]... arrays) {
+        int len = 0;
+        for (byte[] array : arrays) {
+            len += array.length;
+        }
+        byte[] target = new byte[len];
+        int pos = 0;
+        for (byte[] array : arrays) {
+            System.arraycopy(array, 0, target, pos, array.length);
+            pos += array.length;
+        }
+        return target;
+    }
+
+    @Test
+    public void testBomYaml() {
+        String s1 = "sonderfertigkeiten:\n- name: \"";
+        String s2 = "\"\n  kosten: 10";
+        byte[] content = joinArrays(BOM, s1.getBytes(StandardCharsets.UTF_8), UTF8_CHARS, s2.getBytes(StandardCharsets.UTF_8));
+        Config config = Loader.load(content, Loader.FileType.YAML);
+        assertEquals(new String(UTF8_CHARS, StandardCharsets.UTF_8), config.sonderfertigkeiten.get(0).name);
+    }
+
+    @Test
+    public void testBomJson() {
+        String s1 = "{\"sonderfertigkeiten\":[{\"name\": \"";
+        String s2 = "\", \"kosten\": 10}]}";
+        byte[] content = joinArrays(BOM, s1.getBytes(StandardCharsets.UTF_8), UTF8_CHARS, s2.getBytes(StandardCharsets.UTF_8));
+        Config config = Loader.load(content, Loader.FileType.JSON);
+        assertEquals(new String(UTF8_CHARS, StandardCharsets.UTF_8), config.sonderfertigkeiten.get(0).name);
+    }
+
+    @Test
+    public void testBomCsv() {
+        String s1 = "Name,Kategorie,Merkmale,Probe,Mods/MR,Verbreitung,Settings\n";
+        String s2 = ",A,Anti,KL/IN/IN,,,Alle\n";
+        byte[] content = joinArrays(BOM, s1.getBytes(StandardCharsets.UTF_8), UTF8_CHARS, s2.getBytes(StandardCharsets.UTF_8));
+        Config config = Loader.load(content, Loader.FileType.CSV);
+        assertEquals(new String(UTF8_CHARS, StandardCharsets.UTF_8), config.zauber.get(0).name);
     }
 }
