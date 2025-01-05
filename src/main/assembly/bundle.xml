@@ -25,7 +25,7 @@
             <source>src/main/resources/examples/erweiterungen-libreoffice.csv</source>
         </file>
         <file>
-            <source>README.txt</source>
+            <source>README.md</source>
         </file>
     </files>
 </assembly>

@@ -391,11 +391,13 @@ Externe Komponenten
 -------------------
 Dieses Plugin basiert auf verschiedenen anderen Projekten:
 
-- json-simple by *Yidong Fang*, [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 - [OpenPojo](https://github.com/oshoukry/openpojo), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 - IntelliJ Forms_rt by [Jetbrains](http://www.jetbrains.com/), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 - [ASM Commons](http://asm.ow2.org/), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
-- [Apache CSV](https://commons.apache.org/proper/commons-csv/), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0) 
+- [Apache CSV](https://commons.apache.org/proper/commons-csv/), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+- [Jackson](https://github.com/FasterXML/jackson), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+- [Hibernate Validator](https://hibernate.org/validator/), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+- [jsonschema-generator](https://github.com/victools/jsonschema-generator), [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
  
  
  
