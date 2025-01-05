@@ -55,7 +55,7 @@ sonderfertigkeiten:
     kosten: 200
   - name: "Feenwelten-kundig"
     kosten: 200
-    kategorie: Geländekunde
+    kategorie: "Geländekunde"
 
   # Sonderfertigkeit mit Varianten
   - name: Göttliche Berührung
@@ -88,6 +88,10 @@ sonderfertigkeiten:
       - type: Eigenschaft  # Fingerfertigkeit >= 15
         name: "FF"
         value: 15
+      - type: LKW  # Liturgiekenntnis >= 0
+        value: 0
+      - type: MagieLevel  # Optionen: Viertelzauberer, Spruchzauberer, Schamane, Halbzauberer, Vollzauberer, Geweihter
+        name: Vollzauberer
 
   # Komplexe Bedingungen:
   - name: Karmaler Schub
