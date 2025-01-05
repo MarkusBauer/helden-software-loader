@@ -1,0 +1,225 @@
+{
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "definitions" : {
+    "BedingungConfig" : {
+      "type" : "object",
+      "properties" : {
+        "bedingungen" : {
+          "description" : "Für Typ or, and: Liste mit weiteren Bedingungen",
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/BedingungConfig"
+          }
+        },
+        "name" : {
+          "type" : "string",
+          "description" : "Für Typ Sonderfertigkeit, Talent, Zauber, Eigenschaft: was vorausgesetzt wird",
+          "default" : "Magiekunde"
+        },
+        "not" : {
+          "type" : "boolean",
+          "description" : "Invertiere diese Bedingung (Bedingung darf NICHT erfüllt sein)",
+          "default" : "false"
+        },
+        "type" : {
+          "type" : "string",
+          "enum" : [ "Sonderfertigkeit", "SF", "Zauber", "Talent", "Eigenschaft", "MagieLevel", "LKW", "or", "and" ],
+          "description" : "Bedingungs-Art. Beispiel: \"Sonderfertigkeit\"",
+          "default" : "Talent"
+        },
+        "value" : {
+          "type" : "integer",
+          "description" : "Mindest-Wert der Voraussetzung \"name\"",
+          "default" : "0"
+        }
+      },
+      "required" : [ "type" ]
+    },
+    "Verbreitungen" : {
+      "type" : "object"
+    }
+  },
+  "type" : "object",
+  "properties" : {
+    "repräsentationen" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "abkürzung" : {
+            "type" : "string",
+            "description" : "Abkürzung. Beispiel: \"Hoc\"",
+            "default" : "Xxx",
+            "minLength" : 1,
+            "maxLength" : 5
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Name der eigenen Repräsentation. Beispiel: \"Hochelfisch\"",
+            "minLength" : 1
+          },
+          "ritualkenntnis" : {
+            "type" : "boolean",
+            "description" : "true um eine passende Ritualkenntnis anzulegen"
+          },
+          "zauber" : {
+            "allOf" : [ {
+              "$ref" : "#/definitions/Verbreitungen"
+            }, {
+              "description" : "Verbreitungen der einzelnen Zauber in dieser Repräsentation. Nicht angegebene Zauber können später nur per Editor aktiviert werden. Beispiel:\n{\"Armatrutz\": 7}"
+            } ]
+          }
+        },
+        "required" : [ "abkürzung", "name" ]
+      }
+    },
+    "sonderfertigkeiten" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "bedingungen" : {
+            "description" : "Bedingung, damit diese Sonderfertigkeit aktiviert werden kann. Siehe Manual.",
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/definitions/BedingungConfig"
+            }
+          },
+          "grad" : {
+            "type" : "integer",
+            "description" : "(für neue Liturgie): Grad (1-7)",
+            "minimum" : 0,
+            "maximum" : 7
+          },
+          "kategorie" : {
+            "type" : "string",
+            "description" : "Kategorie der Sonderfertigkeit. Beispiel: \"Geländekunde\", \"Magisch\", ...",
+            "default" : "Allgemein",
+            "minLength" : 1
+          },
+          "kosten" : {
+            "type" : "integer",
+            "description" : "Abenteuerpunkte-Kosten der Sonderfertigkeit",
+            "default" : "0",
+            "minimum" : 0
+          },
+          "liturgiekenntnis" : {
+            "description" : "(für neue Liturgie): mögliche Liturgiekenntnis. Beispiel: \"Praios\"",
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "minLength" : 1
+            }
+          },
+          "liturgien" : {
+            "description" : "(für neue Liturgie-Kenntnis): Liste mit möglichen Liturgien",
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "minLength" : 1
+            }
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Name der Sonderfertigkeit, darf noch nicht existieren",
+            "minLength" : 1
+          },
+          "varianten" : {
+            "description" : "(optional) mögliche Varianten, beispielsweise \"Bogen\" und \"Armbrust\" bei Scharfschütze. \nFormat: - \"Varianten-Name\"  oder\n        - name: \"Varianten-Name\"          kosten: 250  # Abenteuerpunkte pro Variante",
+            "type" : "array",
+            "items" : {
+              "type" : [ "string", "object" ],
+              "properties" : {
+                "kosten" : {
+                  "type" : "integer",
+                  "description" : "(optional) Kosten dieser Variante (falls unterschiedlich)",
+                  "minimum" : 0
+                },
+                "name" : {
+                  "type" : "string",
+                  "description" : "Varianten-Name",
+                  "minLength" : 1
+                }
+              },
+              "required" : [ "name" ]
+            }
+          }
+        },
+        "required" : [ "kosten", "name" ]
+      }
+    },
+    "source" : {
+      "type" : "string"
+    },
+    "zauber" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "kategorie" : {
+            "type" : "string",
+            "description" : "Steigerungs-Kategorie (\"A\"-\"H\")",
+            "default" : "A",
+            "minLength" : 1,
+            "pattern" : "^[A-H]$"
+          },
+          "merkmale" : {
+            "description" : "Merkmale, Kurzfassung und Langfassung möglich. Beispiel: [\"Anti\", \"Kraft\", \"Metamagie\"]",
+            "minItems" : 1,
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "minLength" : 1
+            }
+          },
+          "mod" : {
+            "type" : "string",
+            "description" : "Proben-Modifikator wie \"+MR\", \"+Mod\", ..."
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Zaubername, darf noch nicht existieren. Beispiel: \"Inarcanitas\"",
+            "minLength" : 1
+          },
+          "probe" : {
+            "type" : "string",
+            "description" : "Probe \"XX/YY/ZZ\", auch \"**\" möglich. Beispiel: \"MU/KL/KL\"",
+            "default" : "XX/YY/ZZ",
+            "minLength" : 1
+          },
+          "quelle" : {
+            "type" : "string",
+            "description" : "Quellenangabe im Format \"XXX:<seitenzahl>\". Beispiel: \"LCD:123\""
+          },
+          "settings" : {
+            "description" : "Spielwelten, in denen der Zauber zur Verfügung steht. Beispiel: [\"Aventurien\"]",
+            "default" : "[Alle]",
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "default" : "[Alle]",
+              "minLength" : 1
+            }
+          },
+          "spezialisierungen" : {
+            "description" : "Mögliche Spezialisierungen. Beispiel: [\"Reichweite\", \"Zauberdauer\", \"Variante X\"]",
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "minLength" : 1
+            }
+          },
+          "verbreitung" : {
+            "allOf" : [ {
+              "$ref" : "#/definitions/Verbreitungen"
+            }, {
+              "description" : "Verbreitung in Repräsentationen. Beispiele: \n{\"Mag\": 7}\n{\"Hex(Mag)\": 2}"
+            } ]
+          }
+        },
+        "required" : [ "kategorie", "merkmale", "name", "probe" ],
+        "description" : "Eigener, neuer Zauber"
+      }
+    }
+  }
+}
