@@ -14,7 +14,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -59,24 +58,16 @@ public class Loader {
     }
 
     public static Config load(File file, FileType type) throws IOException {
-        Reader reader = null;
-        try {
-            if (type == FileType.CSV) {
-                // convert CSV to JSON stream
-                reader = new InputStreamReader(new CsvConverter().convertToJson(file.toPath()), StandardCharsets.UTF_8);
-                type = FileType.JSON;
-            } else {
-                reader = preprocessStream(Files.newInputStream(file.toPath()));
-            }
+        if (type == FileType.CSV) {
+            // read CSV with separate Loader (which processes Zauber only)
+            return new CsvConverter().convertToConfig(file.toPath());
+        }
+        try (Reader reader = preprocessStream(Files.newInputStream(file.toPath()))) {
             Config config = load(reader, type);
             config.source = file.getAbsolutePath();
             return config;
-
         } catch (ConfigError | JsonParseException e) {
             throw new ConfigError("In " + file.getAbsolutePath() + ": \n" + e.getMessage());
-        } finally {
-            if (reader != null)
-                reader.close();
         }
     }
 

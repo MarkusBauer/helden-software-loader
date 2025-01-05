@@ -16,8 +16,8 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 public class CsvConfigTest {
-    private void testImportedZauber(Reader in) throws IOException {
-        Config config = Loader.load(in, Loader.FileType.JSON);
+    private void testImportedZauber(Path p) throws IOException {
+        Config config = new CsvConverter().convertToConfig(p);
         assertEquals(1, config.zauber.size());
         for (ZauberConfig z : config.zauber) {
             // Name
@@ -37,26 +37,20 @@ public class CsvConfigTest {
     @Test
     public void testExampleCsvLibreoffice() throws URISyntaxException, IOException {
         Path p = Paths.get(getClass().getResource("/examples/erweiterungen-libreoffice.csv").toURI());
-        try (InputStreamReader r = new InputStreamReader(new CsvConverter().convertToJson(p))) {
-            testImportedZauber(r);
-        }
+        testImportedZauber(p);
     }
 
 
     @Test
     public void testExampleCsvExcel() throws URISyntaxException, IOException {
         Path p = Paths.get(getClass().getResource("/examples/erweiterungen-excel-2.csv").toURI());
-        try (InputStreamReader r = new InputStreamReader(new CsvConverter().convertToJson(p))) {
-            testImportedZauber(r);
-        }
+        testImportedZauber(p);
     }
 
     @Test
     public void testExampleCsvExcelStrange() throws URISyntaxException, IOException {
         Path p = Paths.get(getClass().getResource("/examples/erweiterungen-excel-strange.csv").toURI());
-        try (InputStreamReader r = new InputStreamReader(new CsvConverter().convertToJson(p))) {
-            testImportedZauber(r);
-        }
+        testImportedZauber(p);
     }
 
 
@@ -64,8 +58,6 @@ public class CsvConfigTest {
     public void testExampleCsv() throws URISyntaxException, IOException {
         // Excel-style, UTF8, BOM
         Path p = Paths.get(getClass().getResource("/examples/erweiterungen.csv").toURI());
-        try (InputStreamReader r = new InputStreamReader(new CsvConverter().convertToJson(p))) {
-            testImportedZauber(r);
-        }
+        testImportedZauber(p);
     }
 }
