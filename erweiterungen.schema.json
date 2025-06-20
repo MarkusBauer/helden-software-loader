@@ -41,6 +41,33 @@
   },
   "type" : "object",
   "properties" : {
+    "merkmale" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "abkürzung" : {
+            "type" : "string",
+            "description" : "Abkürzung. Beispiel: \"Erw\"",
+            "minLength" : 1,
+            "maxLength" : 8
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Vollständiger Name des Merkmals. Beispiel: \"Erweckung\"",
+            "minLength" : 1
+          },
+          "stufe" : {
+            "type" : "integer",
+            "description" : "Stufe (1-3). 1 = 100AP, 2 = 200AP, 3 = 300AP",
+            "default" : "2",
+            "minimum" : 1,
+            "maximum" : 3
+          }
+        },
+        "required" : [ "abkürzung", "name" ]
+      }
+    },
     "repräsentationen" : {
       "type" : "array",
       "items" : {
@@ -185,7 +212,8 @@
             "type" : "string",
             "description" : "Probe \"XX/YY/ZZ\", auch \"**\" möglich. Beispiel: \"MU/KL/KL\"",
             "default" : "XX/YY/ZZ",
-            "minLength" : 1
+            "minLength" : 1,
+            "pattern" : "^[A-Z*]{2}/[A-Z*]{2}/[A-Z*]{2}$"
           },
           "quelle" : {
             "type" : "string",

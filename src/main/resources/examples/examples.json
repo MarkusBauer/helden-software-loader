@@ -140,5 +140,14 @@
                 "Fulminictus Donnerkeil":  7
             }
         }
+    ],
+
+
+    "merkmale": [
+        // Neue Merkmale müssen definiert werden, und können danach in eigenen Zaubern verwendet werden.
+        {
+            "name": "Erweckung",
+            "abkürzung": "Erw"  // Kurzform auf dem Heldenbogen
+        }
     ]
 }

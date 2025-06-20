@@ -67,6 +67,10 @@ public class ConfigMerger {
             if (addEntity("Repräsentation", r.name, r, newConfig.source))
                 config.repraesentationen.add(r);
         }
+        for (MerkmalConfig m : newConfig.merkmale) {
+            if (addEntity("Merkmal", m.name, m, newConfig.source))
+                config.merkmale.add(m);
+        }
     }
 
     public ConfigMergeResult getResult() {

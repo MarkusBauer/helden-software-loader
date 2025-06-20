@@ -65,8 +65,10 @@ public class EntryCreator {
 
 	// Merkmal ("Antimagie", ...)
 	Class merkmalType;
+	Constructor merkmalConstructor;
 	// Name => Merkmal (auch Kurzfassungen funktionieren)
 	Map<String, Object> alleMerkmale = new HashMap<>();
+	Map<String, Object> merkmalKinds = new HashMap<>();  // "MERKMAL", "QUELLE", "BEIDES"
 
 	// QuellenObj := (String, int), z.B. ("LCD", 123)
 	Class quellenObjType;
@@ -188,6 +190,22 @@ public class EntryCreator {
 			assert getMerkmale != null;
 			merkmalType = getMerkmale.getReturnType().getComponentType();
 			createStringMap(alleMerkmale, merkmalType);
+			for (Constructor c: merkmalType.getDeclaredConstructors()) {
+				if (c.getParameterCount() == 5) {
+					merkmalConstructor = c;
+					merkmalConstructor.setAccessible(true);
+					break;
+				}
+			}
+			assert merkmalConstructor != null;
+			for (Class subclass: merkmalType.getDeclaredClasses()) {
+				Object[] merkmalKinds = subclass.getEnumConstants();
+				if (merkmalKinds != null && merkmalKinds.length > 0) {
+					for (Object kind: merkmalKinds) {
+						this.merkmalKinds.put(kind.toString(), kind);
+					}
+				}
+			}
 
 			// Quelle
 			quellenObjType = Zauber.class.getMethod("getQuellenObj").getReturnType();
@@ -714,6 +732,18 @@ public class EntryCreator {
 		}
 		return sfname;
 	}
+
+	public Object createMerkmal(String name, String shortname, String abkuerzung, int stufe) {
+        try {
+			Object merkmal = merkmalConstructor.newInstance(abkuerzung, name, shortname, stufe, merkmalKinds.get("MERKMAL"));
+			alleMerkmale.put(name, merkmal);
+			alleMerkmale.put(shortname, merkmal);
+			return merkmal;
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			ErrorHandler.handleException(e);
+			return null;
+        }
+    }
 
 	public RepresentationWrapper createRepresentation(String name, String shortname, boolean hasRitualkenntnis) {
 		try {

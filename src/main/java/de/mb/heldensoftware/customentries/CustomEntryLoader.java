@@ -33,6 +33,10 @@ public class CustomEntryLoader {
             newSFNames.add(sf.name);
         }
 
+        for (MerkmalConfig m : config.merkmale) {
+             loadMerkmal(m);
+        }
+
         // load all sonderfertigkeit
         for (SonderfertigkeitConfig sf : config.sonderfertigkeiten) {
             loadSF(sf);
@@ -227,9 +231,13 @@ public class CustomEntryLoader {
     }
 
     protected void linkRepresentationZauber(EntryCreator.RepresentationWrapper repr, RepraesentationConfig cfg) {
-        for (Map.Entry<String, Integer> e: cfg.zauber.entrySet()) {
+        for (Map.Entry<String, Integer> e : cfg.zauber.entrySet()) {
             repr.addZauber(e.getKey(), e.getValue());
         }
+    }
+
+    protected void loadMerkmal(MerkmalConfig m) {
+        Object merkmal = EntryCreator.getInstance().createMerkmal(m.name, m.abkuerzung, m.abkuerzung.toLowerCase().substring(0, 2), m.stufe);
     }
 
 
@@ -276,7 +284,7 @@ public class CustomEntryLoader {
 
             CustomEntryLoader entryLoader = new CustomEntryLoader();
             ConfigMerger.ConfigMergeResult config = ConfigMerger.mergeAll(configs);
-            if (!config.duplicates.isEmpty()){
+            if (!config.duplicates.isEmpty()) {
                 JOptionPane.showMessageDialog(null, String.join("\n", config.duplicates),
                         "Helden-Software-Loader: Eigene Einträge mehrfach vorhanden!", JOptionPane.WARNING_MESSAGE);
             }

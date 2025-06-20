@@ -11,15 +11,19 @@ import java.util.Objects;
 public class Config {
     @JsonProperty
     @Valid
-    public ArrayList<ZauberConfig> zauber = new ArrayList<>();
-
-    @JsonProperty
-    @Valid
     public ArrayList<SonderfertigkeitConfig> sonderfertigkeiten = new ArrayList<>();
 
     @JsonProperty("repräsentationen")
     @Valid
     public ArrayList<RepraesentationConfig> repraesentationen = new ArrayList<>();
+
+    @JsonProperty("merkmale")
+    @Valid
+    public ArrayList<MerkmalConfig> merkmale = new ArrayList<>();
+
+    @JsonProperty
+    @Valid
+    public ArrayList<ZauberConfig> zauber = new ArrayList<>();
 
     // Filename or whatever where we got that config from.
     // Optional, not compared etc.
@@ -29,11 +33,12 @@ public class Config {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Config config = (Config) o;
-        return Objects.equals(zauber, config.zauber) && Objects.equals(sonderfertigkeiten, config.sonderfertigkeiten) && Objects.equals(repraesentationen, config.repraesentationen);
+        return Objects.equals(zauber, config.zauber) && Objects.equals(sonderfertigkeiten, config.sonderfertigkeiten) &&
+                Objects.equals(repraesentationen, config.repraesentationen) && Objects.equals(merkmale, config.merkmale);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(zauber, sonderfertigkeiten, repraesentationen);
+        return Objects.hash(zauber, sonderfertigkeiten, repraesentationen, merkmale);
     }
 }

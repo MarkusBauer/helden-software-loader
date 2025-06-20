@@ -156,3 +156,9 @@ repräsentationen:
     zauber: # Verbreitung der in dieser Repräsentation bekannten Zauber
       Armatrutz: 7  # Format: Zaubername: Verbreitung (1-7)
       Fulminictus Donnerkeil: 7
+
+
+merkmale:
+  # Neue Merkmale müssen definiert werden, und können danach in eigenen Zaubern verwendet werden.
+  - name: Erweckung
+    abkürzung: Erw  # Kurzform auf dem Heldenbogen
