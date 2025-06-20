@@ -35,6 +35,7 @@ public class CustomEntryLoader {
 
         for (MerkmalConfig m : config.merkmale) {
              loadMerkmal(m);
+             newSFNames.add("Merkmalskenntnis: " + m.name);
         }
 
         // load all sonderfertigkeit
@@ -237,7 +238,9 @@ public class CustomEntryLoader {
     }
 
     protected void loadMerkmal(MerkmalConfig m) {
-        Object merkmal = EntryCreator.getInstance().createMerkmal(m.name, m.abkuerzung, m.abkuerzung.toLowerCase().substring(0, 2), m.stufe);
+        // internal 2-digit code (param 3) should be sth like: m.abkuerzung.toLowerCase().substring(0, 2)
+        // but it also shouldn't collide, so we use the full shortname here
+        EntryCreator.getInstance().createMerkmal(m.name, m.abkuerzung, m.abkuerzung, m.stufe);
     }
 
 

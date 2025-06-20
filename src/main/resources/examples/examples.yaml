@@ -160,5 +160,7 @@ repräsentationen:
 
 merkmale:
   # Neue Merkmale müssen definiert werden, und können danach in eigenen Zaubern verwendet werden.
+  # Die Sonderfertigkeit "Merkmalskenntnis: X" wird automatisch erstellt
   - name: Erweckung
     abkürzung: Erw  # Kurzform auf dem Heldenbogen
+    stufe: 2  # (optional:) 1 = 100AP, 2 = 200AP, 3 = 300AP

@@ -97,6 +97,7 @@ public class EntryCreator {
 	Method sonderfertigkeitListAdd;
 	Method sonderfertigkeitListGet;
 	Method sonderfertigkeitRegistryGetList;
+	Method newMerkmalskenntnis;
 
 	// new Zauber: (String name, Kategorie spalte, Merkmal[] merkmale, Probe probe, QuellenObj quellenangabe, String mod) -> Zauber
 	Constructor<Zauber> newZauber = null;
@@ -207,6 +208,7 @@ public class EntryCreator {
 				}
 			}
 
+
 			// Quelle
 			quellenObjType = Zauber.class.getMethod("getQuellenObj").getReturnType();
 			quellenObjConstructor = quellenObjType.getConstructors()[0];
@@ -237,6 +239,9 @@ public class EntryCreator {
 			newSonderfertigkeit.setAccessible(true);
 			sonderfertigkeitSetCorrespondingTalent = getVoidMethodByParameterType(sonderfertigkeitType, Zauber.class.getSuperclass());
 			assert sonderfertigkeitSetCorrespondingTalent != null;
+
+			newMerkmalskenntnis = getMethodByParameterTypes(sonderfertigkeitType, String.class, merkmalType);
+			assert newMerkmalskenntnis != null;
 
 			// Zauber
 			for (Constructor<?> c : Zauber.class.getConstructors()) {
@@ -700,7 +705,7 @@ public class EntryCreator {
 		}
 	}
 
-	private Object registerSonderfertigkeit(String name, Object sf) throws Exception {
+	private Object registerSonderfertigkeit(String name, Object sf) throws ReflectiveOperationException {
 		Object otherList = sonderfertigkeitRegistryGetList.invoke(null);
 		sonderfertigkeitListAdd.invoke(otherList, sf);
 		Object sfname = newSonderfertigkeitName.newInstance(name);
@@ -735,11 +740,23 @@ public class EntryCreator {
 
 	public Object createMerkmal(String name, String shortname, String abkuerzung, int stufe) {
         try {
+			if (alleMerkmale.containsKey(name)) {
+				throw new IllegalArgumentException("Merkmal \"" + name + "\" ist bereits bekannt!");
+			}
+			if (alleMerkmale.containsKey(shortname)) {
+				throw new IllegalArgumentException("Merkmal \"" + shortname + "\" ist bereits bekannt!");
+			}
+
 			Object merkmal = merkmalConstructor.newInstance(abkuerzung, name, shortname, stufe, merkmalKinds.get("MERKMAL"));
 			alleMerkmale.put(name, merkmal);
 			alleMerkmale.put(shortname, merkmal);
+
+			String sfname = "Merkmalskenntnis: " + merkmal;
+			Object sf = newMerkmalskenntnis.invoke(null, sfname, merkmal);
+			registerSonderfertigkeit(sfname, sf);
+
 			return merkmal;
-		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+		} catch (ReflectiveOperationException e) {
 			ErrorHandler.handleException(e);
 			return null;
         }
@@ -924,7 +941,7 @@ public class EntryCreator {
 			this.p3 = p[2];
 		}
 
-		public Object getProbe() throws Exception {
+		public Object getProbe() throws ReflectiveOperationException {
 			Object o1 = instance.alleEigenschaften.get(p1);
 			if (o1 == null) throw new IllegalArgumentException("Unbekannte Eigenschaft: " + p1);
 			Object o2 = instance.alleEigenschaften.get(p2);
