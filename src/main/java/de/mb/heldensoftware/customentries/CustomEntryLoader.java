@@ -33,19 +33,25 @@ public class CustomEntryLoader {
             newSFNames.add(sf.name);
         }
 
-        // load all zauber
-        for (ZauberConfig zauber : config.zauber) {
-            loadZauber(zauber);
-        }
-
         // load all sonderfertigkeit
         for (SonderfertigkeitConfig sf : config.sonderfertigkeiten) {
             loadSF(sf);
         }
 
         // load all repräsentationen
+        ArrayList<EntryCreator.RepresentationWrapper> newRepresentations = new ArrayList<>();
         for (RepraesentationConfig repr : config.repraesentationen) {
-            loadRepresentation(repr);
+            newRepresentations.add(loadRepresentation(repr));
+        }
+
+        // load all zauber
+        for (ZauberConfig zauber : config.zauber) {
+            loadZauber(zauber);
+        }
+
+        // link representation with zauber (if not already done)
+        for (int i = 0; i < newRepresentations.size(); i++) {
+            linkRepresentationZauber(newRepresentations.get(i), config.repraesentationen.get(i));
         }
     }
 
@@ -216,8 +222,11 @@ public class CustomEntryLoader {
         }
     }
 
-    protected void loadRepresentation(RepraesentationConfig cfg) {
-        EntryCreator.RepresentationWrapper repr = EntryCreator.getInstance().createRepresentation(cfg.name, cfg.abkuerzung, cfg.ritualkenntnis);
+    protected EntryCreator.RepresentationWrapper loadRepresentation(RepraesentationConfig cfg) {
+        return EntryCreator.getInstance().createRepresentation(cfg.name, cfg.abkuerzung, cfg.ritualkenntnis);
+    }
+
+    protected void linkRepresentationZauber(EntryCreator.RepresentationWrapper repr, RepraesentationConfig cfg) {
         for (Map.Entry<String, Integer> e: cfg.zauber.entrySet()) {
             repr.addZauber(e.getKey(), e.getValue());
         }

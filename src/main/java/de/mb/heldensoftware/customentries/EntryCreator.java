@@ -721,6 +721,7 @@ public class EntryCreator {
 			Object sf2 = hasRitualkenntnis ? createSonderfertigkeit("Ritualkenntnis: " + name, 250, 4, null) : null;
 			Object repr = newRepresentation.newInstance("z" + (numRepresentations++), name, shortname, sf1, sf2);
 			alleRepresentationen.put(name, repr);
+			alleRepresentationen.put(shortname, repr);
 
 			for (Setting setting : Setting.getHauptSettings()) {
 				setting.getIncluded().add("R" + name);
