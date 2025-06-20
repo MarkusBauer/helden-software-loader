@@ -49,6 +49,14 @@ zauber:
     settings: [ Aventurien ]
     # Keine Verbreitung - nur per Editor wählbar
 
+  # === eigene Merkmale (Definition siehe weiter unten) ===
+  - name: "Ensiferi Klingentanz"
+    kategorie: C
+    merkmale:
+      - Erweckung
+      - Telekinese
+    probe: KL/IN/GE
+
 
 sonderfertigkeiten:
   - name: Gesegnet

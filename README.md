@@ -1,7 +1,7 @@
 Custom Entry Plugin für die Helden-Software
 ===========================================
 
-Dieses Plugin ist in der Lage, eigene Zauber, Talente, Sprachen, Sonderfertigkeiten 
+Dieses Plugin ist in der Lage, eigene Zauber, Talente, Sprachen, Sonderfertigkeiten, Merkmale 
 und Repräsentationen zur DSA 4.1 Helden-Software von 
 [www.helden-software.de](http://www.helden-software.de) hinzuzufügen.
 Neue Zauber sind wahlweise per Editor oder zur regulären Aktivierung verfügbar, 
@@ -11,7 +11,7 @@ Sonderfertigkeiten und Repräsentationen können über die üblichen Wege aktivi
 
 ![](screenshot1.png)
 
-Nach der Installation können eigene Zauber, Sonderfertigkeiten und Repräsentationen 
+Nach der Installation können eigene Zauber, Sonderfertigkeiten, Merkmale und Repräsentationen 
 in eine Konfigurationsdatei eingetragen werden, und stehen dann in allen Helden 
 zur Verfügung. Diese Konfigurationsdatei könnt ihr auch an andere Spieler versenden, 
 denen eure Zauber dann ebenfalls zur Verfügung stehen.
@@ -122,6 +122,8 @@ Eine leere `erweiterungen.yaml` ohne neue Zauber, Sonderfertigkeiten und Repräs
   # Hier kommen eure neuen Sonderfertigkeiten hin
 # repräsentationen:
   # Hier kommen eure neuen Repräsentationen hin
+# merkmale:
+  # Hier kommen eure neuen Merkmale hin
 ```
 Die `#` sind Kommentarzeichen - alles was dahinter steht gehört nicht zum 
  eigentlichen Inhalt der Datei (und wird nicht mit eingelesen). 
@@ -390,6 +392,27 @@ repräsentationen:
 ```
 Name und Abkürzung dürfen nicht verändert werden, sobald die Repräsentation oder ein Zauber in dieser Repräsentation aktiviert wurden.
 Eigene Zauber können hier verwendet werden.
+
+
+### Neue Merkmale
+Neue Merkmale für eigene Zauebr können so erstellt werden. 
+Eine Merkmalskenntnis wird automatisch mit erzeugt.
+```yaml
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
+
+merkmale:
+  - name: Erweckung
+    abkürzung: Erw  # Kurzform auf dem Heldenbogen
+    stufe: 2  # (optional:) 1 = 100AP, 2 = 200AP, 3 = 300AP
+
+zauber:
+  - name: "Ensiferi Klingentanz"
+    kategorie: C
+    merkmale:
+      - Erweckung  # anschließend können diese ganz normal verwendet werden
+      - Telekinese
+    probe: KL/IN/GE
+```
 
 
 
