@@ -19,9 +19,17 @@ import java.util.Arrays;
 public class HeldenLauncher {
 
 	public static void main(String[] args) {
-		try {
+        HeldenLauncher launcher = new HeldenLauncher();
+        launcher.registerBundledPlugins();
+        launcher.sideloaderWithPotentialRestart(args);
+        launcher.prepareEntryLoader();
+        // Launch Helden-Software
+		Helden.main(args);
+	}
+
+    protected void sideloaderWithPotentialRestart(String[] args) {
+        try {
 			// Register the plugin component
-			PluginSideloader.addPlugin(CustomEntryLoaderPlugin.class);
 			PluginSideloader.registerSideloader();
 		} catch (RuntimeException e) {
 			// Java 9+ module API prevents us from modifying the classloader.
@@ -36,18 +44,23 @@ public class HeldenLauncher {
 			}
 			throw e;
 		}
-		// Patch bugs
-		ErrorHandler.patchHeldenErrorHandler();
-		ModsDatenParserBugPatcher.patchModsDatenParser();
-		// Resolve reflection references (after patches are deployed, before HeldenSoftware initializes anything)
-		EntryCreator.getInstance();
-		// Load the non-plugin component
-		CustomEntryLoader.loadFiles();
-		// Launch Helden-Software
-		Helden.main(args);
-	}
+    }
 
-	public static void restart(String[] args) {
+    protected void prepareEntryLoader() {
+        // Patch bugs
+        ErrorHandler.patchHeldenErrorHandler();
+        ModsDatenParserBugPatcher.patchModsDatenParser();
+        // Resolve reflection references (after patches are deployed, before HeldenSoftware initializes anything)
+        EntryCreator.getInstance();
+        // Load the non-plugin component
+        CustomEntryLoader.loadFiles();
+    }
+
+    protected void registerBundledPlugins() {
+        PluginSideloader.addPlugin(CustomEntryLoaderPlugin.class);
+    }
+
+    public void restart(String[] args) {
 		if (System.getenv().containsKey("CUSTOMENTRYLOADER_INVOKED"))
 			return;
 		try {
@@ -69,16 +82,10 @@ public class HeldenLauncher {
 			command.add(jvmBinary);
 
 			// JVM ARGS
-			command.addAll(ManagementFactory.getRuntimeMXBean().getInputArguments());
-			command.add("-classpath");
-			command.add(System.getProperty("java.class.path"));
-			command.add("--add-opens");
-			command.add("java.base/java.lang=ALL-UNNAMED");
-			// we might need this argument for other plugins
-			command.add("-Djava.security.manager=allow");
+            additionalJvmArgs(command);
 
-			// The JAR
-			String jarPath = Paths.get(HeldenLauncher.class
+            // The JAR
+			String jarPath = Paths.get(getClass()
 					.getProtectionDomain()
 					.getCodeSource()
 					.getLocation()
@@ -123,5 +130,15 @@ public class HeldenLauncher {
 			throw new RuntimeException(e);
 		}
 	}
+
+    protected void additionalJvmArgs(ArrayList<String> command) {
+        command.addAll(ManagementFactory.getRuntimeMXBean().getInputArguments());
+        command.add("-classpath");
+        command.add(System.getProperty("java.class.path"));
+        command.add("--add-opens");
+        command.add("java.base/java.lang=ALL-UNNAMED");
+        // we might need this argument for other plugins
+        command.add("-Djava.security.manager=allow");
+    }
 
 }
