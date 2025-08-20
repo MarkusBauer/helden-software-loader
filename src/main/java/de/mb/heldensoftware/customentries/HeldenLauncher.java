@@ -95,7 +95,7 @@ public class HeldenLauncher {
 				command.add("-jar");
 				command.add(jarPath);
 			} else {
-				command.add(HeldenLauncher.class.getName());
+				command.add(getClass().getName());
 			}
 
 			// Args
