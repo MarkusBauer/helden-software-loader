@@ -145,6 +145,10 @@ public class HeldenLauncher {
     protected boolean hasSecurityManager() {
         String version = System.getProperty("java.version");
         if (version.startsWith("1.")) return true;
+        int p = version.indexOf('.');
+        if (p >= 0) {
+            version = version.substring(0, p);
+        }
         return Integer.parseInt(version) < 24;
     }
 
