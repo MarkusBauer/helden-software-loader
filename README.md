@@ -93,7 +93,9 @@ Konfigurationsdatei (`erweiterungen.yaml`) geschrieben.
 Diese Datei kommt ins gleiche Verzeichnis wie eure `helden.zip.hld` - also 
 `C:\Benutzer\XXX\helden\erweiterungen.yaml` unter Windows bzw. `~/helden/erweiterungen.yaml` unter Linux.
 Sollen mehrere Dateien geladen werden, können diese in einem Unterordner `erweiterungen` abgelegt werden (mit der Endung `.yaml`).
-Bei Installation mit `-hslocal` (USB-Sticks etc.) können Erweiterungen auch neben die `helden.jar` gelegt werden. 
+Bei Installation mit `-hslocal` (USB-Sticks etc.) können Erweiterungen auch neben die `helden.jar` gelegt werden.
+
+Ihr könnt diese Datei anlegen, indem ihr in der Helden-Software auf "Erweiterungen" klickt und den Eintrag "Eigene Zauber bearbeiten" wählt.
  
 Neue **Talente** benötigen keine Konfiguration, und können im "Erweiterungen"-Menü erstellt werden.
 
