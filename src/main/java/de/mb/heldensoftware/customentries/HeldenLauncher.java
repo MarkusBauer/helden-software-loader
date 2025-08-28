@@ -58,6 +58,7 @@ public class HeldenLauncher {
 
     protected void registerBundledPlugins() {
         PluginSideloader.addPlugin(CustomEntryLoaderPlugin.class);
+        PluginSideloader.addPlugin(CreateConfigFilePlugin.class);
     }
 
     public void restart(String[] args) {

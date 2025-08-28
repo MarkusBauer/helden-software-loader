@@ -246,6 +246,12 @@ public class CustomEntryLoader {
 
     private static boolean filesLoaded = false;
 
+    private static File firstConfigFile = null;
+
+    public static File getFirstConfigFile() {
+        return firstConfigFile;
+    }
+
     /**
      * Load first file from:
      * - helden.jar directory
@@ -344,6 +350,7 @@ public class CustomEntryLoader {
             if (c != null) {
                 configs.add(c);
                 System.err.println("[CustomEntryLoader] Lade " + f.getAbsolutePath());
+                if (firstConfigFile == null) firstConfigFile = f;
             } else {
                 System.err.println("[CustomEntryLoader] Unbekanntes Format: " + f.getAbsolutePath());
             }
