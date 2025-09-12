@@ -83,21 +83,21 @@ public class EntryCreator {
 	Map<String, Object> alleRepresentationen = new HashMap<>();
 
 	// Sonderfertigkeit
-	Class sonderfertigkeitNameType;
-	Constructor<?> newSonderfertigkeitName;
-	Class sonderfertigkeitType;
-	Constructor<?> newSonderfertigkeit;
-	Class sonderfertigkeitLiturgieType;
-	Constructor<?> newLiturgieSonderfertigkeit;
-	Class sonderfertigkeitWithParamsType;
-	Constructor<?> newSonderfertigkeitWithParams;
-	Method sonderfertigkeitSetCorrespondingTalent;
-	Class sonderfertigkeitRegistryType;
-	Class sonderfertigkeitListType;
-	Method sonderfertigkeitListAdd;
-	Method sonderfertigkeitListGet;
-	Method sonderfertigkeitRegistryGetList;
-	Method newMerkmalskenntnis;
+	public Class sonderfertigkeitNameType;
+	public Constructor<?> newSonderfertigkeitName;
+	public Class sonderfertigkeitType;
+	public Constructor<?> newSonderfertigkeit;
+	public Class sonderfertigkeitLiturgieType;
+	public Constructor<?> newLiturgieSonderfertigkeit;
+	public Class sonderfertigkeitWithParamsType;
+	public Constructor<?> newSonderfertigkeitWithParams;
+	public Method sonderfertigkeitSetCorrespondingTalent;
+	public Class sonderfertigkeitRegistryType;
+	public Class sonderfertigkeitListType;
+	public Method sonderfertigkeitListAdd;
+	public Method sonderfertigkeitListGet;
+	public Method sonderfertigkeitRegistryGetList;
+	public Method newMerkmalskenntnis;
 
 	// new Zauber: (String name, Kategorie spalte, Merkmal[] merkmale, Probe probe, QuellenObj quellenangabe, String mod) -> Zauber
 	Constructor<Zauber> newZauber = null;
