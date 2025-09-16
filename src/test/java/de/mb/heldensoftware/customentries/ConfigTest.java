@@ -27,6 +27,16 @@ public class ConfigTest {
     }
 
     @Test
+    public void testEmptyYamlFile() throws IOException, URISyntaxException {
+        Path p = Paths.get(getClass().getResource("/empty.yaml").toURI());
+        Config cfg = Loader.load(p, Loader.FileType.YAML);
+        assertEquals(0, cfg.zauber.size());
+        assertEquals(0, cfg.sonderfertigkeiten.size());
+        assertEquals(0, cfg.repraesentationen.size());
+        assertEquals(0, cfg.merkmale.size());
+    }
+
+    @Test
     public void testExampleConfigsEqual() throws IOException, URISyntaxException {
         Path p = Paths.get(getClass().getResource("/examples/examples.json").toURI());
         Config json = Loader.load(p, Loader.FileType.JSON);

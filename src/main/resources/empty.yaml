@@ -1,20 +1,21 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
 # Dokumentation und Beispiele: https://github.com/MarkusBauer/helden-software-loader/
+# Ihr moddet hier die Helden-Software, nicht einen einzelnen Helden. Helden mit neuen Features sind nur eingeschränkt übertragbar.
 # Alles hinter dem '#'-Zeichen ist ein Kommentar und wird ignoriert. Entfernt # vor den Abschnitten die ihr nutzen wollt.
 
-# zauber:
-  # Hier kommen eure neuen Zauber hin, z.B.:
+zauber:
+  # # Hier kommen eure neuen Zauber hin, z.B.:
   # - name: Bannbaladin (erhöhte Reichweite)
   #   kategorie: B
   #   merkmale: [ Einfluss ]
   #   probe: IN/CH/CH
   #   settings: [ Aventurien ]
 
-# sonderfertigkeiten:
+sonderfertigkeiten:
   # Hier kommen eure neuen Sonderfertigkeiten hin
 
-# repräsentationen:
+repräsentationen:
   # Hier kommen eure neuen Repräsentationen hin
 
-# merkmale:
+merkmale:
   # Hier kommen eure neuen Merkmale hin
