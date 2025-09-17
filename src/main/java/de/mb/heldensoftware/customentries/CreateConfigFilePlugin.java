@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 
 public class CreateConfigFilePlugin implements HeldenDatenPlugin {
@@ -66,11 +67,57 @@ public class CreateConfigFilePlugin implements HeldenDatenPlugin {
             JOptionPane.showMessageDialog(jFrame, "Die Datei " + f.getAbsolutePath() + " wurde angelegt.");
         }
 
+        openConfigFile(jFrame, f);
+    }
+
+    private void openConfigFile(JFrame jFrame, File f) {
         try {
-            Desktop.getDesktop().open(f);
+            if (isFileAssoicationMissing(".yaml")) {
+                int result = JOptionPane.showOptionDialog(
+                        jFrame,
+                        "Erweiterungen werden in Yaml-Dateien konfiguriert. \n" +
+                                "Auf ihrem System ist kein Editor für Yaml-Dateien verfügbar. \n" +
+                                "Sie können beispielsweise VS Code herunterladen, oder die Einstellungsdatei mit Notepad bearbeiten.",
+                        "Editor wählen",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        new Object[]{"VS Code herunterladen", "Notepad benutzen", "Abbrechen"},
+                        "Notepad benutzen"
+                );
+                if (result == 0) {
+                    Desktop.getDesktop().browse(URI.create("https://code.visualstudio.com/Download"));
+                } else if (result == 1) {
+                    Runtime.getRuntime().exec("notepad.exe \"" + f.getAbsolutePath() + "\"");
+                }
+
+            } else {
+                Desktop.getDesktop().open(f);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean isFileAssoicationMissing(String ext) {
+        if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
+            return false;
+        }
+
+        try {
+            // check for global assignment of extension
+            Process p = Runtime.getRuntime().exec("reg query HKLM\\SOFTWARE\\Classes\\" + ext + "\\ /ve");
+            if (p.waitFor() != 0) {
+                // check for local assignment of extension
+                p = Runtime.getRuntime().exec("reg query HKCU\\SOFTWARE\\Classes\\" + ext + "\\ /ve");
+                if (p.waitFor() != 0) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
