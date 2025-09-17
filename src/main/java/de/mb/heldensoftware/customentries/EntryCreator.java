@@ -4,17 +4,20 @@ import com.openpojo.reflection.PojoClass;
 import com.openpojo.reflection.impl.PojoClassFactory;
 import de.mb.heldensoftware.customentries.config.Loader;
 import de.mb.heldensoftware.customentries.config.SonderfertigkeitConfig;
+import helden.cloudinterface.HeldenContainerImpl;
 import helden.framework.EigeneErweiterungenMoeglich;
 import helden.framework.bedingungen.AbstraktBedingung;
 import helden.framework.bedingungen.Bedingung;
 import helden.framework.bedingungen.BedingungsVerknuepfung;
 import helden.framework.held.persistenz.BasisXMLParser;
 import helden.framework.held.persistenz.ModsDatenParser;
+import helden.framework.held.persistenz.XMLParserKonverter;
 import helden.framework.settings.Setting;
 import helden.framework.settings.Settings;
 import helden.framework.zauber.Zauber;
 import helden.framework.zauber.ZauberFabrik;
 import helden.framework.zauber.ZauberVerbreitung;
+import helden.plugin.datenplugin.impl.DatenPluginHeldenWerkzeugImpl;
 import org.w3c.dom.Element;
 
 import java.io.File;
@@ -142,8 +145,12 @@ public class EntryCreator {
 	HashMap<String, Object> talentFactoryMap;
 
 	// Held
-	Class HeldType;
+	public Class HeldType;
+    public Class HeldInterfaceType;
 	Method heldAddTalent;
+    public Class<?> MainWindowType;
+    public Method getMainWindowInstance;
+    public Method getCurrentHeld;
 
 	// Bedingung
 	Method bedingungHatSonderfertigkeit;
@@ -424,6 +431,22 @@ public class EntryCreator {
 			createStringMap((Map) alleMagielevel, Bedingung.MagieLevel.class);
 			assert !alleMagielevel.isEmpty();
 
+            // Held
+            HeldInterfaceType = DatenPluginHeldenWerkzeugImpl.class.getConstructors()[0].getParameterTypes()[0];
+            HeldType = HeldenContainerImpl.class.getMethod("getHeld").getReturnType();
+            MainWindowType = XMLParserKonverter.class.getConstructors()[0].getParameterTypes()[0];
+            getMainWindowInstance = getMethodByReturnType(MainWindowType, MainWindowType);
+            getCurrentHeld = getMethodByReturnType(MainWindowType, HeldInterfaceType);
+            for (Method m : HeldType.getMethods()) {
+                Class[] params = m.getParameterTypes();
+                if (params.length == 2 && m.getReturnType().equals(Void.TYPE) && params[0].equals(TalentType.getSuperclass()) && params[1].equals(Integer.TYPE)) {
+                    heldAddTalent = m;
+                }
+            }
+            assert getMainWindowInstance != null;
+            assert getCurrentHeld != null;
+            assert heldAddTalent != null;
+
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 		}
@@ -447,17 +470,6 @@ public class EntryCreator {
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void initHeldTypes(Object held) {
-		HeldType = held.getClass();
-		for (Method m : HeldType.getMethods()) {
-			Class[] params = m.getParameterTypes();
-			if (params.length == 2 && m.getReturnType().equals(Void.TYPE) && params[0].equals(TalentType.getSuperclass()) && params[1].equals(Integer.TYPE)) {
-				heldAddTalent = m;
-			}
-		}
-		if (heldAddTalent == null) throw new RuntimeException("heldAddTalent not found");
 	}
 
 
@@ -815,7 +827,6 @@ public class EntryCreator {
 
 
 	public void addTalentToHeld(Object held, Object talent, int value) {
-		if (HeldType == null) initHeldTypes(held);
 		try {
 			heldAddTalent.invoke(held, talent, value);
 		} catch (Exception e) {

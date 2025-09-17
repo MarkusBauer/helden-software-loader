@@ -39,8 +39,7 @@
                             <addClasspath>true</addClasspath>
                         </manifest>
                         <manifestEntries>
-                            <!-- HeldenPluginClass: heldenbildPlugin.HeldenbildPlugin.class -->
-                            <HeldenDatenPluginClass>de.mb.heldensoftware.customentries.CustomEntryLoaderPlugin.class</HeldenDatenPluginClass>
+                            <HeldenPluginClass>de.mb.heldensoftware.customentries.CustomEntryMenuPlugin.class</HeldenPluginClass>
                             <Class-Path>. helden.jar helden5.jar helden-${helden.version}.jar</Class-Path>
                         </manifestEntries>
                     </archive>
