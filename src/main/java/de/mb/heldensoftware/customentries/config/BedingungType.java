@@ -8,6 +8,7 @@ public enum BedingungType {
     Eigenschaft,
     MagieLevel,
     LKW,
+    Leiteigenschaft,
     or,
     and,
 }

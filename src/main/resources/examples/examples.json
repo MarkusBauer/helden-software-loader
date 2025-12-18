@@ -94,7 +94,8 @@
             {"type": "Talent", "name": "Steinschneider/Juwelier", "value": 10},  // TaW Steinschneider >= 10 (eigene Talente nicht möglich)
             {"type": "Eigenschaft", "name": "FF", "value": 15},  // Fingerfertigkeit >= 15
             {"type": "LKW", "value": 0},  // Liturgiekenntnis >= 0
-            {"type": "MagieLevel", "name": "Vollzauberer"}  // Optionen: "Viertelzauberer", "Spruchzauberer", "Schamane", "Halbzauberer", "Vollzauberer", "Geweihter"
+            {"type": "MagieLevel", "name": "Vollzauberer"},  // Optionen: "Viertelzauberer", "Spruchzauberer", "Schamane", "Halbzauberer", "Vollzauberer", "Geweihter"
+            {"type": "Leiteigenschaft", "value": 10}
         ]},
 
         // Komplexe Bedingungen:

@@ -39,7 +39,7 @@ public class BedingungConfig {
 
     @AssertTrue(message = "ist erforderlich")
     private boolean isName() {
-        if (type != BedingungType.or && type != BedingungType.and && type != BedingungType.LKW) {
+        if (type != BedingungType.or && type != BedingungType.and && type != BedingungType.LKW && type != BedingungType.Leiteigenschaft) {
             return name != null && !name.isEmpty();
         }
         return true;

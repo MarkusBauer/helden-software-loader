@@ -100,6 +100,8 @@ sonderfertigkeiten:
         value: 0
       - type: MagieLevel  # Optionen: Viertelzauberer, Spruchzauberer, Schamane, Halbzauberer, Vollzauberer, Geweihter
         name: Vollzauberer
+      - type: Leiteigenschaft
+        value: 10
 
   # Komplexe Bedingungen:
   - name: Karmaler Schub

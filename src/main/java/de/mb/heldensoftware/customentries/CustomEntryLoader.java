@@ -200,6 +200,9 @@ public class CustomEntryLoader {
                         throw new RuntimeException("MagieLevel \"" + bc.name + "\" nicht gefunden!");
                     b = Bedingung.istMindestens(level);
                     break;
+                case Leiteigenschaft:
+                    b = Bedingung.hatLeiteigenschaft(bc.value);
+                    break;
                 default:
                     System.err.println("[CustomEntryLoader] Ignorierte Bedingung: " + bc.type);
                     throw new RuntimeException("Ungültige Bedingung: type \"" + bc.type + "\" ist nicht bekannt!");
