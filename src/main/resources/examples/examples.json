@@ -85,6 +85,14 @@
             ]
         },
 
+        // Sonderfertigkeit mit Freitext-Variante
+        // Funktioniert erst mit Helden-Software 5.5.4 (nicht mit der Vorabversion von 5.5.4!)
+        {
+            "name": "Berufserfahrung",
+            "kosten": 200,
+            "varianten": ["freitext"]
+        },
+
         // Eigene Ritualkenntnis / Rituale
         {"name": "Ritualkenntnis: Alt-Druidisch", "kosten": 250, "kategorie":  "Magisch"},
 

@@ -14,6 +14,7 @@ import helden.framework.held.persistenz.ModsDatenParser;
 import helden.framework.held.persistenz.XMLParserKonverter;
 import helden.framework.settings.Setting;
 import helden.framework.settings.Settings;
+import helden.framework.sonderfertigkeit.EmptyMASF;
 import helden.framework.zauber.Zauber;
 import helden.framework.zauber.ZauberFabrik;
 import helden.framework.zauber.ZauberVerbreitung;
@@ -711,6 +712,24 @@ public class EntryCreator {
 			if (bedingung != null)
 				sonderfertigkeitSetBedingung.invoke(sf, bedingung);
 			return registerSonderfertigkeit(name, sf);
+		} catch (Exception e) {
+			ErrorHandler.handleException(e);
+			return null;
+		}
+	}
+
+	public Object createSonderfertigkeitWithFreeText(String name, int kosten, int category, BedingungsVerknuepfung bedingung) {
+		try {
+			if (isSonderfertigkeitKnown(name)) {
+				throw new IllegalArgumentException("Sonderfertigkeit \"" + name + "\" ist bereits bekannt!");
+			}
+
+			Object sf = new EmptyMASF(name, category, kosten, new ArrayList());
+			if (bedingung != null)
+				sonderfertigkeitSetBedingung.invoke(sf, bedingung);
+			return registerSonderfertigkeit(name, sf);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Ihre Version der Helden-Software ist zu alt, um Sonderfertigkeiten mit Freitext zu unterstützen");
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 			return null;

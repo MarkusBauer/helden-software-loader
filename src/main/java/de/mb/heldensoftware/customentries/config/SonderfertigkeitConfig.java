@@ -111,4 +111,8 @@ public class SonderfertigkeitConfig {
     public int hashCode() {
         return Objects.hash(name, kosten, kategorie, varianten, bedingungen, liturgien, liturgiekenntnis, grad);
     }
+
+    public boolean isFreitextVariante() {
+        return varianten.size() == 1 && (varianten.get(0).name.isEmpty() || varianten.get(0).name.equalsIgnoreCase("freitext"));
+    }
 }

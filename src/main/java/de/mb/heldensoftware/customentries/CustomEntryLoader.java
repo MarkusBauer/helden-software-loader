@@ -99,7 +99,10 @@ public class CustomEntryLoader {
         }
 
         Object sfname;
-        if (!sf.varianten.isEmpty()) {
+        if (sf.isFreitextVariante()) {
+            // SF mit Freitext-Variante
+            sfname = EntryCreator.getInstance().createSonderfertigkeitWithFreeText(sf.name, sf.kosten, cat, bedingung);
+        } else if (!sf.varianten.isEmpty()) {
             // SF mit Varianten
             sfname = EntryCreator.getInstance().createSonderfertigkeitWithParams(sf.name, sf.kosten, cat, bedingung, sf.varianten);
         } else {
