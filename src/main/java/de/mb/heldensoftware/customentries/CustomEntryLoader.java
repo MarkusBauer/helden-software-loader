@@ -38,6 +38,13 @@ public class CustomEntryLoader {
              newSFNames.add("Merkmalskenntnis: " + m.name);
         }
 
+        for (RepraesentationConfig repr : config.repraesentationen) {
+            newSFNames.add("Repräsentation: " + repr.name);
+            if (repr.ritualkenntnis) {
+                newSFNames.add("Ritualkenntnis: " + repr.name);
+            }
+        }
+
         // load all sonderfertigkeit
         for (SonderfertigkeitConfig sf : config.sonderfertigkeiten) {
             loadSF(sf);
