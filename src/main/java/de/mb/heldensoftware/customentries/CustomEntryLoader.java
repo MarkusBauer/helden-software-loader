@@ -260,6 +260,7 @@ public class CustomEntryLoader {
     private static boolean filesLoaded = false;
 
     private static File firstConfigFile = null;
+    private static HashSet<File> allConfigFiles = new HashSet<>();
 
     public static File getFirstConfigFile() {
         return firstConfigFile;
@@ -359,16 +360,22 @@ public class CustomEntryLoader {
 
     private static void tryLoad(List<Config> configs, File f) throws IOException {
         if (f.exists()) {
+            f = f.getAbsoluteFile();
+            if (allConfigFiles.contains(f)) {
+                System.err.println("[CustomEntryLoader] Ignoriere " + f + " (bereits geladen)");
+                return;
+            }
             Config c = Loader.load(f.toPath());
             if (c != null) {
                 configs.add(c);
-                System.err.println("[CustomEntryLoader] Lade " + f.getAbsolutePath());
+                System.err.println("[CustomEntryLoader] Lade " + f);
                 if (firstConfigFile == null) firstConfigFile = f;
+                allConfigFiles.add(f);
             } else {
-                System.err.println("[CustomEntryLoader] Unbekanntes Format: " + f.getAbsolutePath());
+                System.err.println("[CustomEntryLoader] Unbekanntes Format: " + f);
             }
         } else {
-            System.err.println("[CustomEntryLoader] Keine Erweiterungen in " + f.getAbsolutePath());
+            System.err.println("[CustomEntryLoader] Keine Erweiterungen in " + f);
         }
     }
 
