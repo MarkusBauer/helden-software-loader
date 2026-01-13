@@ -455,9 +455,7 @@ public class EntryCreator {
 			Class superclassVonTalentWerte = newKampfwerte.getParameterTypes()[1];
 			for (Method m : HeldType.getMethods()) {
 				if (m.getParameterCount() == 0 && superclassVonTalentWerte.isAssignableFrom(m.getReturnType())) {
-					System.out.println("CANDIDATE " + m);
 					if (Arrays.stream(m.getReturnType().getMethods()).anyMatch(m2 -> m2.getReturnType().equals(KonkreterZauber.class))) {
-						System.out.println("... =zauber");
 						continue;
 					}
 					heldGetTalente = m;
@@ -630,8 +628,12 @@ public class EntryCreator {
 	private Object getMerkmale(List<String> merkmale) {
 		Object result = Array.newInstance(merkmalType, merkmale.size());
 		for (int i = 0; i < merkmale.size(); i++) {
-			Object mkml = alleMerkmale.get(merkmale.get(i));
-			if (mkml == null) throw new IllegalArgumentException("Unbekanntes Merkmal: " + merkmale.get(i));
+			String s = merkmale.get(i);
+			s = cleanupString(s.replace("(gesamt)", ""));
+			Object mkml = alleMerkmale.get(s);
+			if (mkml == null) {
+				throw new IllegalArgumentException("Unbekanntes Merkmal: " + merkmale.get(i));
+			}
 			Array.set(result, i, mkml);
 		}
 		return result;
@@ -961,6 +963,11 @@ public class EntryCreator {
 	}
 
 
+	public static String cleanupString(String s) {
+		return s.replace("\u00a0"," ").trim();
+	}
+
+
 	/**
 	 * Eine Probe aus drei Eigenschaften. Bsp: "(MU/KL/KO)"
 	 */
@@ -1044,7 +1051,7 @@ public class EntryCreator {
 		public final Zauber zauber;
 
 		public ZauberWrapper(String name, Zauber zauber) {
-			this.name = name;
+			this.name = cleanupString(name);
 			this.zauber = zauber;
 		}
 
@@ -1074,7 +1081,9 @@ public class EntryCreator {
 		 * @see helden.framework.zauber.ZauberVerbreitung
 		 */
 		public void addVerbreitung(String repr, String bekanntIn, int num) {
-			Object reprObj = instance.alleRepresentationen.get(repr);
+			repr = cleanupString(repr);
+			bekanntIn = cleanupString(bekanntIn);
+			Object reprObj = instance.alleRepresentationen.get(repr.trim());
 			if (reprObj == null) throw new IllegalArgumentException("Unbekannte Repräsentation: " + repr);
 			Object bekanntObj = instance.alleRepresentationen.get(bekanntIn);
 			if (bekanntObj == null) throw new IllegalArgumentException("Unbekannte Repräsentation: " + bekanntIn);
@@ -1129,13 +1138,13 @@ public class EntryCreator {
 		public final Object repr;
 
 		public RepresentationWrapper(String name, Object repr) {
-			this.name = name;
+			this.name = cleanupString(name);
 			this.repr = repr;
 		}
 
 		public void addZauber(String name, int verbreitung) {
 			try {
-				Zauber zauber = ZauberFabrik.getInstance().getZauberfertigkeit(name);
+				Zauber zauber = ZauberFabrik.getInstance().getZauberfertigkeit(cleanupString(name));
 				zauber.getVerbreitung().add(instance.newZauberVerbreitung.newInstance(repr, repr, verbreitung));
 			} catch (RuntimeException e) {
 				ErrorHandler.handleException(new RuntimeException("Unbekannter Zauber: " + name, e));
