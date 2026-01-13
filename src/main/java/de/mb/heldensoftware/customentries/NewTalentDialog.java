@@ -120,7 +120,7 @@ public class NewTalentDialog extends JDialog {
 		// Arten
 		for (Object o : ec.getAllStaticInstances(ec.TalentArtType)) {
 			boolean b = ((Boolean) ec.talentArtIsPrimitive.invoke(o)).booleanValue();
-			if ((b && !o.toString().equals("Kampf")) || o.toString().equals("Gaben"))
+			if ((b && !o.toString().equals("Kampf")) || o.toString().equals("Gaben") || o.toString().equals("Nahkampf") || o.toString().equals("Fernkampf"))
 				comboArt.addItem(o); // "Kampf" is not importable, "Nahkampf"/"Fernkampf" is broken
 		}
 		// Sprachfamilien
@@ -202,8 +202,10 @@ public class NewTalentDialog extends JDialog {
 		try {
 			Object talent = createTalentInstance();
 			System.out.println(talent);
-			if (newTalentCallback != null)
+			if (newTalentCallback != null) {
 				newTalentCallback.talentCreated(talent, (Integer) spinnerStartwert.getValue());
+				// TODO held.setKampfwerte(talent, new Kampfwerte(0, 0))
+			}
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 		}

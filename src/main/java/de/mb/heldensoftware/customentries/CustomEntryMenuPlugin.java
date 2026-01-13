@@ -57,12 +57,7 @@ public class CustomEntryMenuPlugin implements HeldenXMLDatenPlugin3 {
                 final Object held = ec.getCurrentHeld.invoke(ec.getMainWindowInstance.invoke(null));
 
                 NewTalentDialog dialog = new NewTalentDialog(jFrame);
-                dialog.setNewTalentCallback(new NewTalentDialog.TalentCallback() {
-                    @Override
-                    public void talentCreated(Object talent, int value) {
-                        EntryCreator.getInstance().addTalentToHeld(held, talent, value);
-                    }
-                });
+                dialog.setNewTalentCallback((talent, value) -> EntryCreator.getInstance().addTalentToHeld(held, talent, value));
                 dialog.pack();
                 dialog.setVisible(true);
 

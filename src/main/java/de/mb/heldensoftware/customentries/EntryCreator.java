@@ -15,6 +15,7 @@ import helden.framework.held.persistenz.XMLParserKonverter;
 import helden.framework.settings.Setting;
 import helden.framework.settings.Settings;
 import helden.framework.sonderfertigkeit.EmptyMASF;
+import helden.framework.zauber.KonkreterZauber;
 import helden.framework.zauber.Zauber;
 import helden.framework.zauber.ZauberFabrik;
 import helden.framework.zauber.ZauberVerbreitung;
@@ -149,6 +150,9 @@ public class EntryCreator {
 	public Class HeldType;
     public Class HeldInterfaceType;
 	Method heldAddTalent;
+	Method heldSetKampfWerte;
+	Constructor newKampfwerte;
+	Method heldGetTalente;
     public Class<?> MainWindowType;
     public Method getMainWindowInstance;
     public Method getCurrentHeld;
@@ -443,10 +447,27 @@ public class EntryCreator {
                 if (params.length == 2 && m.getReturnType().equals(Void.TYPE) && params[0].equals(TalentType.getSuperclass()) && params[1].equals(Integer.TYPE)) {
                     heldAddTalent = m;
                 }
+				if (params.length == 2 && m.getReturnType().equals(Void.TYPE) && params[0].equals(TalentType) && !params[1].isPrimitive()) {
+					heldSetKampfWerte = m;
+					newKampfwerte = m.getParameterTypes()[1].getDeclaredConstructors()[0];
+				}
             }
+			Class superclassVonTalentWerte = newKampfwerte.getParameterTypes()[1];
+			for (Method m : HeldType.getMethods()) {
+				if (m.getParameterCount() == 0 && superclassVonTalentWerte.isAssignableFrom(m.getReturnType())) {
+					System.out.println("CANDIDATE " + m);
+					if (Arrays.stream(m.getReturnType().getMethods()).anyMatch(m2 -> m2.getReturnType().equals(KonkreterZauber.class))) {
+						System.out.println("... =zauber");
+						continue;
+					}
+					heldGetTalente = m;
+				}
+			}
             assert getMainWindowInstance != null;
             assert getCurrentHeld != null;
             assert heldAddTalent != null;
+            assert heldSetKampfWerte != null;
+            assert heldGetTalente != null;
 
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
@@ -848,6 +869,9 @@ public class EntryCreator {
 	public void addTalentToHeld(Object held, Object talent, int value) {
 		try {
 			heldAddTalent.invoke(held, talent, value);
+			if (KampfTalentType.isInstance(talent)) {
+				heldSetKampfWerte.invoke(held, talent, newKampfwerte.newInstance(talent, heldGetTalente.invoke(held)));
+			}
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 		}
