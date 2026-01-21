@@ -116,7 +116,7 @@ public class CsvConverter {
             final String type = eachVerbreitung.substring(0, index);
             final String numString = eachVerbreitung.substring(index);
             try {
-                verbreitungObj.put(type, Integer.parseInt(numString));
+                verbreitungObj.put(type.trim(), Integer.parseInt(numString.trim()));
             } catch (NumberFormatException ex) {
                 throw new IllegalArgumentException("Verbreitung '" + eachVerbreitung + "' enthält keine gültige Zahl. " +
                         "Erwartet wurde eine Zahl zwischen 1 und 7, erhaltener Wert war: " + numString);

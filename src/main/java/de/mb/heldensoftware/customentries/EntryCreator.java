@@ -1070,7 +1070,7 @@ public class EntryCreator {
 			}
 		}
 
-		private static final Pattern reprPattern = Pattern.compile("^(\\w{3})\\s?\\((\\w{3})\\)$");
+		private static final Pattern reprPattern = Pattern.compile("^(\\w{3})\\s*\\((\\w{3})\\)$");
 
 		/**
 		 * (Dru, Elf, 3) => Dru(Elf) 3
