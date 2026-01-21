@@ -11,12 +11,13 @@ import java.io.Reader;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 public class CsvConfigTest {
-    private void testImportedZauber(Path p) throws IOException {
+    private ZauberConfig testImportedZauber(Path p) throws IOException {
         Config config = Loader.load(p, Loader.FileType.CSV);
         assertEquals(1, config.zauber.size());
         for (ZauberConfig z : config.zauber) {
@@ -31,13 +32,18 @@ public class CsvConfigTest {
             // Assert no trailing \r has been left
             assertEquals(1, z.settings.size());
             assertEquals("Aventurien", z.settings.get(0));
+            return z;
         }
+        return null;
     }
 
     @Test
     public void testExampleCsvLibreoffice() throws URISyntaxException, IOException {
         Path p = Paths.get(getClass().getResource("/examples/erweiterungen-libreoffice.csv").toURI());
-        testImportedZauber(p);
+        ZauberConfig z = testImportedZauber(p);
+        assertEquals("LCD:666", z.quelle);
+        assertEquals(2, z.spezialisierungen.size());
+        assertTrue(z.spezialisierungen.contains("s1"));
     }
 
 

@@ -22,6 +22,8 @@ public class CsvConverter {
         String MODS_MR = "Mods/MR";
         String Verbreitung = "Verbreitung";
         String Settings = "Settings";
+        String Spezialisierungen = "Spezialisierungen";
+        String Quelle = "Quelle";
     }
 
     public Config convertToConfig(String content) {
@@ -29,7 +31,7 @@ public class CsvConverter {
                 Columns.Name, Columns.Kategorie,
                 Columns.Merkmale, Columns.Probe,
                 Columns.MODS_MR, Columns.Verbreitung,
-                Columns.Settings
+                Columns.Settings, Columns.Spezialisierungen, Columns.Quelle
         };
         CSVFormat csvFormat = detectFormat(content).withHeader(columns).withSkipHeaderRecord();
 
@@ -40,7 +42,7 @@ public class CsvConverter {
 
             // Verify Existence of columns
             for (String headerName : columns) {
-                if (!headerMap.containsKey(headerName)) {
+                if (!headerMap.containsKey(headerName) && !headerName.equals(Columns.Quelle) && !headerName.equals(Columns.Spezialisierungen)) {
                     throw new IllegalStateException("Es wurde keine Spalte mit der Bezeichnung '" + headerName + "' gefunden.");
                 }
             }
@@ -66,6 +68,14 @@ public class CsvConverter {
         zauber.mod = record.get(Columns.MODS_MR);
         zauber.settings = parseList(record.get(Columns.Settings), ",");
         zauber.verbreitung = parseVerbreitung(record.get(Columns.Verbreitung), ",");
+        try {
+            zauber.quelle = record.get(Columns.Quelle);
+        } catch (IllegalArgumentException ignored) {
+        }
+        try {
+            zauber.spezialisierungen = parseList(record.get(Columns.Spezialisierungen), ",");
+        } catch (IllegalArgumentException ignored) {
+        }
         return zauber;
     }
 
