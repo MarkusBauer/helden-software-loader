@@ -182,6 +182,10 @@ public class CustomEntryLoader {
                     break;
                 case Sonderfertigkeit:
                 case SF:
+                    // validation
+                    if (bc.value > 0) {
+                        throw new RuntimeException("Bedingung vom Typ \"Sonderfertigkeit\" oder \"SF\" darf keinen Wert (value) haben!\n(bei Gaben/Ritualkenntnis ggf. \"Talent\" nutzen)");
+                    }
                     b = EntryCreator.getInstance().createBedingungSF(bc.name, newSFNames.contains(bc.name));
                     break;
                 case Zauber:
