@@ -224,8 +224,8 @@ Die `erweiterungen.csv` Datei, kommt ins gleiche Verzeichnis wie eure `helden.zi
 Die folgende Tabelle veranschaulicht das Format:
 
 ```csv
-Name,Kategorie,Merkmale,Probe,Mods/MR,Verbreitung,Settings
-Mein Zauber,D,Antimagie,MU/KL/CH,,Mag3,Aventurien
+Name,Kategorie,Merkmale,Probe,Mods/MR,Verbreitung,Settings,Spezialisierungen,Quelle
+Mein Zauber,D,Antimagie,MU/KL/CH,,Mag3,Aventurien,"Kosten,Variante 1",LCD:666
 
 ```
 
