@@ -47,7 +47,11 @@ public class CustomEntryLoader {
 
         // load all sonderfertigkeit
         for (SonderfertigkeitConfig sf : config.sonderfertigkeiten) {
-            loadSF(sf);
+            try {
+                loadSF(sf);
+            } catch (NotYetSupportedException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Not yet supported", JOptionPane.ERROR_MESSAGE);
+            }
         }
 
         // load all repräsentationen

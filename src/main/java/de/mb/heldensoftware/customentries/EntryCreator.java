@@ -751,8 +751,8 @@ public class EntryCreator {
 			if (bedingung != null)
 				sonderfertigkeitSetBedingung.invoke(sf, bedingung);
 			return registerSonderfertigkeit(name, sf);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("Ihre Version der Helden-Software ist zu alt, um Sonderfertigkeiten mit Freitext zu unterstützen");
+		} catch (ClassNotFoundException | NoClassDefFoundError e) {
+			throw new NotYetSupportedException("Ihre Version der Helden-Software ist zu alt, um Sonderfertigkeiten mit Freitext zu unterstützen.\nSonderfertigkeit " + name + " wird nicht geladen.");
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
 			return null;
