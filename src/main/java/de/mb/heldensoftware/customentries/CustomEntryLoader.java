@@ -34,8 +34,8 @@ public class CustomEntryLoader {
         }
 
         for (MerkmalConfig m : config.merkmale) {
-             loadMerkmal(m);
-             newSFNames.add("Merkmalskenntnis: " + m.name);
+            loadMerkmal(m);
+            newSFNames.add("Merkmalskenntnis: " + m.name);
         }
 
         for (RepraesentationConfig repr : config.repraesentationen) {
@@ -57,12 +57,20 @@ public class CustomEntryLoader {
         // load all repräsentationen
         ArrayList<EntryCreator.RepresentationWrapper> newRepresentations = new ArrayList<>();
         for (RepraesentationConfig repr : config.repraesentationen) {
-            newRepresentations.add(loadRepresentation(repr));
+            try {
+                newRepresentations.add(loadRepresentation(repr));
+            } catch (NotYetSupportedException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Not yet supported", JOptionPane.ERROR_MESSAGE);
+            }
         }
 
         // load all zauber
         for (ZauberConfig zauber : config.zauber) {
-            loadZauber(zauber);
+            try {
+                loadZauber(zauber);
+            } catch (NotYetSupportedException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Not yet supported", JOptionPane.ERROR_MESSAGE);
+            }
         }
 
         // link representation with zauber (if not already done)
