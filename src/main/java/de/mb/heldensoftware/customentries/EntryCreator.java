@@ -853,7 +853,7 @@ public class EntryCreator {
 		return sfname;
 	}
 
-	public Object createMerkmal(String name, String shortname, String abkuerzung, int stufe, String sphaere) {
+	public Object createMerkmal(String name, String shortname, String abkuerzung, int stufe, String sphaere, boolean quelle) {
         try {
 			if (alleMerkmale.containsKey(name)) {
 				throw new IllegalArgumentException("Merkmal \"" + name + "\" ist bereits bekannt!");
@@ -863,12 +863,13 @@ public class EntryCreator {
 			}
 
 			Object merkmal;
+			Object kind = quelle ? merkmalKinds.get("QUELLE") : merkmalKinds.get("MERKMAL");
 			if (sphaere == null || sphaere.isEmpty()) {
-				merkmal = merkmalConstructor.newInstance(abkuerzung, name, shortname, stufe, merkmalKinds.get("MERKMAL"));
+				merkmal = merkmalConstructor.newInstance(abkuerzung, name, shortname, stufe, kind);
 			} else {
 				if (merkmalConstructor2 == null)
 					throw new NotYetSupportedException("Myranische Merkmale sind erst mit einer neueren Version der Helden-Software verfügbar!");
-				merkmal = merkmalConstructor2.newInstance(abkuerzung, name, shortname, stufe, merkmalKinds.get("MERKMAL"), getSphaere(sphaere));
+				merkmal = merkmalConstructor2.newInstance(abkuerzung, name, shortname, stufe, kind, getSphaere(sphaere));
 			}
 			alleMerkmale.put(name, merkmal);
 			alleMerkmale.put(shortname, merkmal);

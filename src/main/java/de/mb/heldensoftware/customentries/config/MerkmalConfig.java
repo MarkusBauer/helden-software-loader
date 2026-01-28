@@ -32,15 +32,19 @@ public class MerkmalConfig {
     @JsonPropertyDescription("Sphäre eines myranischen Merkmals. Beispiel: \"Stellar\"")
     public String sphaere;
 
+    @JsonProperty(value = "quelle", required = false)
+    @JsonPropertyDescription("Dies ist eine myranische Quelle, kein aventurisches Merkmal")
+    public boolean quelle = false;
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         MerkmalConfig that = (MerkmalConfig) o;
-        return stufe == that.stufe && Objects.equals(name, that.name) && Objects.equals(abkuerzung, that.abkuerzung) && Objects.equals(sphaere, that.sphaere);
+        return stufe == that.stufe && Objects.equals(name, that.name) && Objects.equals(abkuerzung, that.abkuerzung) && Objects.equals(sphaere, that.sphaere) && quelle == that.quelle;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, abkuerzung, stufe, sphaere);
+        return Objects.hash(name, abkuerzung, stufe, sphaere, quelle);
     }
 }
