@@ -72,6 +72,39 @@
     ],
 
 
+    // Beispiele aus: Myranische Magie, Auflage 2, S. 122 (Auflage 1: S.94)
+    "myranor_zauber": [
+        {
+            "name": "Inspiration von Ahnengeistern",
+            "kategorie": "B",
+            "merkmal": "Totenwesen",
+            "art": "Wesen"
+        },
+        {
+            "name": "Beschwörung von Feuergeistern",
+            "kategorie": "D",
+            "merkmal": "Elementar (Feuer)",
+            "art": "Wesen"
+        },
+        // generalisierter Zauber: für "alle Elementare" gibt's keine passende myranische Quelle.
+        // das aventurische Merkmal "Elementar (gesamt)" taugt als Ersatz:
+        {
+            "name": "Inspiration durch alle Elementare",
+            "kategorie": "E",
+            "merkmal": "Elementar",
+            "art": "Wesen"
+        },
+        // für das Regelbeispiel "alle Stellare" muss ein neues Merkmal / eine neue Quelle "Stellar" angelegt werden.
+        // siehe dazu das Beispiel im Abschnitt "Neue Merkmale".
+        {
+            "name": "Invokation von Stellargeistern",
+            "kategorie": "C",
+            "merkmal": "Stellar",
+            "art": "Wesen"
+        }
+    ],
+
+
     "sonderfertigkeiten": [
         {"name": "Gesegnet", "kosten": 200},
         {"name": "Feenwelten-kundig", "kosten": 200, "kategorie": "Geländekunde"},
@@ -165,6 +198,23 @@
         {
             "name": "Erweckung",
             "abkürzung": "Erw"  // Kurzform auf dem Heldenbogen
+        },
+
+        // Beispiel: neue myranische Quelle
+        {
+            "name": "Ruhe",
+            "abkürzung": "Ruh",  // Kurzform auf dem Heldenbogen
+            "stufe": 1,
+            "quelle": true,  // true = myranische Quelle statt aventurisches Merkmal
+            "sphäre": "Stellar"
+        },
+
+        // Beispiel: für die Regeln aus MyMa 122 brauchen wir ein Merkmal "Stellar"
+        {
+            "name": "Stellar",
+            "abkürzung": "Stl",
+            "stufe": 2,
+            "sphäre": "Stellar"
         }
     ]
 }

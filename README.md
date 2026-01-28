@@ -128,7 +128,7 @@ Eine leere `erweiterungen.yaml` ohne neue Zauber, Sonderfertigkeiten und Repräs
   # Hier kommen eure neuen Merkmale hin
 ```
 Die `#` sind Kommentarzeichen - alles was dahinter steht gehört nicht zum 
- eigentlichen Inhalt der Datei (und wird nicht mit eingelesen). 
+ eigentlichen Inhalt der Datei (und wird nicht mit eingelesen). Das dient als euer Notizfeld.
 Nicht benötigte Abschnitte können auskommentiert oder gelöscht werden, nur leere Abschnitte mag das Format nicht.
 Die Zeile mit `# yaml-language-server` ist optional, unterstützt aber euren Editor beim Formatieren.
  
@@ -232,6 +232,40 @@ Mein Zauber,D,Antimagie,MU/KL/CH,,Mag3,Aventurien,"Kosten,Variante 1",LCD:666
 Beispieldateien liegen dem Plugin bei (für Excel und Libreoffice). 
 
 
+### Neue Myranische Zauber
+*(ab Helden-Software Version 5.6.0)*
+
+Neue myranische Zauber können wie folgt erstellt werden. 
+Beispiele aus dem "Baukasten für Wesenbeschwörungszauber", Myranische Magie, Auflage 2, S. 122 (Auflage 1: S.94).
+```yaml
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
+myranor_zauber:
+  - name: Inspiration von Ahnengeistern
+    kategorie: B
+    merkmal: Totenwesen
+    art: Wesen
+  - name: Beschwörung von Feuergeistern
+    kategorie: D
+    merkmal: Elementar (Feuer)
+    art: Wesen
+    
+  # generalisierter Zauber: für "alle Elementare" gibt's keine passende myranische Quelle.
+  # das aventurische Merkmal "Elementar (gesamt)" taugt als Ersatz:
+  - name: Inspiration durch alle Elementare
+    kategorie: E
+    merkmal: Elementar
+    art: Wesen
+    
+  # für das Regelbeispiel "alle Stellare" muss ein neues Merkmal / eine neue Quelle "Stellar" angelegt werden.
+  # siehe dazu das Beispiel im Abschnitt "Neue Merkmale".
+  - name: Invokation von Stellargeistern
+    kategorie: C
+    merkmal: Stellar
+    art: Wesen
+```
+
+
+
 ### Neue Sonderfertigkeiten
 Sonderfertigkeiten werden wie folgt konfiguriert:
 ```yaml
@@ -260,6 +294,12 @@ sonderfertigkeiten:
       - Namenloser
       - name: Swafnir  # Kosten können pro Variante überschrieben werden
         kosten: 200    # Swafnir ist hier billiger
+
+  # Sonderfertigkeit mit Freitext-Variante
+  # Funktioniert erst mit Helden-Software 5.6.0
+  - name: Berufserfahrung
+    kosten: 200
+    varianten: ["freitext"]
 ```
 
 Eine eigene **Ritualkenntnis** oder **Liturgiekenntnis** kann ebenfalls über Sonderfertigkeiten realisiert werden. 
@@ -414,6 +454,25 @@ zauber:
       - Erweckung  # anschließend können diese ganz normal verwendet werden
       - Telekinese
     probe: KL/IN/GE
+```
+
+
+Ebenso lassen sich neue myranische Quellen erstellen *(ab Helden-Software Version 5.6.0)*:
+```yaml
+# yaml-language-server: $schema=https://raw.githubusercontent.com/MarkusBauer/helden-software-loader/refs/heads/master/erweiterungen.schema.json
+
+merkmale:
+  - name: Ruhe
+    abkürzung: Ruh  # Kurzform auf dem Heldenbogen
+    stufe: 1
+    quelle: true  # true = myranische Quelle statt aventurisches Merkmal
+    sphäre: Stellar
+
+  # Beispiel: für die Regeln aus MyMa 122 brauchen wir ein Merkmal "Stellar" (siehe Abschnitt zu neuen myranischen Zaubern)
+  - name: Stellar
+    abkürzung: Stl
+    stufe: 2
+    sphäre: Stellar
 ```
 
 

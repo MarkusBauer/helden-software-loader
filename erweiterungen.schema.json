@@ -57,6 +57,14 @@
             "description" : "Vollständiger Name des Merkmals. Beispiel: \"Erweckung\"",
             "minLength" : 1
           },
+          "quelle" : {
+            "type" : "boolean",
+            "description" : "Dies ist eine myranische Quelle, kein aventurisches Merkmal"
+          },
+          "sphäre" : {
+            "type" : "string",
+            "description" : "Sphäre eines myranischen Merkmals. Beispiel: \"Stellar\""
+          },
           "stufe" : {
             "type" : "integer",
             "description" : "Stufe (1-3). 1 = 100AP, 2 = 200AP, 3 = 300AP",
@@ -66,6 +74,65 @@
           }
         },
         "required" : [ "abkürzung", "name" ]
+      }
+    },
+    "myranor_zauber" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "art" : {
+            "type" : "string",
+            "description" : "Art des Zaubers. \"Wesen\" oder \"Essenz\".",
+            "default" : "Wesen",
+            "minLength" : 1
+          },
+          "kategorie" : {
+            "type" : "string",
+            "description" : "Steigerungs-Kategorie (\"A\"-\"H\")",
+            "default" : "A",
+            "minLength" : 1,
+            "pattern" : "^[A-H]$"
+          },
+          "merkmal" : {
+            "type" : "string",
+            "description" : "Merkmal/Quelle, Kurzfassung und Langfassung möglich. Beispiele: \"Elementar (Feuer)\", \"Freiheit\"",
+            "minLength" : 1
+          },
+          "mod" : {
+            "type" : "string",
+            "description" : "Proben-Modifikator wie \"+MR\", \"+Mod\", ..."
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Zaubername, darf noch nicht existieren. Beispiel: \"Beschwörung von Feuergeistern\"",
+            "minLength" : 1
+          },
+          "quelle" : {
+            "type" : "string",
+            "description" : "Quellenangabe im Format \"XXX:<seitenzahl>\". Beispiel: \"LCD:123\""
+          },
+          "settings" : {
+            "description" : "Spielwelten, in denen der Zauber zur Verfügung steht. Beispiel: [\"Myranor\"]",
+            "default" : "[Myranor]",
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "default" : "[Myranor]",
+              "minLength" : 1
+            }
+          },
+          "spezialisierungen" : {
+            "description" : "Mögliche Spezialisierungen, zusätzlich zu den standardmäßigen Spezialisierungen. Beispiel: [\"Variante X\"]",
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "minLength" : 1
+            }
+          }
+        },
+        "required" : [ "art", "kategorie", "merkmal", "name" ],
+        "description" : "Eigener, neuer myranischer Zauber"
       }
     },
     "repräsentationen" : {

@@ -11,6 +11,9 @@ zauber:
   #   probe: IN/CH/CH
   #   settings: [ Aventurien ]
 
+myranor_zauber:
+  # Hier kommen eure neuen Myranischen Zauber hin
+
 sonderfertigkeiten:
   # Hier kommen eure neuen Sonderfertigkeiten hin
 
