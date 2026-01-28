@@ -28,15 +28,19 @@ public class MerkmalConfig {
     @Max(3)
     public int stufe = 2;
 
+    @JsonProperty(value = "sphäre", required = false)
+    @JsonPropertyDescription("Sphäre eines myranischen Merkmals. Beispiel: \"Stellar\"")
+    public String sphaere;
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         MerkmalConfig that = (MerkmalConfig) o;
-        return stufe == that.stufe && Objects.equals(name, that.name) && Objects.equals(abkuerzung, that.abkuerzung);
+        return stufe == that.stufe && Objects.equals(name, that.name) && Objects.equals(abkuerzung, that.abkuerzung) && Objects.equals(sphaere, that.sphaere);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, abkuerzung, stufe);
+        return Objects.hash(name, abkuerzung, stufe, sphaere);
     }
 }

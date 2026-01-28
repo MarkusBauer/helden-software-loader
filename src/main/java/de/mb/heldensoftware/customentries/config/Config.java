@@ -27,6 +27,10 @@ public class Config {
     @Valid
     public ArrayList<ZauberConfig> zauber = new ArrayList<>();
 
+    @JsonProperty
+    @Valid
+    public ArrayList<MyranorZauberConfig> myranor_zauber = new ArrayList<>();
+
     // Filename or whatever where we got that config from.
     // Optional, not compared etc.
     public String source = null;
@@ -36,11 +40,12 @@ public class Config {
         if (o == null || getClass() != o.getClass()) return false;
         Config config = (Config) o;
         return Objects.equals(zauber, config.zauber) && Objects.equals(sonderfertigkeiten, config.sonderfertigkeiten) &&
-                Objects.equals(repraesentationen, config.repraesentationen) && Objects.equals(merkmale, config.merkmale);
+                Objects.equals(repraesentationen, config.repraesentationen) &&
+                Objects.equals(merkmale, config.merkmale) && Objects.equals(myranor_zauber, config.myranor_zauber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(zauber, sonderfertigkeiten, repraesentationen, merkmale);
+        return Objects.hash(zauber, sonderfertigkeiten, repraesentationen, merkmale, myranor_zauber);
     }
 }

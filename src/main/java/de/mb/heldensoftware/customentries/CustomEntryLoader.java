@@ -73,6 +73,15 @@ public class CustomEntryLoader {
             }
         }
 
+        // load myranor zauber
+        for (MyranorZauberConfig zauber : config.myranor_zauber) {
+            try {
+                loadMyranorZauber(zauber);
+            } catch (NotYetSupportedException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Not yet supported", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
         // link representation with zauber (if not already done)
         for (int i = 0; i < newRepresentations.size(); i++) {
             linkRepresentationZauber(newRepresentations.get(i), config.repraesentationen.get(i));
@@ -95,6 +104,24 @@ public class CustomEntryLoader {
         // Verbreitung
         for (Map.Entry<String, Integer> e : zauber.verbreitung.entrySet()) {
             zw.addVerbreitung(e.getKey(), e.getValue());
+        }
+
+        // Spezialisierungen
+        if (!zauber.spezialisierungen.isEmpty()) {
+            zw.setSpezialisierungen(zauber.spezialisierungen);
+        }
+    }
+
+    protected void loadMyranorZauber(MyranorZauberConfig zauber) {
+        // Read parameters
+        Quellenangabe quelle = zauber.quelle.isEmpty() ? Quellenangabe.leereQuelle : new Quellenangabe(zauber.quelle);
+
+        // Create spell
+        ZauberWrapper zw = EntryCreator.getInstance().createMyranorSpell(zauber.name, zauber.kategorie, zauber.merkmal, zauber.art, quelle, zauber.mod);
+
+        // Settings
+        for (String setting : zauber.settings) {
+            zw.addToSetting(setting);
         }
 
         // Spezialisierungen
@@ -269,7 +296,7 @@ public class CustomEntryLoader {
     protected void loadMerkmal(MerkmalConfig m) {
         // internal 2-digit code (param 3) should be sth like: m.abkuerzung.toLowerCase().substring(0, 2)
         // but it also shouldn't collide, so we use the full shortname here
-        EntryCreator.getInstance().createMerkmal(m.name, m.abkuerzung, m.abkuerzung, m.stufe);
+        EntryCreator.getInstance().createMerkmal(m.name, m.abkuerzung, m.abkuerzung, m.stufe, m.sphaere);
     }
 
 

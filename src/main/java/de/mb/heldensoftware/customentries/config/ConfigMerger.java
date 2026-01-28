@@ -59,6 +59,10 @@ public class ConfigMerger {
             if (addEntity("Zauber", z.name, z, newConfig.source))
                 config.zauber.add(z);
         }
+        for (MyranorZauberConfig z : newConfig.myranor_zauber) {
+            if (addEntity("Myranor-Zauber", z.name, z, newConfig.source))
+                config.myranor_zauber.add(z);
+        }
         for (SonderfertigkeitConfig sf : newConfig.sonderfertigkeiten) {
             if (addEntity("Sonderfertigkeit", sf.name, sf, newConfig.source))
                 config.sonderfertigkeiten.add(sf);

@@ -15,10 +15,7 @@ import helden.framework.held.persistenz.XMLParserKonverter;
 import helden.framework.settings.Setting;
 import helden.framework.settings.Settings;
 import helden.framework.sonderfertigkeit.EmptyMASF;
-import helden.framework.zauber.KonkreterZauber;
-import helden.framework.zauber.Zauber;
-import helden.framework.zauber.ZauberFabrik;
-import helden.framework.zauber.ZauberVerbreitung;
+import helden.framework.zauber.*;
 import helden.plugin.datenplugin.impl.DatenPluginHeldenWerkzeugImpl;
 import org.w3c.dom.Element;
 
@@ -71,9 +68,15 @@ public class EntryCreator {
 	// Merkmal ("Antimagie", ...)
 	Class merkmalType;
 	Constructor merkmalConstructor;
+	Constructor merkmalConstructor2;
 	// Name => Merkmal (auch Kurzfassungen funktionieren)
 	Map<String, Object> alleMerkmale = new HashMap<>();
 	Map<String, Object> merkmalKinds = new HashMap<>();  // "MERKMAL", "QUELLE", "BEIDES"
+
+	Class sphaerenType;
+	Class myranischeZauberArtType;
+	Method sphaerenGet;
+	Method myranischeZauberArtGet;
 
 	// QuellenObj := (String, int), z.B. ("LCD", 123)
 	Class quellenObjType;
@@ -109,6 +112,9 @@ public class EntryCreator {
 
 	// new ZauberVerbreitung: (Repräsentation bekanntBei, Repräsentation bekanntIn, int verbreitung) -> ZauberVerbreitung
 	Constructor<ZauberVerbreitung> newZauberVerbreitung;
+
+	// Same for myranor
+	Constructor<MyranischerZauber> newMyranischerZauber;
 
 	// Zauber.setSpezialisierungen: (ArrayList<String> spezialisierungen) -> void
 	Method zauberSetSpezialisierungen;
@@ -207,7 +213,9 @@ public class EntryCreator {
 				if (c.getParameterCount() == 5) {
 					merkmalConstructor = c;
 					merkmalConstructor.setAccessible(true);
-					break;
+				} else if (c.getParameterCount() == 6) {
+					merkmalConstructor2 = c;
+					merkmalConstructor2.setAccessible(true);
 				}
 			}
 			assert merkmalConstructor != null;
@@ -219,6 +227,12 @@ public class EntryCreator {
 					}
 				}
 			}
+
+			// Myranor-Kram
+			sphaerenType = MyranischerZauber.class.getMethod("getSphare").getReturnType();
+			sphaerenGet = sphaerenType.getMethod("valueOf", String.class);
+			myranischeZauberArtType = MyranischerZauber.class.getMethod("getZauberArt").getReturnType();
+			myranischeZauberArtGet = myranischeZauberArtType.getMethod("valueOf", String.class);
 
 
 			// Quelle
@@ -262,6 +276,12 @@ public class EntryCreator {
 			assert newZauber != null;
 			zauberSetSpezialisierungen = methods.get("setSpezialisierungen");
 			newZauberVerbreitung = (Constructor<ZauberVerbreitung>) ZauberVerbreitung.class.getConstructors()[0];
+
+			// Myranischer Zauber
+			for (Constructor<?> c : MyranischerZauber.class.getConstructors()) {
+				if (c.getParameterTypes().length == 6) newMyranischerZauber = (Constructor<MyranischerZauber>) c;
+			}
+			// assert newMyranischerZauber != null;  // from 5.6.0 on
 
 			// Talent
 			Method einlesenTalent = ModsDatenParser.class.getMethod("einlesenTalent", File.class);
@@ -628,15 +648,30 @@ public class EntryCreator {
 	private Object getMerkmale(List<String> merkmale) {
 		Object result = Array.newInstance(merkmalType, merkmale.size());
 		for (int i = 0; i < merkmale.size(); i++) {
-			String s = merkmale.get(i);
-			s = cleanupString(s.replace("(gesamt)", ""));
-			Object mkml = alleMerkmale.get(s);
-			if (mkml == null) {
-				throw new IllegalArgumentException("Unbekanntes Merkmal: " + merkmale.get(i));
-			}
+			Object mkml = getMerkmal(merkmale.get(i));
 			Array.set(result, i, mkml);
 		}
 		return result;
+	}
+
+
+	private Object getMerkmal(String merkmal) {
+		merkmal = cleanupString(merkmal.replace("(gesamt)", ""));
+		Object mkml = alleMerkmale.get(merkmal);
+		if (mkml == null) {
+			throw new IllegalArgumentException("Unbekanntes Merkmal: " + merkmal);
+		}
+		return mkml;
+	}
+
+
+	private Object getMyranischeZauberArt(String art) throws InvocationTargetException, IllegalAccessException {
+		return myranischeZauberArtGet.invoke(null, art.toUpperCase());
+	}
+
+
+	private Object getSphaere(String sphaere) throws InvocationTargetException, IllegalAccessException {
+		return sphaerenGet.invoke(null, sphaere.toUpperCase());
 	}
 
 
@@ -675,6 +710,32 @@ public class EntryCreator {
 	private boolean isSpellKnown(String name) {
 		try {
 			return ZauberFabrik.getInstance().getZauberfertigkeit(name) != null;
+		} catch (RuntimeException e) {
+			return false;
+		}
+	}
+
+	public ZauberWrapper createMyranorSpell(String name, String kategorie, String merkmal, String art, Quellenangabe q, String mod) {
+		if (newMyranischerZauber == null)
+			throw new NotYetSupportedException("Myranische Zauber sind erst in einer neueren Version der Helden-Software möglich!");
+		try {
+			if (q == null)
+				q = Quellenangabe.leereQuelle;
+			if (mod == null)
+				mod = "";
+			Object kat = alleKategorien.get(kategorie);
+			if (isMyranorSpellKnown(name))
+				throw new IllegalArgumentException("Myranischer Zauber \"" + name + "\" ist bereits bekannt!");
+			MyranischerZauber mz = newMyranischerZauber.newInstance(name, getMerkmal(merkmal), getMyranischeZauberArt(art), kat, q.getQuellenObj(), mod);
+			return new ZauberWrapper(name, mz);
+		} catch (Exception e) {
+			throw ErrorHandler.handleException(e);
+		}
+	}
+
+	private boolean isMyranorSpellKnown(String name) {
+		try {
+			return MyranischerZauber.zauberExists(name);
 		} catch (RuntimeException e) {
 			return false;
 		}
@@ -792,7 +853,7 @@ public class EntryCreator {
 		return sfname;
 	}
 
-	public Object createMerkmal(String name, String shortname, String abkuerzung, int stufe) {
+	public Object createMerkmal(String name, String shortname, String abkuerzung, int stufe, String sphaere) {
         try {
 			if (alleMerkmale.containsKey(name)) {
 				throw new IllegalArgumentException("Merkmal \"" + name + "\" ist bereits bekannt!");
@@ -801,7 +862,14 @@ public class EntryCreator {
 				throw new IllegalArgumentException("Merkmal \"" + shortname + "\" ist bereits bekannt!");
 			}
 
-			Object merkmal = merkmalConstructor.newInstance(abkuerzung, name, shortname, stufe, merkmalKinds.get("MERKMAL"));
+			Object merkmal;
+			if (sphaere == null || sphaere.isEmpty()) {
+				merkmal = merkmalConstructor.newInstance(abkuerzung, name, shortname, stufe, merkmalKinds.get("MERKMAL"));
+			} else {
+				if (merkmalConstructor2 == null)
+					throw new NotYetSupportedException("Myranische Merkmale sind erst mit einer neueren Version der Helden-Software verfügbar!");
+				merkmal = merkmalConstructor2.newInstance(abkuerzung, name, shortname, stufe, merkmalKinds.get("MERKMAL"), getSphaere(sphaere));
+			}
 			alleMerkmale.put(name, merkmal);
 			alleMerkmale.put(shortname, merkmal);
 
