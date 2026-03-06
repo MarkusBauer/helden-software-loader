@@ -133,6 +133,13 @@ public class CustomEntryLoader {
     protected void loadSF(SonderfertigkeitConfig sf) {
         sf.autoFixNames();
 
+        // check for special names
+        for (String prefix: SonderfertigkeitConfig.FORBIDDEN_PREFIX) {
+            if (sf.name.startsWith(prefix)) {
+                throw new RuntimeException("Sonderfertigkeit \"" + sf.name + "\": Name kann nicht mit \"" + prefix + "\" starten");
+            }
+        }
+
         int cat = getSFCategory(sf.kategorie);
         BedingungsVerknuepfung bedingung = sf.bedingungen.isEmpty() ? null : loadBedingungen(sf.bedingungen, false);
 

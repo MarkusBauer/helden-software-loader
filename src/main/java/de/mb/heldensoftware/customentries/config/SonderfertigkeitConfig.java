@@ -10,6 +10,20 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class SonderfertigkeitConfig {
+    // Helden-Software parses SFs special if they start with one of these strings.
+    // You won't be able to load a custom SF.
+    public static final String[] FORBIDDEN_PREFIX = new String[]{
+            "Talentspezialisierung",
+            "Zauberspezialisierung",
+            "Kulturkunde",
+            "Scharfschütze",
+            "Meisterschütze",
+            "Schnellladen",
+            "Ortskenntnis",
+            "Akoluth",
+            "Elementarharmonisierte Aura"
+    };
+
     @JsonProperty(required = true)
     @JsonPropertyDescription("Name der Sonderfertigkeit, darf noch nicht existieren")
     @NotBlank
