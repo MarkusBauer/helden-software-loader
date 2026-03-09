@@ -74,6 +74,10 @@ public class XmlEntryCreator {
 		addValue(talent, "hatparade", parade ? "true" : "false");
 	}
 
+	public void setBeidhaendigerKampf(Element talent, boolean parade){
+		addValue(talent, "hatbhk", parade ? "true" : "false");
+	}
+
 	public void setTalentKomplexitaet(Element talent, int komplex){
 		addValue(talent, "komplexitaet", String.valueOf(komplex));
 	}

@@ -45,7 +45,7 @@ warum dieser Fehler auftreten kann:
  - Ein Zauber / eine SF/Repräsentationen wurde aus der Konfiguration entfernt (oder umbenannt). Ein Spruch oder eine SF/Repräsentation den Helden aktiviert haben darf nicht entfernt oder umbenannt werden.
  - Die Helden-Software hat sich gerade aktualisiert und neugestartet. Ein weiterer Neustart (natürlich ohne zu speichern) löst das Problem. 
 
-**Talente mit gleichem Namen sollten gleich sein.** Sonst weigert sich der Editor später, das Talent zu bearbeiten. 
+**Talente mit gleichem Namen sollten gleich sein.** Sonst weigert sich der Editor später, das Talent zu bearbeiten (pre-5.6.0). 
 
 **Macht Backups!**
 Sollte eigentlich selbstverständlich sein, ist es aber leider nicht. 
@@ -474,6 +474,13 @@ merkmale:
     stufe: 2
     sphäre: Stellar
 ```
+
+
+### Neue Talente
+Neue Talente benötigen keine Konfiguration, und können im "Erweiterungen"-Menü erstellt werden.
+
+Neue Kampftalente funktionieren ab 5.6.0. Dazu könnt ihr beliebige Waffen editieren und das Kampftalent auf ein verfügbares eigenes Talent ändern.
+Talentspezialisierungen auf Waffen funktionieren ebenfalls, hier muss der **Originalname** (vor Umbenennen) der Waffe angegeben werden.
 
 
 

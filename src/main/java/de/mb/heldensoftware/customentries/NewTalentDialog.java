@@ -26,6 +26,7 @@ public class NewTalentDialog extends JDialog {
 	private JTextField textBehinderung;
 	private JSpinner spinnerBehinderung;
 	private JCheckBox checkParadeMoeglich;
+	private JCheckBox checkBeidhaendigMoeglich;
 	private JLabel lblProbe;
 	private JLabel lblBehinderungStr;
 	private JLabel lblBehinderungInt;
@@ -181,8 +182,9 @@ public class NewTalentDialog extends JDialog {
 		lblBehinderungInt.setVisible(isKampf);
 		spinnerBehinderung.setVisible(isKampf);
 
-		// Parade
-		checkParadeMoeglich.setVisible(isKampf);
+		// Parade/BHK
+		checkParadeMoeglich.setVisible(art.equals("Nahkampf"));
+		checkBeidhaendigMoeglich.setVisible(art.equals("Nahkampf"));
 	}
 
 
@@ -249,7 +251,8 @@ public class NewTalentDialog extends JDialog {
 
 		if (isKampf) {
 			xmlec.setTalentBehinderung(xmlnode, -Math.abs((Integer) spinnerBehinderung.getValue()));
-			xmlec.setTalentParade(xmlnode, checkParadeMoeglich.isSelected());
+			xmlec.setTalentParade(xmlnode, art.equals("Nahkampf") && checkParadeMoeglich.isSelected());
+			xmlec.setBeidhaendigerKampf(xmlnode, art.equals("Nahkampf") && checkBeidhaendigMoeglich.isSelected());
 		} else if (isSpracheSchrift) {
 			xmlec.setTalentKomplexitaet(xmlnode, (Integer) spinnerSprachKomplex.getValue());
 			if (isSprache) {
@@ -299,20 +302,39 @@ public class NewTalentDialog extends JDialog {
 		buttonCancel.setText("Cancel");
 		panel2.add(buttonCancel, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		paneFields = new JPanel();
-		paneFields.setLayout(new GridLayoutManager(13, 4, new Insets(0, 0, 0, 0), -1, -1));
+		paneFields.setLayout(new GridLayoutManager(14, 4, new Insets(0, 0, 0, 0), -1, -1));
 		contentPane.add(paneFields, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+		final Spacer spacer2 = new Spacer();
+		paneFields.add(spacer2, new GridConstraints(13, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+
+		final JLabel label2 = new JLabel();
+		label2.setText("Eigene Talente kosten keine AP, und können nach Aktivierung nicht mehr geändert werden.");
+		paneFields.add(label2, new GridConstraints(0, 0, 1, 4, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+
+		final JLabel label1 = new JLabel();
+		label1.setText("Talentart");
+		paneFields.add(label1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		comboArt = new JComboBox();
+		comboArt.setActionCommand("TalentArtChanged");
+		paneFields.add(comboArt, new GridConstraints(1, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+
 		lblTalentname = new JLabel();
 		lblTalentname.setText("Talentname");
-		paneFields.add(lblTalentname, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		final Spacer spacer2 = new Spacer();
-		paneFields.add(spacer2, new GridConstraints(12, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+		paneFields.add(lblTalentname, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		textTalentName = new JTextField();
-		paneFields.add(textTalentName, new GridConstraints(1, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		paneFields.add(textTalentName, new GridConstraints(2, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 		lblTalentAbkuerzung = new JLabel();
 		lblTalentAbkuerzung.setText("(Abkürzung)");
-		paneFields.add(lblTalentAbkuerzung, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		paneFields.add(lblTalentAbkuerzung, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		textTalentAbkuerzung = new JTextField();
-		paneFields.add(textTalentAbkuerzung, new GridConstraints(2, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		paneFields.add(textTalentAbkuerzung, new GridConstraints(3, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+
+		final JLabel label3 = new JLabel();
+		label3.setText("Startwert");
+		paneFields.add(label3, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		spinnerStartwert = new JSpinner();
+		paneFields.add(spinnerStartwert, new GridConstraints(4, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+
 		lblProbe = new JLabel();
 		lblProbe.setText("Probe");
 		paneFields.add(lblProbe, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -327,12 +349,13 @@ public class NewTalentDialog extends JDialog {
 		paneFields.add(lblKategorie, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		comboKategorie = new JComboBox();
 		paneFields.add(comboKategorie, new GridConstraints(6, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		final JLabel label1 = new JLabel();
-		label1.setText("Talentart");
-		paneFields.add(label1, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		comboArt = new JComboBox();
-		comboArt.setActionCommand("TalentArtChanged");
-		paneFields.add(comboArt, new GridConstraints(4, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		lblBehinderungStr = new JLabel();
+		lblBehinderungStr.setText("Behinderung");
+		lblBehinderungStr.setToolTipText("Beispielsweise \"BE\", \"BEx2\", \"BE-2\", ...");
+		paneFields.add(lblBehinderungStr, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		textBehinderung = new JTextField();
+		textBehinderung.setToolTipText("Beispielsweise \"BE\", \"BEx2\", \"BE-2\", ...");
+		paneFields.add(textBehinderung, new GridConstraints(7, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 		lblSprachFamilie = new JLabel();
 		lblSprachFamilie.setText("Sprachfamilie");
 		paneFields.add(lblSprachFamilie, new GridConstraints(8, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -343,13 +366,6 @@ public class NewTalentDialog extends JDialog {
 		paneFields.add(lblSprachKomplex, new GridConstraints(9, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		spinnerSprachKomplex = new JSpinner();
 		paneFields.add(spinnerSprachKomplex, new GridConstraints(9, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		lblBehinderungStr = new JLabel();
-		lblBehinderungStr.setText("Behinderung");
-		lblBehinderungStr.setToolTipText("Beispielsweise \"BE\", \"BEx2\", \"BE-2\", ...");
-		paneFields.add(lblBehinderungStr, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		textBehinderung = new JTextField();
-		textBehinderung.setToolTipText("Beispielsweise \"BE\", \"BEx2\", \"BE-2\", ...");
-		paneFields.add(textBehinderung, new GridConstraints(7, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 		spinnerBehinderung = new JSpinner();
 		paneFields.add(spinnerBehinderung, new GridConstraints(10, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		lblBehinderungInt = new JLabel();
@@ -358,14 +374,9 @@ public class NewTalentDialog extends JDialog {
 		checkParadeMoeglich = new JCheckBox();
 		checkParadeMoeglich.setText("Parade möglich");
 		paneFields.add(checkParadeMoeglich, new GridConstraints(11, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		final JLabel label2 = new JLabel();
-		label2.setText("Eigene Talente kosten keine AP, und können nach Aktivierung nicht mehr geändert werden.");
-		paneFields.add(label2, new GridConstraints(0, 0, 1, 4, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		final JLabel label3 = new JLabel();
-		label3.setText("Startwert");
-		paneFields.add(label3, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		spinnerStartwert = new JSpinner();
-		paneFields.add(spinnerStartwert, new GridConstraints(3, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		checkBeidhaendigMoeglich = new JCheckBox();
+		checkBeidhaendigMoeglich.setText("Beidhändiger Kampf möglich");
+		paneFields.add(checkBeidhaendigMoeglich, new GridConstraints(12, 1, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 	}
 
 	/**
