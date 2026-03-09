@@ -120,7 +120,7 @@ public class NewTalentDialog extends JDialog {
 		// Arten
 		for (Object o : ec.getAllStaticInstances(ec.TalentArtType)) {
 			boolean b = ((Boolean) ec.talentArtIsPrimitive.invoke(o)).booleanValue();
-			if ((b && !o.toString().equals("Kampf")) || o.toString().equals("Gaben") || o.toString().equals("Nahkampf") || o.toString().equals("Fernkampf"))
+			if ((b && !o.toString().equals("Kampf")) || o.toString().equals("Gaben") || o.toString().equals("Schwarze Gabe") || o.toString().equals("Nahkampf") || o.toString().equals("Fernkampf"))
 				comboArt.addItem(o); // "Kampf" is not importable, "Nahkampf"/"Fernkampf" is broken
 		}
 		// Sprachfamilien
@@ -137,7 +137,7 @@ public class NewTalentDialog extends JDialog {
 		boolean isSprache = art.equals("Sprachen");
 		boolean isSpracheSchrift = isSprache || art.equals("Schriften");
 		boolean isRK = art.equals("Ritualkenntnis");
-		boolean isF = art.equals("Liturgiekenntnis") || art.equals("Gaben");
+		boolean isF = art.equals("Liturgiekenntnis") || art.equals("Gaben") || art.equals("Schwarze Gabe");
 
 		// Probe
 		comboProbe1.setEnabled(!isKampf && !isSpracheSchrift);
