@@ -248,7 +248,7 @@ public class NewTalentDialog extends JDialog {
 				"", "CustomEntryLoader Plugin", "");
 
 		if (isKampf) {
-			xmlec.setTalentBehinderung(xmlnode, (Integer) spinnerBehinderung.getValue());
+			xmlec.setTalentBehinderung(xmlnode, -Math.abs((Integer) spinnerBehinderung.getValue()));
 			xmlec.setTalentParade(xmlnode, checkParadeMoeglich.isSelected());
 		} else if (isSpracheSchrift) {
 			xmlec.setTalentKomplexitaet(xmlnode, (Integer) spinnerSprachKomplex.getValue());
