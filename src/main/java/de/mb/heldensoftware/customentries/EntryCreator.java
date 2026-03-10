@@ -959,6 +959,11 @@ public class EntryCreator {
 		talentFactoryMap.put(talent.toString(), talent);
 	}
 
+	public boolean talentExists(String name) {
+		initTalentFactoryMap();
+		return talentFactoryMap.containsKey(name);
+	}
+
 	/**
 	 * Ensure TalentFactoryMap is initialized properly
 	 */

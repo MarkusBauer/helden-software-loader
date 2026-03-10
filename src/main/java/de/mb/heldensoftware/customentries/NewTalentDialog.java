@@ -206,7 +206,6 @@ public class NewTalentDialog extends JDialog {
 			System.out.println(talent);
 			if (newTalentCallback != null) {
 				newTalentCallback.talentCreated(talent, (Integer) spinnerStartwert.getValue());
-				// TODO held.setKampfwerte(talent, new Kampfwerte(0, 0))
 			}
 		} catch (Exception e) {
 			ErrorHandler.handleException(e);
@@ -217,20 +216,29 @@ public class NewTalentDialog extends JDialog {
 	}
 
 	private void sanitizeInput() {
-		if (textTalentName.getText().isEmpty()) throw new IllegalArgumentException("Bitte einen Talentnamen eingeben!");
+		String name = textTalentName.getText().trim();
+		if (name.isEmpty()) {
+			throw new IllegalArgumentException("Bitte einen Talentnamen eingeben!");
+		}
 		if (textTalentAbkuerzung.getText().isEmpty()) {
-			String name = textTalentName.getText();
 			if (name.startsWith("Sprachen kennen")) name = name.substring(16);
 			if (name.startsWith("Lesen/Schreiben")) name = name.substring(16);
 			textTalentAbkuerzung.setText(name);
 		}
 		if (comboArt.getSelectedItem().toString().equals("Sprachen")) {
-			if (!textTalentName.getText().startsWith("Sprachen kennen"))
-				textTalentName.setText("Sprachen kennen " + textTalentName.getText());
+			if (!name.startsWith("Sprachen kennen")) {
+				name = "Sprachen kennen " + name;
+				textTalentName.setText(name);
+			}
 		}
 		if (comboArt.getSelectedItem().toString().equals("Schriften")) {
-			if (!textTalentName.getText().startsWith("Lesen/Schreiben"))
-				textTalentName.setText("Lesen/Schreiben " + textTalentName.getText());
+			if (!name.startsWith("Lesen/Schreiben")) {
+				name = "Lesen/Schreiben " + name;
+				textTalentName.setText(name);
+			}
+		}
+		if (EntryCreator.getInstance().talentExists(name)) {
+			throw new IllegalArgumentException("Talent \"" + name + "\" existiert bereits!");
 		}
 		textBehinderung.setText(textBehinderung.getText().replace(" ", ""));
 	}
@@ -244,7 +252,7 @@ public class NewTalentDialog extends JDialog {
 		boolean isSpracheSchrift = isSprache || art.equals("Schriften");
 
 		XmlEntryCreator xmlec = XmlEntryCreator.getInstance();
-		Element xmlnode = xmlec.createBasicTalentNode(textTalentName.getText(), comboArt.getSelectedItem().toString(),
+		Element xmlnode = xmlec.createBasicTalentNode(textTalentName.getText().trim(), comboArt.getSelectedItem().toString(),
 				textTalentAbkuerzung.getText(), comboKategorie.getSelectedItem().toString(),
 				comboProbe1.getSelectedItem(), comboProbe2.getSelectedItem(), comboProbe3.getSelectedItem(),
 				"", "CustomEntryLoader Plugin", "");
