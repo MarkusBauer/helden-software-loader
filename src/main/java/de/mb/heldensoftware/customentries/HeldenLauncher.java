@@ -2,6 +2,7 @@ package de.mb.heldensoftware.customentries;
 
 import de.mb.heldensoftware.customentries.EntryCreator.*;
 import helden.Helden;
+import helden.Version;
 
 import javax.print.URIException;
 import javax.swing.*;
@@ -49,7 +50,9 @@ public class HeldenLauncher {
     protected void prepareEntryLoader() {
         // Patch bugs
         ErrorHandler.patchHeldenErrorHandler();
-        ModsDatenParserBugPatcher.patchModsDatenParser();
+        if (Version.versionStringToNummer(Version.getVersion()) < Version.versionStringToNummer( "5.6.0")) {
+            ModsDatenParserBugPatcher.patchModsDatenParser();
+        }
         // Resolve reflection references (after patches are deployed, before HeldenSoftware initializes anything)
         EntryCreator.getInstance();
         // Load the non-plugin component

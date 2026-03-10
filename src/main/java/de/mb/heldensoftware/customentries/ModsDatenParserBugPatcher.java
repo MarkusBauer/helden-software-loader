@@ -7,6 +7,7 @@ import java.util.HashSet;
  * ModsDatenParser.einlesenTalent does not add the new talent to TalentFactory.
  * But the editor expects this.
  * This is more a workaround than a fix (equal-named but inequal Talent break editor, but do not crash anymore)
+ * Upstream bug fixen in 5.6.0
  */
 public class ModsDatenParserBugPatcher {
 
