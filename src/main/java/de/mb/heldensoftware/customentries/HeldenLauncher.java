@@ -36,12 +36,14 @@ public class HeldenLauncher {
             // Java 9+ module API prevents us from modifying the classloader.
             if (e.getClass().getName().contains("InaccessibleObjectException")) {
                 restart(args);
-                JOptionPane.showMessageDialog(null,
-                        "Die Java-Konfiguration verbietet Modifikationen am Class-Loader. \n\n" +
-                                "Um Modifikationen zu erlauben, sind diese Start-Parameter notwendig (zwischen java und -jar):\n" +
-                                "--add-opens java.base/java.lang=ALL-UNNAMED\n\n" +
-                                "Alternativ können Sie eine ältere Java-Version einsetzen (bspw. Java 11).",
-                        "Java Configuration Error", JOptionPane.ERROR_MESSAGE);
+                try (DummyFrame frame = new DummyFrame("Java Configuration Error")) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Die Java-Konfiguration verbietet Modifikationen am Class-Loader. \n\n" +
+                                    "Um Modifikationen zu erlauben, sind diese Start-Parameter notwendig (zwischen java und -jar):\n" +
+                                    "--add-opens java.base/java.lang=ALL-UNNAMED\n\n" +
+                                    "Alternativ können Sie eine ältere Java-Version einsetzen (bspw. Java 11).",
+                            "Java Configuration Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
             throw e;
         }

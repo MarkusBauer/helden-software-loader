@@ -50,7 +50,7 @@ public class CustomEntryLoader {
             try {
                 loadSF(sf);
             } catch (NotYetSupportedException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage(), "Not yet supported", JOptionPane.ERROR_MESSAGE);
+                notYetSupported(e.getMessage());
             }
         }
 
@@ -60,7 +60,7 @@ public class CustomEntryLoader {
             try {
                 newRepresentations.add(loadRepresentation(repr));
             } catch (NotYetSupportedException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage(), "Not yet supported", JOptionPane.ERROR_MESSAGE);
+                notYetSupported(e.getMessage());
             }
         }
 
@@ -69,7 +69,7 @@ public class CustomEntryLoader {
             try {
                 loadZauber(zauber);
             } catch (NotYetSupportedException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage(), "Not yet supported", JOptionPane.ERROR_MESSAGE);
+                notYetSupported(e.getMessage());
             }
         }
 
@@ -78,13 +78,19 @@ public class CustomEntryLoader {
             try {
                 loadMyranorZauber(zauber);
             } catch (NotYetSupportedException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage(), "Not yet supported", JOptionPane.ERROR_MESSAGE);
+                notYetSupported(e.getMessage());
             }
         }
 
         // link representation with zauber (if not already done)
         for (int i = 0; i < newRepresentations.size(); i++) {
             linkRepresentationZauber(newRepresentations.get(i), config.repraesentationen.get(i));
+        }
+    }
+
+    private void notYetSupported(String msg) {
+        try (DummyFrame frame = new DummyFrame("Helden-Software-Loader")) {
+            JOptionPane.showMessageDialog(frame, msg, "Not yet supported", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -358,8 +364,10 @@ public class CustomEntryLoader {
             CustomEntryLoader entryLoader = new CustomEntryLoader();
             ConfigMerger.ConfigMergeResult config = ConfigMerger.mergeAll(configs);
             if (!config.duplicates.isEmpty()) {
-                JOptionPane.showMessageDialog(null, String.join("\n", config.duplicates),
-                        "Helden-Software-Loader: Eigene Einträge mehrfach vorhanden!", JOptionPane.WARNING_MESSAGE);
+                try (DummyFrame frame = new DummyFrame("Helden-Software-Loader")) {
+                    JOptionPane.showMessageDialog(frame, String.join("\n", config.duplicates),
+                            "Helden-Software-Loader: Eigene Einträge mehrfach vorhanden!", JOptionPane.WARNING_MESSAGE);
+                }
             }
             entryLoader.loadCustomEntries(config.config);
 
@@ -369,7 +377,9 @@ public class CustomEntryLoader {
             String msg = e.getMessage() + "\n" + e.toString();
             while ((e instanceof RuntimeException) && e.getCause() != null && !(e instanceof Loader.ConfigError))
                 e = e.getCause();
-            JOptionPane.showMessageDialog(null, msg, e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
+            try (DummyFrame frame = new DummyFrame("Helden-Software-Loader")) {
+                JOptionPane.showMessageDialog(frame, msg, e.getClass().getName(), JOptionPane.ERROR_MESSAGE);
+            }
             System.exit(-1);
         }
 
