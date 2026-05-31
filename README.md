@@ -82,7 +82,7 @@ Solltet ihr die Helden-Software versehentlich über eine alte Verknüpfung start
 (ohne dass das Plugin geladen wird), werdet ihr mit einer großen Warnung begrüßt, 
 dass manche eurer Helden nicht geladen werden können, und daher verloren gehen, 
 sobald ihr erneut speichert. In diesem Fall: Keine Panik, schließen **ohne** zu
-Speichern, und den Generator mit Plugin starten. 
+Speichern, und die Helden-Software mit Plugin starten. 
 
 
 
